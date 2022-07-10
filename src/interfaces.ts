@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { SwaggerDataType, SwaggerDataTypeFormat } from "./types";
 
 
 export interface ServerConfigs {
@@ -12,6 +13,7 @@ export interface ServerConfigs {
     };
     server: {
         port: number;
+        host?: string;
     };
     admin_users: ServerAdminUserConfig[];
     auth_user: {
@@ -45,18 +47,80 @@ export interface ServerRedisConfig {
 export interface ServerAdminUserConfig {
     username: string;
     userkey: string;
-    /**
-     * seconds
-     */
-    lifetime: number;
 }
 
 export interface ApiRoute {
     method: 'get' | 'post' | 'delete' | 'put';
     path: string;
     response: (req: Request, res: Response) => any;
+    /**
+     * for swagger
+     */
+    tag?: string;
+    /**
+     * for swagger
+     */
+    des?: string;
+    /**
+     * for swagger
+     */
+    type?: 'admin' | 'public';
+    /**
+     * for swagger
+     */
+    responses?: {
+        [k: string]: SwaggerApiResponse;
+    };
+    /**
+     * for swagger
+     */
+    parameters?: SwaggerApiParameter[];
+    /**
+     * for swagger
+     */
+    deprecated?: boolean;
 }
+export interface SwaggerApiResponse {
+    description: string;
+    content?: {
+        [k in 'application/json' | '*/*' | 'application/x-www-form-urlencoded']: {
+            schema?: {
+                $ref?: string;
+                type: SwaggerDataType;
+                items?: object;
+            };
+        };
+    };
 
+}
+export interface SwaggerApiParameter {
+    name: string;
+    summary?: string;
+    description: string;
+    example?: any;
+    /**
+     * path parameters, such as /users/{id}
+     * query parameters, such as /users?role=admin
+     * header parameters, such as X-MyHeader: Value
+     * cookie parameters, which are passed in the Cookie header, such as Cookie: debug=0; csrftoken=BUSe35dohU3O1MZvDCU
+     */
+    in: 'query' | 'path' | 'header' | 'cookie' | 'body';
+    required?: boolean;
+    type?: SwaggerDataType;
+    format?: SwaggerDataTypeFormat;
+    allowEmptyValue?: boolean;
+    /**
+     * for array type
+     */
+    items?: {
+        type?: SwaggerDataType;
+        format?: SwaggerDataTypeFormat;
+        enum?: string[];
+        defalut?: any;
+    };
+    collectionFormat?: 'multi';
+    defalut?: any;
+}
 export interface WorkflowField {
     name: string;
     type?: 'string' | 'number' | 'file';

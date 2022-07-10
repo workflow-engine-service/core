@@ -8,6 +8,7 @@ export async function InitDB() {
     Const.DB = new MongoDB();
     await Const.DB.connect();
     await Const.DB.initModels();
+    await Const.DB.addAdminUsers();
 }
 
 export async function loadConfigs() {
@@ -18,6 +19,10 @@ export async function loadConfigs() {
         }
         let configsFile = JSON.parse(fs.readFileSync(configsPath).toString());
         Const.CONFIGS = configsFile;
+        // =>set defaults for properties
+        if (!Const.CONFIGS.server.host) {
+            Const.CONFIGS.server.host = 'localhost';
+        }
         return true;
     } catch (e) {
         console.error(e);

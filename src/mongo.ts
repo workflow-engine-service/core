@@ -47,11 +47,24 @@ export class MongoDB {
         }
     }
 
-    // async dropCollection(name: DBCollection) {
-    //     try {
-    //         return await this.db.collection(name).drop();
-    //     } catch (e) {
-    //         return false;
-    //     }
-    // }
+    async addAdminUsers() {
+        console.log('adding admin users defined in configs.json ...');
+        for (const user of Const.CONFIGS.admin_users) {
+            // =>check user exist
+            if (await this.models.users.findOne({ name: user.username })) {
+                continue;
+            }
+            // =>add admin user
+            await this.models.users.create({
+                id: Math.ceil(Math.random() * 2000000) + 1000000,
+                email: `${user.username}@service.com`,
+                name: user.username,
+                secret_key: user.userkey,
+                role: '__admin__',
+                is_admin: true,
+                info: {},
+            });
+            console.log(`user '${user.username}' created!`);
+        }
+    }
 }

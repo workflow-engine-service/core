@@ -5,18 +5,19 @@
         "name": "workflow_db"
     },
     "server": {
-        "port": 8082
+        "port": 8082,
+        "host": "localhost"
     },
     "admin_users": [
         {
             "username": "admin",
-            "userkey": "349543jdsfjdsjsd8trf4jv843vj4trhtd655%%^5rhytr",
-            "lifetime": 300
+            "userkey": "349543jdsfjdsjsd8trf4jv843vj4trhtd655%%^5rhytr"
         }
     ],
     "auth_user": {
         "type": "api_based",
         "lifetime": 1000,
+        "admin_lifetime": 10000,
         "url": "http://127.0.0.1/django/api/auth-token",
         "method": "post",
         "param_name": "access_token"
