@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+
+  mongodb:
+    image: dockerhub.ir/mongo
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: workflow_db
+      TZ: "Asia/Tehran"
+      # MONGO_INITDB_ROOT_USERNAME: admin
+      # MONGO_INITDB_ROOT_PASSWORD: 12345qwer
+    volumes:
+      - ./mongo:/data/db
+    ports:
+      - 27017:27017 # remove this line on prod

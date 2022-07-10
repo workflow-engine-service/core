@@ -1,0 +1,9 @@
+{
+  "name": "cli",
+  "version": "1.0.0",
+  "main": ".dat/play.js",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^16.11.6"
+  }
+}

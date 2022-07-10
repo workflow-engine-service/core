@@ -1,0 +1,24 @@
+{
+    "mongo": {
+        "host": "127.0.0.1",
+        "port": 27017,
+        "name": "workflow_db"
+    },
+    "server": {
+        "port": 8082
+    },
+    "admin_users": [
+        {
+            "username": "admin",
+            "userkey": "349543jdsfjdsjsd8trf4jv843vj4trhtd655%%^5rhytr",
+            "lifetime": 300
+        }
+    ],
+    "auth_user": {
+        "type": "api_based",
+        "lifetime": 1000,
+        "url": "http://127.0.0.1/django/api/auth-token",
+        "method": "post",
+        "param_name": "access_token"
+    }
+}
