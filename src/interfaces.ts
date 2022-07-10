@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
-import { SwaggerDataType, SwaggerDataTypeFormat } from "./types";
+import { SwaggerApiParameter, SwaggerApiResponse } from "./swagger/interfaces";
+import { HttpStatusCode, RequestMethodType, SwaggerTagName } from "./types";
 
 
 export interface ServerConfigs {
@@ -14,13 +14,14 @@ export interface ServerConfigs {
     server: {
         port: number;
         host?: string;
+        logs_path?: string;
+        debug_mode?: boolean;
     };
     admin_users: ServerAdminUserConfig[];
     auth_user: {
-        type: 'api_based' | 'directly';
+        type: 'api_based' | 'directly' | 'dual';
         /**
          * seconds
-         * for directly
          */
         lifetime: number;
         /**
@@ -33,9 +34,14 @@ export interface ServerConfigs {
         method: 'post' | 'get' | 'put';
         /**
          * for api_based
-         * default: 'access_token'
+         * @default: 'access_token'
          */
         param_name?: string;
+        /**
+         * @default: "authentication"
+         */
+        header_name?: string,
+
     }
 }
 
@@ -46,17 +52,30 @@ export interface ServerRedisConfig {
 
 export interface ServerAdminUserConfig {
     username: string;
-    userkey: string;
+    secretkey: string;
 }
 
 export interface ApiRoute {
-    method: 'get' | 'post' | 'delete' | 'put';
+    method: RequestMethodType;
     path: string;
-    response: (req: Request, res: Response) => any;
+    // response: (req: Request, res: Response) => any;
+    functionName: string;
+    /**
+     * not need to add auth header in request
+     */
+    noAuth?: boolean;
+    /**
+     * @default v1
+     */
+    version?: 'v1';
+    /**
+     * used for auth middleware, routing
+     */
+    absPath?: string;
     /**
      * for swagger
      */
-    tag?: string;
+    tags?: SwaggerTagName[];
     /**
      * for swagger
      */
@@ -79,47 +98,11 @@ export interface ApiRoute {
      * for swagger
      */
     deprecated?: boolean;
-}
-export interface SwaggerApiResponse {
-    description: string;
-    content?: {
-        [k in 'application/json' | '*/*' | 'application/x-www-form-urlencoded']: {
-            schema?: {
-                $ref?: string;
-                type: SwaggerDataType;
-                items?: object;
-            };
-        };
-    };
-
-}
-export interface SwaggerApiParameter {
-    name: string;
-    summary?: string;
-    description: string;
-    example?: any;
     /**
-     * path parameters, such as /users/{id}
-     * query parameters, such as /users?role=admin
-     * header parameters, such as X-MyHeader: Value
-     * cookie parameters, which are passed in the Cookie header, such as Cookie: debug=0; csrftoken=BUSe35dohU3O1MZvDCU
+     * for swagger
+     * select interfaces, types of source code
      */
-    in: 'query' | 'path' | 'header' | 'cookie' | 'body';
-    required?: boolean;
-    type?: SwaggerDataType;
-    format?: SwaggerDataTypeFormat;
-    allowEmptyValue?: boolean;
-    /**
-     * for array type
-     */
-    items?: {
-        type?: SwaggerDataType;
-        format?: SwaggerDataTypeFormat;
-        enum?: string[];
-        defalut?: any;
-    };
-    collectionFormat?: 'multi';
-    defalut?: any;
+    usedDefinitions?: string[];
 }
 export interface WorkflowField {
     name: string;
@@ -165,4 +148,16 @@ export interface WorkflowProcessField {
     meta?: {
 
     };
+}
+
+export interface APIResponse<T = any> {
+    success: boolean;
+    message?: string;
+    data: T;
+    responseTime?: number;
+    statusCode: HttpStatusCode;
+    paginate?: {
+        //TODO:
+    },
+    error?: any;
 }

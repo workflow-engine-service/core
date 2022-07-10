@@ -1,8 +1,10 @@
 import mongoose from "mongoose";
 import { Const } from "./const";
-import { DeployedWorkflowModel, UserModel, WorkflowProcessModel } from "./models/models";
+import { DeployedWorkflowModel, LogModel, SessionModel, UserModel, WorkflowProcessModel } from "./models/models";
 import * as fs from 'fs';
 import * as path from 'path';
+import { debugLog, errorLog } from "./common";
+import { Auth } from "./auth";
 
 export class MongoDB {
     db: mongoose.Connection;
@@ -10,8 +12,10 @@ export class MongoDB {
         users?: mongoose.Model<UserModel>;
         workflows?: mongoose.Model<DeployedWorkflowModel>;
         processes?: mongoose.Model<WorkflowProcessModel>;
+        logs?: mongoose.Model<LogModel>;
+        sessions?: mongoose.Model<SessionModel>;
     } = {};
-    modelNames = ['users', 'workflows', 'processes'];
+    modelNames = ['users', 'workflows', 'processes', 'logs', 'sessions'];
     constructor() {
 
     }
@@ -38,17 +42,17 @@ export class MongoDB {
         for (const name of this.modelNames) {
             let filePath = path.join(path.dirname(__filename), 'models', name + '.js');
             if (!fs.existsSync(filePath)) {
-                console.warn(`not found model '${name}'`);
+                errorLog('db', `not found model '${name}'`);
                 continue;
             }
             let modelFile = await import(filePath);
             this.models[name] = await modelFile['getSchema']();
-            console.log(`model '${name}' deployed`);
+            debugLog('db', `model '${name}' deployed`);
         }
     }
 
     async addAdminUsers() {
-        console.log('adding admin users defined in configs.json ...');
+        debugLog('db', 'adding admin users defined in configs.json ...');
         for (const user of Const.CONFIGS.admin_users) {
             // =>check user exist
             if (await this.models.users.findOne({ name: user.username })) {
@@ -59,12 +63,12 @@ export class MongoDB {
                 id: Math.ceil(Math.random() * 2000000) + 1000000,
                 email: `${user.username}@service.com`,
                 name: user.username,
-                secret_key: user.userkey,
+                secret_key: await Auth.encryptPassword(user.secretkey),
                 role: '__admin__',
                 is_admin: true,
                 info: {},
             });
-            console.log(`user '${user.username}' created!`);
+            debugLog('db', `user '${user.username}' created!`);
         }
     }
 }

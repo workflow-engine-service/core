@@ -6,6 +6,7 @@ const metaDataSchema = new mongoose.Schema<WorkflowProcessModel, WorkflowProcess
     workflow_version: Number,
     current_state: String,
     field_values: Array,
+    history: Array,
 });
 
 export async function getSchema() {

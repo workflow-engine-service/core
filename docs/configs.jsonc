@@ -17,22 +17,24 @@
     // required
     "server": {
         "port": 8082,
-        "host": "127.0.0.1"
+        "host": "127.0.0.1",
+        "logs_path": "./logs",
+        "debug_mode": true
     },
     // required
     "admin_users": [
         {
             "username": "admin",
-            "userkey": "349543jdsfjdsjsd8trf4jv843vj4trhtd655%%^5rhytr"
+            "secretkey": "349543jdsfjdsjsd8trf4jv843vj4trhtd655%%^5rhytr"
         }
     ],
     // required
     "auth_user": {
         "type": "api_based", // api_based | directly
-        "lifetime": 100, // for directly (sec)
-        "admin_lifetime": 1000, // for call admin apis
+        "lifetime": 100, // (sec)
         "url": "http://127.0.0.1/django/api/auth-token", // for api_based
         "method": "post", // for api_based
+        "header_name": "Authorization", // default
         "param_name": "access_token" // for api_based
         // (api_based) send a request with one param and get response user id or user name
         // (directly) get access_token of user and validate it

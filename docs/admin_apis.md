@@ -13,24 +13,6 @@
 - secret_key?: string (for auth user directly)
 - info?: object
 
-## /api/v1/admin/token [POST]
-* parameters:
-- username: string
-- userkey: string
-* returns:
-- access_token: string
-- refresh_token: string
-- lifetime: number (seconds)
-- expired_token: number (timestamp ms)
-## /api/v1/admin/refresh-token [POST]
-* parameters:
-- refresh_token: string
-* returns:
-- access_token: string
-- refresh_token: string
-- lifetime: number (seconds)
-- expired_token: number (timestamp ms)
-
 ## /api/v1/admin/deploy-workflow [POST]
 * parameters:
 - code: json

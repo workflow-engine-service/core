@@ -38,7 +38,7 @@ get a process hash instance and return states of workflow with transitions by fi
 - access_token: string
 - refresh_token: string
 - lifetime: number (seconds)
-- expired_token: number (timestamp ms)
+- expired_time: number (timestamp ms)
 ## /api/v1/user/refresh-token [POST]
 > for directly method auth
 * parameters:
@@ -47,4 +47,4 @@ get a process hash instance and return states of workflow with transitions by fi
 - access_token: string
 - refresh_token: string
 - lifetime: number (seconds)
-- expired_token: number (timestamp ms)
+- expired_time: number (timestamp ms)
