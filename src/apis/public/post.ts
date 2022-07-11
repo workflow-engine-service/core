@@ -1,9 +1,11 @@
+import { DeployedWorkflowModel } from "../../models/models";
 import { Auth } from "../../auth";
-import { infoLog } from "../../common";
+import { generateString, infoLog } from "../../common";
 import { Const } from "../../const";
 import { HttpStatusCode } from "../../types";
 import { BaseApi } from "../base";
 import { UserTokenResponse } from "./interfaces";
+import mongoose from "mongoose";
 
 export function classApi() {
     return PublicPostApi;
@@ -36,6 +38,48 @@ export class PublicPostApi extends BaseApi {
     }
     /********************************** */
     async createProcess() {
+        // =>get params
+        let name = this.param('name');
+        let version = this.param('version');
+        let workflow: DeployedWorkflowModel;
+        // =>find workflow by name, version
+        if (version) {
+            workflow = await Const.DB.models.workflows.findOne({
+                name,
+                version,
+            });
+        }
+        // =>find workflow by name, lastest version
+        else {
+            let workflows = await Const.DB.models.workflows.find({
+                name,
+            }).sort({ version: -1 }).limit(1);
+            if (workflows.length > 0) {
+                workflow = workflows[0];
+            }
+        }
+        // =>if not found workflow
+        if (!workflow) return this.error404(`not found such workflow '${name}:${version}'`);
+        // =>check access create from this workflow
+        if (!this.checkUserRoleHasAccess(workflow.settings.create_access_roles)) {
+            return this.error403(`no access to create process from '${workflow.name}:${workflow.version}' workflow`);
+        }
+        // =>create new process
+        let res = await Const.DB.models.processes.create({
+            workflow_name: name,
+            workflow_version: workflow.version,
+            current_state: workflow.start_state,
+            field_values: [],
+            history: [],
+            workflow: workflow,
+            created_at: new Date().getTime(),
+            created_by: this.request.user().id,
+        });
+
+        return this.response(res);
+    }
+    /********************************** */
+    async doAction() {
         //TODO:
     }
 }

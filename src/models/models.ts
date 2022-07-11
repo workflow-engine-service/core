@@ -8,22 +8,27 @@ export interface DeployedWorkflowModel {
     end_state: string;
     settings: {
         auto_delete_after_end?: boolean;
+        create_access_roles?: string[];
     };
     fields: WorkflowField[];
     states: WorkflowState[];
+
+    _id: string;
 }
 
 export interface WorkflowProcessModel {
     /**
      * hash id
      */
-    id: string;
+    _id: string;
     workflow_name?: string;
     workflow_version?: number;
     current_state: string;
     field_values?: WorkflowProcessField[];
     history: WorkflowProcessHistoryModel[];
+    workflow: DeployedWorkflowModel;
     created_at: number;
+    created_by: number;
     updated_at: number;
 }
 

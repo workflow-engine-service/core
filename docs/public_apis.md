@@ -14,19 +14,19 @@ get a process hash instance and return states of workflow with transitions by fi
 * parameters
     - process_hash: string
 
-## /api/v1/workflow/state-info [GET]
+## /api/v1/workflow/state-info [GET] [DONE]
 * parameters
-    - process_hash: string
+    - process_id: string
 
 ## /api/v1/workflow/actions-info [GET]
 > return actions that access this user
 * parameters
-    - process_hash: string
+    - process_id: string
 
 ## /api/v1/workflow/action [POST]
 - parameters
     - state_action: string
-    - process_hash: string
+    - process_id: string
     - message?: string
     - fields?: object
     - files?: file[]

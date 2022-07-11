@@ -20,4 +20,21 @@ export class PublicGetApi extends BaseApi {
         }
         return this.response(urls);
     }
+    /******************************* */
+    async getStateInfo() {
+        let processId = this.param('process_id');
+        // =>find process by id
+        let process = await Const.DB.models.processes.findById(processId).populate('workflow');
+        if (!process) return this.error404();
+        // console.log(process, process.workflow.name)
+        // =>find current state info
+        let stateInfo = process.workflow.states.find(i => i.name === process.current_state);
+        // =>check access state
+        if (!this.checkUserRoleHasAccess(stateInfo.access_role)) {
+            return this.error403('no access to state info');
+        }
+
+
+        return this.response(stateInfo);
+    }
 }

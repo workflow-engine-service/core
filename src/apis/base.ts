@@ -108,4 +108,16 @@ export class BaseApi {
     error(code: HttpStatusCode = HttpStatusCode.HTTP_400_BAD_REQUEST, data?: string | object) {
         return this.response(data, code);
     }
+    /*************************************** */
+    /*************************************** */
+    /*************************************** */
+    checkUserRoleHasAccess(roles: string[]) {
+        if (!roles) {
+            roles = ['_all_'];
+        }
+        if (!roles.includes('_all_') && !roles.includes(this.request.user().role)) {
+            return false;
+        }
+        return true;
+    }
 }

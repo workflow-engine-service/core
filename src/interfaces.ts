@@ -86,6 +86,11 @@ export interface ApiRoute {
     des?: string;
     /**
      * for swagger
+     * long description
+     */
+    description?: string;
+    /**
+     * for swagger
      */
     type?: 'admin' | 'public';
     /**
@@ -176,6 +181,11 @@ export interface WorkflowDescriptor {
      * @default 1
      */
     version?: number;
+    /**
+     * user roles that access to create process from this workflow
+     * @default ['_all_']
+     */
+    create_access_roles?: string[];
     /**
      * default same as workflow name (for interfaces)
      * 

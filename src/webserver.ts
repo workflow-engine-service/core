@@ -16,19 +16,20 @@ export namespace WebServer {
             app.use(express.json({ limit: '400kb', strict: false }));
             await loadMiddlewares();
             WebRoutes.routes(app);
-            // =>init swagger, if allowed
-            if (!Const.CONFIGS.server.swagger_disabled) {
-                await Swagger.init(app);
-            }
 
-            // =>init wiki, if allowed
-            if (!Const.CONFIGS.server.wiki_disabled) {
-                await Wiki.init(app);
-            }
 
-            app.listen(Const.CONFIGS.server.port, () => {
-                console.log(`WorkFlow Engine Service listening on port ${Const.CONFIGS.server.port}!`),
-                    res(true);
+            app.listen(Const.CONFIGS.server.port, async () => {
+                console.log(`WorkFlow Engine Service listening on port ${Const.CONFIGS.server.port}!`);
+                // =>init swagger, if allowed
+                if (!Const.CONFIGS.server.swagger_disabled) {
+                    await Swagger.init(app);
+                }
+
+                // =>init wiki, if allowed
+                if (!Const.CONFIGS.server.wiki_disabled) {
+                    await Wiki.init(app);
+                }
+                res(true);
             });
         });
 

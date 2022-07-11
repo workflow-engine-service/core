@@ -6,6 +6,9 @@
         "approve",
         "reject"
     ],
+    "create_access_roles": [
+        "_all_"
+    ],
     "auto_delete_after_end": true,
     "start_state": "enter_info",
     "end_state": "finish",

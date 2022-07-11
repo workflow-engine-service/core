@@ -120,7 +120,7 @@ export namespace Swagger {
             apiPath[api.method.toLowerCase()] = {
                 tags: api.tags || [],
                 summary: api.des,
-                description: api.des,
+                description: api.description || api.des,
                 consumes: [
                     "application/json",
                 ],

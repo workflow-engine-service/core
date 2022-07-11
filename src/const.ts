@@ -3,7 +3,7 @@ import { MongoDB } from "./mongo";
 
 export namespace Const {
 
-    export const VERSION = '0.20';
+    export const VERSION = '0.22';
 
     export let CONFIGS: ServerConfigs;
 
