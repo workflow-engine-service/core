@@ -70,7 +70,21 @@ export namespace Swagger {
             produces: [
                 "application/json"
             ],
-            "definitions": {},
+            definitions: {},
+            components: {},
+            securityDefinitions: {
+                // "Bearer": {
+                //     "type": "apiKey",
+                //     "name": "Authorization",
+                //     "in": "header"
+                // },
+                "local_api_key": {
+                    "type": "apiKey",
+                    "name": Const.CONFIGS.auth_user.header_name,
+                    "in": "header"
+                }
+            },
+
         }
         // =>get all apis
         let apis = WebRoutes.getRoutes();
@@ -116,8 +130,14 @@ export namespace Swagger {
                 deprecated: api.deprecated,
                 parameters: api.parameters || [],
                 responses: api.responses || {},
-
+                security: [],
             };
+            // =>add security option, if need
+            if (!api.noAuth) {
+                apiPath[api.method.toLowerCase()].security = [{
+                    local_api_key: [],
+                }];
+            }
             // =>add definitions
             if (api.usedDefinitions) {
                 for (const def of api.usedDefinitions) {
@@ -166,6 +186,7 @@ export namespace Swagger {
                 path.resolve('src', 'document', 'interfaces.ts'),
                 path.resolve('src', 'types.ts'),
                 path.resolve('src', 'interfaces.ts'),
+                path.resolve('src', 'models', 'models.ts'),
                 path.resolve('src', 'apis', 'public', 'interfaces.ts'),
             ],
             {

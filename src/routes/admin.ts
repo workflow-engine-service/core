@@ -3,7 +3,7 @@ import { ApiRoute } from "src/interfaces";
 export const adminApis: ApiRoute[] = [
     {
         method: 'POST',
-        path: 'deploy-workflow',
+        path: 'workflow/deploy',
         functionName: 'deployWorkflow',
         tags: ['admin', 'workflow',],
         des: 'get a json code and deploy it as workflow',
@@ -14,12 +14,20 @@ export const adminApis: ApiRoute[] = [
         },
         parameters: [
             {
-                name: 'code',
-                description: 'json code of your workflow that must deployed',
+                name: 'request',
                 in: 'body',
                 required: true,
                 type: 'object',
-            }
+                schema: {
+                    type: "object",
+                    properties: {
+                        code: {
+                            $ref: "#/definitions/WorkflowDescriptor"
+                        },
+                    },
+                }
+            },
         ],
+        usedDefinitions: ['WorkflowDescriptor']
     },
 ];

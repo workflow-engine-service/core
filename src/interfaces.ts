@@ -168,14 +168,24 @@ export interface APIResponse<T = any> {
 
 
 export interface WorkflowDescriptor {
+    /**
+     * @default sample_workflow
+     */
     workflow_name: string;
+    /**
+     * @default 1
+     */
     version?: number;
     /**
      * default same as workflow name (for interfaces)
+     * 
+     * 
      */
     workflow_class_name?: string;
     /**
      * these actions are in all states (for interfaces) 
+     * 
+     * 
      */
     shared_actions?: string[];
     auto_delete_after_end?: boolean;

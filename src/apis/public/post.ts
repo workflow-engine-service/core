@@ -34,4 +34,8 @@ export class PublicPostApi extends BaseApi {
         }
         return this.error(HttpStatusCode.HTTP_401_UNAUTHORIZED);
     }
+    /********************************** */
+    async createProcess() {
+        //TODO:
+    }
 }

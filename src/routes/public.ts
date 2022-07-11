@@ -49,5 +49,43 @@ export const publicApis: ApiRoute[] = [
                 description: 'username or secret key is wrong or invalid',
             }
         }
+    },
+    {
+        method: 'POST',
+        path: 'workflow/create',
+        functionName: 'createProcess',
+        tags: ['workflow'],
+        des: 'create new process from a workflow',
+        parameters: [
+            {
+                name: 'request',
+                in: 'body',
+                required: true,
+                type: 'object',
+                schema: {
+                    type: "object",
+                    properties: {
+                        name: {
+                            type: "string",
+                            default: 'sample_workflow'
+                        },
+                        version: {
+                            type: "string",
+                            default: '1',
+                            required: false,
+                        },
+                    },
+                }
+            },
+        ],
+        responses: {
+            '200': {
+                description: 'success to create new process from a workflow and return process info (includes process id)',
+                schema: {
+                    $ref: "#/definitions/WorkflowProcessModel"
+                }
+            }
+        },
+        usedDefinitions: ['WorkflowProcessModel'],
     }
 ];

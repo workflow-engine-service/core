@@ -1,4 +1,4 @@
-import { LogMode } from "src/types";
+import { LogMode } from "../types";
 import { WorkflowField, WorkflowProcessField, WorkflowState } from "../interfaces";
 
 export interface DeployedWorkflowModel {

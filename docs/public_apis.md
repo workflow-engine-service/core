@@ -1,7 +1,9 @@
-# Public Apis
+# Public Apis [deprecated]
 
 > on all apis in header, you can set `Authorization` with user token that validate by app server, after that workflow service, send user token to app server or directly and validate user
 
+## /api/v1/workflow/create
+create new process from a workflow
 ## /api/v1/workflow/list
 get list of workflow instances (processes) for this user
 
