@@ -5,7 +5,7 @@
     "shared_actions": [
         "approve",
         "reject"
-    ], // thease actions are in all states (for interfaces) 
+    ], // these actions are in all states (for interfaces) 
     "auto_delete_after_end": true,
     "auto_start": {
         "event": "user_add" // events: user_add, user_emove, user_update

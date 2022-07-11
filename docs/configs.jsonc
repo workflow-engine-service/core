@@ -19,7 +19,11 @@
         "port": 8082,
         "host": "127.0.0.1",
         "logs_path": "./logs",
-        "debug_mode": true
+        "debug_mode": true,
+        "wiki_base_url": "/wiki",
+        "wiki_disabled": false,
+        "swagger_base_url": "/api-docs",
+        "swagger_disabled": false
     },
     // required
     "admin_users": [

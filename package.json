@@ -5,7 +5,8 @@
     "scripts": {
         "build": "tsc -b tsconfig.json",
         "start": "tsc -b tsconfig.json; node --trace-warnings build/index.js ",
-        "dev": "concurrently \"tsc -b -w tsconfig.json\" \"nodemon --ext 'js' --ignore 'storage' --trace-warnings build/index.js parse\""
+        "dev": "concurrently \"tsc -b -w tsconfig.json\" \"nodemon --ext 'js' --ignore 'storage' --trace-warnings build/index.js parse\"",
+        "wiki": "nodewiki --git --local --port=9876"
     },
     "private": true,
     "dependencies": {
@@ -15,7 +16,9 @@
         "cli-progress": "^3.11.1",
         "cors": "^2.8.5",
         "express": "^4.18.1",
+        "marked": "^4.0.17",
         "mongoose": "^6.3.6",
+        "nodewiki": "^0.1.2",
         "source-map-support": "^0.5.21",
         "swagger-ui-express": "^4.4.0",
         "tslib": "^2.2.0",

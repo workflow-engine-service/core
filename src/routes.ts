@@ -1,4 +1,4 @@
-import { Express } from 'express';
+import { Express, static as expressStatic } from 'express';
 import * as path from 'path';
 import * as fs from 'fs';
 import { ApiRoute } from './interfaces';
@@ -11,6 +11,7 @@ import { Const } from './const';
 
 export namespace WebRoutes {
     let basePath = '/api/';
+    export let assetsBaseUrl = '/assets';
 
     export function routes(app: Express) {
         // =>get all apis
@@ -42,6 +43,13 @@ export namespace WebRoutes {
                 coreRequest.response(response, status);
             });
         }
+        // =>serve wiki
+        if (!Const.CONFIGS.server.wiki_disabled) {
+            app.get(Const.CONFIGS.server.wiki_base_url, (req, res) => {
+                return res.sendFile(path.join(__dirname, '..', 'public', 'pages', 'wiki.html'));
+            });
+        }
+        app.use(assetsBaseUrl, expressStatic(path.join(__dirname, '..', 'public', 'assets')));
         // app.get('/', (req, res) => {
         //     return res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
         // });

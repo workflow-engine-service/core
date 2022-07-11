@@ -1,4 +1,4 @@
-import { SwaggerApiParameter, SwaggerApiResponse } from "./swagger/interfaces";
+import { SwaggerApiParameter, SwaggerApiResponse } from "./document/interfaces";
 import { HttpStatusCode, RequestMethodType, SwaggerTagName } from "./types";
 
 
@@ -16,6 +16,10 @@ export interface ServerConfigs {
         host?: string;
         logs_path?: string;
         debug_mode?: boolean;
+        wiki_base_url?: string;
+        wiki_disabled?: boolean;
+        swagger_disabled?: boolean;
+        swagger_base_url?: string;
     };
     admin_users: ServerAdminUserConfig[];
     auth_user: {
@@ -160,4 +164,27 @@ export interface APIResponse<T = any> {
         //TODO:
     },
     error?: any;
+}
+
+
+export interface WorkflowDescriptor {
+    workflow_name: string;
+    version?: number;
+    /**
+     * default same as workflow name (for interfaces)
+     */
+    workflow_class_name?: string;
+    /**
+     * these actions are in all states (for interfaces) 
+     */
+    shared_actions?: string[];
+    auto_delete_after_end?: boolean;
+    auto_start?: {
+        event: 'user_add' | 'user_emove' | 'user_update';
+        //TODO:
+    };
+    start_state: string;
+    end_state: string;
+    fields?: WorkflowField[];
+    states: WorkflowState[];
 }

@@ -78,6 +78,7 @@ export namespace Swagger {
         // console.log(apis)
         // =>add all tags
         for (const api of apis) {
+            if (!api.tags) continue;
             for (const tag of api.tags) {
                 // =>ignore duplicate tags
                 if (swagger.tags.find(i => i.name === tag)) continue;
@@ -103,7 +104,7 @@ export namespace Swagger {
             }
             // =>add by api method
             apiPath[api.method.toLowerCase()] = {
-                tags: api.tags,
+                tags: api.tags || [],
                 summary: api.des,
                 description: api.des,
                 consumes: [
@@ -146,12 +147,12 @@ export namespace Swagger {
             const swaggerUi = require('swagger-ui-express');
             const swaggerDocument = await generate();
 
-            app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
+            app.use(Const.CONFIGS.server.swagger_base_url, swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
                 explorer: true,
                 customCss: '.swagger-ui .topbar .topbar-wrapper .link { display: none }'
             }));
-            app.get('/api-docs', swaggerUi.setup(swaggerDocument));
-            infoLog('swagger', `swagger docs now is in '/api-docs'`);
+            app.get(Const.CONFIGS.server.swagger_base_url, swaggerUi.setup(swaggerDocument));
+            infoLog('swagger', `swagger docs now is in '${Const.CONFIGS.server.swagger_base_url}'`);
         } catch (e) {
             errorLog('swagger', 'can not init swagger!');
             errorLog('swagger', e);
@@ -162,7 +163,7 @@ export namespace Swagger {
         // console.log(path.join(path.dirname(__filename), '..', '..', 'src'))
         const program = TJS.getProgramFromFiles(
             [
-                path.resolve('src', 'swagger', 'interfaces.ts'),
+                path.resolve('src', 'document', 'interfaces.ts'),
                 path.resolve('src', 'types.ts'),
                 path.resolve('src', 'interfaces.ts'),
                 path.resolve('src', 'apis', 'public', 'interfaces.ts'),

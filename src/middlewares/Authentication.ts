@@ -15,6 +15,13 @@ export function middleware() {
 export class Authentication extends Middleware {
 
    async handle(req: Request, res: Response) {
+      // =>check for exclude urls
+      let excludeUrls = [Const.CONFIGS.server.swagger_base_url, Const.CONFIGS.server.wiki_base_url, WebRoutes.assetsBaseUrl];
+      for (const url of excludeUrls) {
+         if (req.path.startsWith(url)) {
+            return true;
+         }
+      }
       // =>check for exclude apis
       let apis = WebRoutes.getRoutes();
       for (const api of apis) {

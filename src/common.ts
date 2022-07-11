@@ -29,6 +29,12 @@ export async function loadConfigs() {
         if (!Const.CONFIGS.auth_user.header_name) {
             Const.CONFIGS.auth_user.header_name = 'Authorization';
         }
+        if (!Const.CONFIGS.server.wiki_base_url) {
+            Const.CONFIGS.server.wiki_base_url = '/wiki';
+        }
+        if (!Const.CONFIGS.server.swagger_base_url) {
+            Const.CONFIGS.server.swagger_base_url = '/api-docs';
+        }
         return true;
     } catch (e) {
         console.error(e);

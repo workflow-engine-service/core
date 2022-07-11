@@ -1,0 +1,98 @@
+<html dir="ltr">
+
+<head>
+    <title>Workflow Engine Wiki</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/assets/css/paper.min.css">
+    <link rel="stylesheet" href="/assets/wiki/main.css">
+</head>
+
+<body>
+    <div id="main-container">
+        <div class="row">
+            <div class="sm-12 md-8 col ">
+                <div class="paper">
+                    <div v-html="currentDocument" class="document"></div>
+                    <hr>
+                    <ul>
+                        <li> last update: {{last_update}}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="sm-12 md-4 col ">
+                <div class="paper">
+                    <h4 class="sidebar-title">Workflow Engine Wiki</h4>
+
+                    <div class="collapsible-body">
+                        <ul class="menu">
+                            <li v-for="item in menuItems">
+                                <a @click="showDocument(item)" href="#">{{item}}</a>
+                            </li>
+
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script type="text/javascript" src="/assets/js/vue.min.js"></script>
+    <script src="/assets/js/axios.min.js"></script>
+    <script>
+        let vm = new Vue({
+            el: '#main-container',
+            data: {
+                menuItems: [],
+                urls: { 'wiki': '/' },
+                currentDocument: '',
+                last_update: '',
+            },
+            created: async function () {
+                await this.loadUrls();
+                // =>load menu items
+                await this.getMenuItems();
+                // =>load index.md document
+                this.showDocument('index');
+            },
+            methods: {
+                async loadUrls() {
+                    try {
+                        let response = await axios
+                            .get(`/api/v1/urls`);
+                        let res = response.data;
+                        console.log('response:', res);
+                        this.urls = res.data;
+                    } catch (e) {
+                    }
+                },
+                async getMenuItems() {
+                    try {
+                        let response = await axios
+                            .get(`${this.urls['wiki']}/api/menu`);
+                        let res = response.data;
+                        console.log('response:', res);
+                        this.menuItems = res.map(i => i.replace('.md', ''));
+                    } catch (e) {
+                    }
+                },
+                async showDocument(page) {
+                    try {
+                        let response = await axios
+                            .post(`${this.urls['wiki']}/api/document`, { page: `${page}.md` });
+                        let res = response.data;
+                        console.log('response:', res);
+                        this.currentDocument = res.document;
+                        this.last_update = res.last_update;
+                    } catch (e) {
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

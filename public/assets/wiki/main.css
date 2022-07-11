@@ -1,0 +1,24 @@
+.menu li {
+
+    font-size: 1.1em;
+    padding: 10px 0;
+    text-decoration: none;
+    text-transform: uppercase;
+
+}
+
+.document {
+    overflow: hidden;
+}
+
+.document h1 {
+    font-size: 1.4em;
+}
+
+.document h2 {
+    font-size: 1.3em;
+}
+
+.document h3 {
+    font-size: 1.2em;
+}

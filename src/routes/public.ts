@@ -2,6 +2,12 @@ import { ApiRoute } from "src/interfaces";
 
 export const publicApis: ApiRoute[] = [
     {
+        method: 'GET',
+        path: 'urls',
+        functionName: 'urls',
+        noAuth: true,
+    },
+    {
         method: 'POST',
         path: 'token',
         functionName: 'token',

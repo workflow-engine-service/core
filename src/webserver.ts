@@ -3,8 +3,9 @@ import { Const } from './const';
 import { WebRoutes } from './routes';
 import * as path from 'path';
 import * as fs from 'fs';
-import { Swagger } from './swagger/swagger';
+import { Swagger } from './document/swagger';
 import { debugLog } from './common';
+import { Wiki } from './document/wiki';
 
 export namespace WebServer {
     let app: Express;
@@ -12,10 +13,18 @@ export namespace WebServer {
         return new Promise(async (res) => {
 
             app = express();
-            app.use(express.json());
+            app.use(express.json({ limit: '400kb', strict: false }));
             await loadMiddlewares();
             WebRoutes.routes(app);
-            Swagger.init(app);
+            // =>init swagger, if allowed
+            if (!Const.CONFIGS.server.swagger_disabled) {
+                await Swagger.init(app);
+            }
+
+            // =>init wiki, if allowed
+            if (!Const.CONFIGS.server.wiki_disabled) {
+                await Wiki.init(app);
+            }
 
             app.listen(Const.CONFIGS.server.port, () => {
                 console.log(`WorkFlow Engine Service listening on port ${Const.CONFIGS.server.port}!`),
