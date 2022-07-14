@@ -121,7 +121,7 @@ export namespace Swagger {
                 tags: api.tags || [],
                 summary: api.des,
                 description: api.description || api.des,
-                consumes: [
+                consumes: api.consumes || [
                     "application/json",
                 ],
                 produces: [

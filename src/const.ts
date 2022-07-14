@@ -1,9 +1,11 @@
 import { ServerConfigs } from "./interfaces";
 import { MongoDB } from "./mongo";
+import { Redis } from "./redis";
+import { MiddlewareName } from "./types";
 
 export namespace Const {
 
-    export const VERSION = '0.22';
+    export const VERSION = '0.30';
 
     export let CONFIGS: ServerConfigs;
 
@@ -13,5 +15,7 @@ export namespace Const {
 
     export let CoreRequestKey = '_.wf.core_request';
 
-    export let MIDDLEWARES = ['RequestInit', 'Authentication'];
+    export let MIDDLEWARES: MiddlewareName[] = ['RequestInit', 'Authentication', 'RoutingResolver'];
+
+    export let REDIS_INSTANCES: Redis[] = [];
 }

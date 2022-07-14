@@ -3,13 +3,14 @@ import { Const } from "./const";
 import { MongoDB } from "./mongo";
 import { WebServer } from "./webserver";
 import * as fs from 'fs';
+import { Redis } from "./redis";
 
 
 
 async function main() {
-    console.log('------------------------------');
+    console.log('---------------------------------------------------');
     console.log(`WorkFlow Engine Service - Verison ${Const.VERSION}`);
-    console.log('------------------------------');
+    console.log('---------------------------------------------------');
     // =>load configs
     if (!await loadConfigs()) {
         console.log('bad server configs');
@@ -21,6 +22,8 @@ async function main() {
     await InitDB();
     // =>init webserver
     await WebServer.initWebServer();
+    // =>init redis instances
+    await Redis.initRedisInstances();
 
     return true;
 }

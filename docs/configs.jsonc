@@ -29,7 +29,8 @@
     "admin_users": [
         {
             "username": "admin",
-            "secretkey": "349543jdsfjdsjsd8trf4jv843vj4trhtd655%%^5rhytr"
+            "secretkey": "349543jdsfjdsjsd8trf4jv843vj4trhtd655%%^5rhytr",
+            "role": "admin"
         }
     ],
     // required

@@ -13,4 +13,13 @@ services:
     volumes:
       - ./mongo:/data/db
     ports:
-      - 27017:27017 # remove this line on prod
+      - 27017:27017
+  redis:
+    image: redis
+    restart: always
+    # command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - "6379:6379"

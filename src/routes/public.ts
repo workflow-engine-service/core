@@ -90,45 +90,40 @@ export const publicApis: ApiRoute[] = [
     },
     {
         method: 'POST',
+        includeMiddlewares: ['FormDataParser'],
         path: 'workflow/action',
         functionName: 'doAction',
         tags: ['workflow'],
         des: 'call an access action of process from a workflow',
-        description: `you can send json object without uploading files or send form data with uploading files.\n you can send 'files' just as form data not json object`,
+        description: `you can send form data with uploading files.`,
+        consumes: ['multipart/form-data'],
         parameters: [
             {
-                name: 'request',
-                in: 'body',
+                name: 'state_action',
+                in: 'formData',
                 required: true,
-                type: 'object',
-                schema: {
-                    type: "object",
-                    properties: {
-                        start_state: {
-                            type: "string",
-                            default: 'start'
-                        },
-                        process_id: {
-                            type: "string",
-                            default: '345ewt4345'
-                        },
-                        message: {
-                            type: "string",
-                            default: 'just message',
-                            required: false,
-                        },
-                        fields: {
-                            type: "object",
-                            default: {},
-                            required: false,
-                        },
-                        files: {
-                            type: "array",
-                            default: [],
-                            required: false,
-                        },
-                    },
-                }
+                type: 'string',
+                defalut: 'approve',
+            },
+            {
+                name: 'process_id',
+                in: 'formData',
+                required: true,
+                type: 'string',
+                defalut: '62cbc3933626b821f73cb9a2',
+            },
+            {
+                name: 'message',
+                in: 'formData',
+                required: false,
+                type: 'string',
+                defalut: 'hello world',
+            },
+            {
+                name: 'field.[fieldName]',
+                in: 'formData',
+                required: false,
+                description: `you can add some need fields like files that name starts with 'field.'`
             },
         ],
         // responses: {

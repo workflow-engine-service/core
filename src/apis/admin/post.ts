@@ -9,6 +9,7 @@ export function classApi() {
 export class AdminPostApi extends BaseApi {
     async deployWorkflow() {
         let code = this.param<WorkflowDescriptor>('code', undefined, true);
+
         // =>validate workflow code
         let validate = await this.validateWorkflowCode(code);
         if (validate[1]) {
@@ -40,8 +41,27 @@ export class AdminPostApi extends BaseApi {
     /************************************** */
     async validateWorkflowCode(code: WorkflowDescriptor): Promise<[WorkflowDescriptor, string]> {
         if (!code) return [code, 'undefined code'];
+        // =>check workflow name
+        if (!code.workflow_name || typeof code.workflow_name !== 'string') return [code, 'bad workflow name'];
+        // =>normalize code
         if (!code.version) code.version = 1;
         if (!code.fields) code.fields = [];
+        // =>check has start state
+        if (!code.start_state || typeof code.start_state !== 'string') return [code, 'bad start state'];
+        // =>check has end state
+        if (!code.end_state || typeof code.end_state !== 'string') return [code, 'bad end state'];
+        // =>check for at least one state
+        if (!code.states || !Array.isArray(code.states) || code.states.length < 1) {
+            return [code, 'bad define states'];
+        }
+        // =>check for exist start state
+        if (!code.states.find(i => i.name === code.start_state)) {
+            return [code, 'not found start state'];
+        }
+        // =>check for exist end state
+        if (!code.states.find(i => i.name === code.end_state)) {
+            return [code, 'not found end state'];
+        }
         //TODO:
         return [code, undefined];
     }

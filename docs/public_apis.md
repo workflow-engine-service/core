@@ -23,13 +23,18 @@ get a process hash instance and return states of workflow with transitions by fi
 * parameters
     - process_id: string
 
-## /api/v1/workflow/action [POST]
+## /api/v1/workflow/action [POST] [FORMDATA]
 - parameters
     - state_action: string
     - process_id: string
     - message?: string
-    - fields?: object
-    - files?: file[]
+    - field.[name]?: file|string|number
+
+## /api/v1/workflow/short-action [POST]
+- parameters
+    - state_action: string
+    - process_id: string
+    - message?: string
 
 ## /api/v1/user/token [POST]
 > for directly method auth
@@ -50,3 +55,8 @@ get a process hash instance and return states of workflow with transitions by fi
 - refresh_token: string
 - lifetime: number (seconds)
 - expired_time: number (timestamp ms)
+
+## /api/v1/worker/info [GET]
+> for get background worker info
+* parameters:
+- worker_id: string

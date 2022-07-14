@@ -1,9 +1,8 @@
 import { Const } from "../const";
-import { APIResponse } from "../interfaces";
+import { APIResponse, WorkflowState } from "../interfaces";
 import { HttpStatusCode, LogMode, RequestMethodType } from "../types";
 import { CoreRequest } from "./request";
-
-
+import { WorkflowProcessModel } from "src/models/models";
 export class BaseApi {
     request: CoreRequest;
     /*************************************** */
@@ -109,6 +108,17 @@ export class BaseApi {
         return this.response(data, code);
     }
     /*************************************** */
+    formDataParam<T = string>(key: string, def: T = undefined, isFile = false): T {
+        let value: T;
+        if (isFile) {
+            value = this.request.req['files'][key];
+        } else {
+            value = this.request.req['fields'][key];
+        }
+        if (!value) value = def;
+        return value;
+    }
+    /*************************************** */
     /*************************************** */
     /*************************************** */
     checkUserRoleHasAccess(roles: string[]) {
@@ -119,5 +129,23 @@ export class BaseApi {
             return false;
         }
         return true;
+    }
+    /*************************************** */
+    async findProcessById(id: string) {
+        let process = await Const.DB.models.processes.findById(id).populate('workflow');
+        return process;
+    }
+    /*************************************** */
+    async getProcessCurrentState(processId: string): Promise<{ state: WorkflowState, process: WorkflowProcessModel } | [string, HttpStatusCode]> {
+        // =>find process by id
+        let process = await this.findProcessById(processId);
+        if (!process) return this.error404('not found such process');
+        // =>find current state info
+        let stateInfo = process.workflow.states.find(i => i.name === process.current_state);
+        // =>check access state
+        if (!this.checkUserRoleHasAccess(stateInfo.access_role)) {
+            return this.error403('no access to state info');
+        }
+        return { state: stateInfo, process };
     }
 }

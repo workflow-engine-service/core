@@ -1,4 +1,4 @@
-import { DeployedWorkflowModel } from "../../models/models";
+import { DeployedWorkflowModel, WorkflowProcessModel } from "../../models/models";
 import { Auth } from "../../auth";
 import { generateString, infoLog } from "../../common";
 import { Const } from "../../const";
@@ -6,6 +6,8 @@ import { HttpStatusCode } from "../../types";
 import { BaseApi } from "../base";
 import { UserTokenResponse } from "./interfaces";
 import mongoose from "mongoose";
+import { WorkflowStateAction, WorkflowStateActionResponse } from "src/interfaces";
+import { WebWorkers } from "src/workers";
 
 export function classApi() {
     return PublicPostApi;
@@ -80,6 +82,61 @@ export class PublicPostApi extends BaseApi {
     }
     /********************************** */
     async doAction() {
-        //TODO:
+        // console.log('fields:', this.request.req['fields'], this.request.req['files'])
+        // =>get main params
+        let processId = this.formDataParam('process_id');
+        let stateActionName = this.formDataParam('state_action');
+        let userMessage = this.formDataParam('message');
+        let res = await this.getProcessCurrentState(processId);
+        // =>if raise error
+        if (Array.isArray(res)) {
+            return res;
+        } else {
+            // =>find selected action with name
+            let action = res.state.actions.find(i => i.name === stateActionName);
+            if (!action) return this.error404('not found such action');
+            // =>check for message required
+            if (action.message_required && (!userMessage || String(userMessage).trim().length < 1)) {
+                return this.error400('message required');
+            }
+            // =>check for required fields
+            if (action.required_fields) {
+                for (const field of action.required_fields) {
+                    if (this.formDataParam('field.' + field) === undefined) {
+                        return this.error400(`must fill '${field}' field`);
+                    }
+                }
+            }
+            let fields: object = {};
+            // =>collect all required fields, optional fields
+            for (const field of [...action.required_fields, ...action.optional_fields]) {
+                // =>validate all required, optional fields
+                //TODO:
+                let value = this.formDataParam('field.' + field);
+                fields[field] = value;
+            }
+
+            let workerId = await WebWorkers.addActionWorker({
+                required_fields: action.required_fields,
+                optional_fields: action.optional_fields,
+                process_id: res.process._id,
+                state_action_name: action.name,
+                state_name: res.state.name,
+                user_id: this.request.user().id,
+                workflow_name: res.process.workflow_name,
+                workflow_version: res.process.workflow_version,
+                message: userMessage,
+                fields,
+                _action: action,
+                _process: res.process,
+            });
+
+            return this.response(workerId);
+        }
+
     }
+    /********************************** */
+    /********************************** */
+    /********************************** */
+
 }

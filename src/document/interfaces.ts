@@ -41,7 +41,7 @@ export interface SwaggerApiParameter {
      * header parameters, such as X-MyHeader: Value
      * cookie parameters, which are passed in the Cookie header, such as Cookie: debug=0; csrftoken=BUSe35dohU3O1MZvDCU
      */
-    in: 'query' | 'path' | 'header' | 'cookie' | 'body';
+    in: 'query' | 'path' | 'header' | 'cookie' | 'body' | 'formData';
     required?: boolean;
     type?: SwaggerDataType;
     format?: SwaggerDataTypeFormat;

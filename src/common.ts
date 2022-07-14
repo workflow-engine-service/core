@@ -26,6 +26,9 @@ export async function loadConfigs() {
         if (!Const.CONFIGS.server.logs_path) {
             Const.CONFIGS.server.logs_path = 'logs';
         }
+        if (!Const.CONFIGS.server.uploads_path) {
+            Const.CONFIGS.server.uploads_path = 'uploads';
+        }
         if (!Const.CONFIGS.auth_user.header_name) {
             Const.CONFIGS.auth_user.header_name = 'Authorization';
         }

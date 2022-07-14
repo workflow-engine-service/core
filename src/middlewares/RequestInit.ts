@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { CoreRequest } from "../apis/request";
 import { Const } from '../const';
+import { debugLog } from "../common";
 
 
 export function middleware() {
@@ -18,9 +19,11 @@ export class RequestInit extends Middleware {
    /**************************************** */
    async handle(req: Request, res: Response) {
       this.path = req.path;
+      let request = new CoreRequest(req, res);
       // =>init core request
-      req.body[Const.CoreRequestKey] = new CoreRequest(req, res);
+      req.body[Const.CoreRequestKey] = request;
       req.body[Const.CoreRequestKey].startResponseTime = new Date().getTime();
+      debugLog('request', `[${request.method}] request from ${request.clientIp()} to '${this.path}'`);
 
       return true;
    }

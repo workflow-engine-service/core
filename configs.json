@@ -4,6 +4,12 @@
         "port": 27017,
         "name": "workflow_db"
     },
+    "redis": {
+        "redis1": {
+            "host": "127.0.0.1",
+            "port": 6379
+        }
+    },
     "server": {
         "port": 8082,
         "host": "localhost",

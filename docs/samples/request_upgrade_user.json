@@ -1,20 +1,11 @@
 {
-    "workflow_name": "register_user",
+    "workflow_name": "request_upgrade_user",
     "version": 1,
-    "workflow_class_name": "RegisterUserFlow", // default same as workflow name (for interfaces)
     "shared_actions": [
         "approve",
         "reject"
-    ], // these actions are in all states (for interfaces) 
-    "process_init_check": {
-        "type": "local", // local | api
-        "local_check": "just_one_user_running_process" //just_one_user_running_process | 
-    },
+    ],
     "auto_delete_after_end": true,
-    "auto_start": {
-        "event": "user_add" // events: user_add, user_emove, user_update
-        //TODO:
-    },
     "start_state": "enter_info",
     "end_state": "finish",
     "fields": [
@@ -74,54 +65,62 @@
                 "title": "ورود اطلاعات"
             },
             "access_roles": [
-                "_all_" // can use _all_ for all users
+                "_all_"
             ],
             "actions": [
                 {
-                    "access_roles": [
-                        "manager"
-                    ],
+                    "name": "approve",
                     "required_fields": [
                         "firstname",
                         "lastname",
-                        "phone"
-                    ],
-                    "optional_fields": [
+                        "phone",
                         "email"
                     ],
-                    "name": "approve",
-                    "type": "hook_url",
-                    "url": "http://127.0.0.1/django/api/v1/register",
-                    "method": "post",
-                    "message_required": "false",
+                    "optional_fields": [
+                        "avatar"
+                    ],
+                    "type": "redis",
+                    "channel": "request_upgrade_user",
+                    "response_channel": "request_upgrade_user_resp",
+                    "message_required": false,
                     "meta": {
                         "color": "green",
                         "title": "تایید اولیه"
                     }
-                },
-                {
-                    "name": "reject",
-                    "type": "redis",
-                    "channel": "register",
-                    "message_required": "true",
-                    "response_channel": "resp_register",
-                    "set_fields": {
-                        "is_done": false
-                    },
-                    "meta": {
-                        "color": "red",
-                        "isCircleButton": true
-                    }
-                },
-                {
-                    "name": "edit",
-                    "type": "local",
-                    "next_state": "finish"
                 }
             ]
         },
         {
-            "name": "finish"
+            "name": "check_info",
+            "meta": {
+                "title": "بررسی اطلاعات"
+            },
+            "access_roles": [
+                "manager"
+            ],
+            "actions": [
+                {
+                    "name": "approve",
+                    "type": "redis",
+                    "channel": "request_upgrade_user",
+                    "response_channel": "request_upgrade_user_resp",
+                    "message_required": false
+                },
+                {
+                    "name": "reject",
+                    "type": "redis",
+                    "channel": "request_upgrade_user",
+                    "response_channel": "request_upgrade_user_resp",
+                    "message_required": true
+                }
+            ]
+        },
+        {
+            "name": "finish",
+            "access_roles": [
+                "manager"
+            ],
+            "actions": []
         }
     ]
 }

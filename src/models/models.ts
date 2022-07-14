@@ -1,5 +1,5 @@
 import { LogMode } from "../types";
-import { WorkflowField, WorkflowProcessField, WorkflowState } from "../interfaces";
+import { WorkflowField, WorkflowProcessField, WorkflowState, WorkflowProcessOnInit } from "../interfaces";
 
 export interface DeployedWorkflowModel {
     name: string;
@@ -9,6 +9,7 @@ export interface DeployedWorkflowModel {
     settings: {
         auto_delete_after_end?: boolean;
         create_access_roles?: string[];
+        process_init_check?: WorkflowProcessOnInit;
     };
     fields: WorkflowField[];
     states: WorkflowState[];
