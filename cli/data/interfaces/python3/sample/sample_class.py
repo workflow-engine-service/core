@@ -7,7 +7,7 @@ from states import {{name}}States
 
 class {{name}}WorkFlow(workflow.Workflow):
     NAME = '{{name}}'
-    ENTER_STATE = 'enter_state'
-    FINISH_STATE = 'finish'
+    START_STATE = 'enter_state'
+    END_STATE = 'finish'
     FIELDS = {{name}}Fields()
     STATES = {{name}}States

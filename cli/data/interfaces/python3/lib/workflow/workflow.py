@@ -25,12 +25,19 @@ class WorkflowProcessInitCheck():
         self._type = 'api'
         self.url = url
 
+    def __str__(self) -> str:
+        return json.dumps({
+            'type': self._type,
+            'local_check': self._local_check,
+            'api_url': self._api_url,
+        })
+
 
 class Workflow():
     NAME: str = None
     VERSION = 1
-    ENTER_STATE: str = None
-    FINISH_STATE: str = None
+    START_STATE: str = None
+    END_STATE: str = None
     FIELDS: FieldClass = None
     CREATE_ACCESS_ROLES: List[str] = ['_all_']
     PROCESS_INIT_CHECK: WorkflowProcessInitCheck = None
@@ -42,10 +49,10 @@ class Workflow():
         pass
 
     def startState(self):
-        return self.ENTER_STATE
+        return self.START_STATE
 
     def endState(self):
-        return self.FINISH_STATE
+        return self.END_STATE
 
     def goToState(state: str):
         # TODO:
@@ -56,8 +63,24 @@ class Workflow():
         pass
 
     def __str__(self) -> str:
-        return json.dumps({
+        schema = {
             'workflow_name': self.NAME,
             'version': self.VERSION,
-            'create_access_roles': self.CREATE_ACCESS_ROLES
-        })
+            'create_access_roles': self.CREATE_ACCESS_ROLES,
+            'start_state': self.START_STATE,
+            'end_state': self.END_STATE,
+            'fields': [],
+            'states': [],
+        }
+        if self.AUTO_DELETE_AFTER_END:
+            schema['auto_delete_after_end'] = True
+
+        if self.PROCESS_INIT_CHECK:
+            schema['process_init_check'] = self.PROCESS_INIT_CHECK
+        if self.FIELDS:
+            schema['fields'] = json.loads(str(self.FIELDS))
+        if self.STATES:
+            for state in self.STATES:
+                schema['states'].append(json.loads(str(state)))
+
+        return json.dumps(schema, sort_keys=True, indent=4)
