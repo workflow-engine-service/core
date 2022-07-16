@@ -2,7 +2,7 @@ version: "3"
 
 services:
 
-  mongodb:
+  mongo:
     image: dockerhub.ir/mongo
     restart: always
     environment:
@@ -11,15 +11,23 @@ services:
       # MONGO_INITDB_ROOT_USERNAME: admin
       # MONGO_INITDB_ROOT_PASSWORD: 12345qwer
     volumes:
-      - ./mongo:/data/db
+      - ./docker/data/mongo/db:/data/db
     ports:
-      - 27017:27017
+      - "127.0.0.1:27017:27017"
   redis:
     image: redis
     restart: always
     # command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
 
     volumes:
-      - ./redis.conf:/usr/local/etc/redis/redis.conf
+      - ./docker/data/redis/redis.conf:/usr/local/etc/redis/redis.conf
     ports:
       - "6379:6379"
+  app:
+    image: workflow_engine:latest
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./docker/data/app/logs:/app/logs
+      - ./docker/data/app/configs:/app/docker/configs

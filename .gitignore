@@ -4,3 +4,4 @@ node_modules
 mongo
 logs
 swagger.json
+docker/data

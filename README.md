@@ -9,6 +9,12 @@
 4. install dependencies with `npm i`
 6. run server with `npm run dev`. you can see on `http://localhost:8082`
 
+## Get Started (for production mode)
+
+- create docker image by `docker build -t workflow_engine:latest -f ./Dockerfile .`
+- copy `configs.json` to `docker/data/app/configs` folder
+- run docker image by docker-compose: `docker-compose up -d --remove-orphans`
+> for remove dangling images, use `sudo docker rmi $(sudo docker images --filter "dangling=true" -q --no-trunc)`
 
 ## Author
 

@@ -5,7 +5,7 @@
     "scripts": {
         "build": "tsc -b tsconfig.json",
         "start": "tsc -b tsconfig.json; node --trace-warnings build/index.js ",
-        "dev": "concurrently \"tsc -b -w tsconfig.json\" \"nodemon --ext 'js' --ignore 'storage' --trace-warnings build/index.js parse\""
+        "dev": "concurrently \"tsc -b -w tsconfig.json\" \"nodemon --ext 'js' --ignore 'storage' --trace-warnings build/index.js dev\""
     },
     "private": true,
     "dependencies": {

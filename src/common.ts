@@ -17,8 +17,21 @@ export async function loadConfigs() {
         if (!fs.existsSync(configsPath)) {
             configsPath = path.join(path.dirname(__filename), 'configs.json');
         }
-        let configsFile = JSON.parse(fs.readFileSync(configsPath).toString());
-        Const.CONFIGS = configsFile;
+        if (!fs.existsSync(configsPath)) {
+            configsPath = path.join(path.dirname(__filename), '..', 'docker', 'configs', 'configs.json');
+        }
+        if (fs.existsSync(configsPath)) {
+            let configsFile = JSON.parse(fs.readFileSync(configsPath).toString());
+            Const.CONFIGS = configsFile;
+        } else {
+            errorLog('configs', `can not load configs.json file from '${configsPath}'! (using fallback mode)`);
+            Const.CONFIGS = {
+                server: {} as any,
+                admin_users: [],
+                auth_user: {} as any,
+                mongo: {} as any,
+            };
+        }
         // =>set defaults for properties
         if (!Const.CONFIGS.server.host) {
             Const.CONFIGS.server.host = 'localhost';
@@ -37,6 +50,17 @@ export async function loadConfigs() {
         }
         if (!Const.CONFIGS.server.swagger_base_url) {
             Const.CONFIGS.server.swagger_base_url = '/api-docs';
+        }
+        // =>if 'prod' server mode
+        if (Const.SERVER_MODE === 'prod') {
+            Const.CONFIGS.server.port = 8080;
+            Const.CONFIGS.server.host = '0.0.0.0';
+            Const.CONFIGS.server.debug_mode = false;
+            Const.CONFIGS.server.logs_path = './logs';
+            Const.CONFIGS.mongo.host = 'mongo';
+            if (Object.keys(Const.CONFIGS.redis).length > 0) {
+                Const.CONFIGS.redis[Object.keys(Const.CONFIGS.redis)[0]].host = 'redis';
+            }
         }
         return true;
     } catch (e) {
@@ -67,14 +91,11 @@ function log(text: string, label?: string, type: 'info' | 'error' | 'normal' | '
 export function infoLog(name: string, message: string) {
     log(message, name, 'info');
     try {
-        let time = new Date().toTimeString().slice(0, 8);
-        let date = new Date().toISOString().slice(0, 10).replace(/-/g, '.');
         if (typeof message === 'object') {
             message = JSON.stringify(message);
         }
-        fs.writeFileSync(path.join(Const.CONFIGS.server.logs_path, 'info'), `[${date}-${time}] ${name} ${message}\n`, {
-            flag: 'a',
-        });
+        writeLogOnFile('info', `${name} ${message}`);
+
     } catch (e) {
         log(`can not write on ${path.join(Const.CONFIGS.server.logs_path, 'info')} file`, 'err455563', 'error');
     }
@@ -82,36 +103,38 @@ export function infoLog(name: string, message: string) {
 /***************************************** */
 export function debugLog(name: string, message: string) {
     // console.log(settings('DEBUG_MODE'))
-    if (!Const.CONFIGS.server.debug_mode) return;
+    if (!Const.CONFIGS || !Const.CONFIGS.server.debug_mode) return;
     log(message, name, 'debug');
     try {
-        let time = new Date().toTimeString().slice(0, 8);
-        let date = new Date().toISOString().slice(0, 10).replace(/-/g, '.');
         if (typeof message === 'object') {
             message = JSON.stringify(message);
         }
-        fs.writeFileSync(path.join(Const.CONFIGS.server.logs_path, 'debug'), `[${date}-${time}] ${name} ${message}\n`, {
-            flag: 'a',
-        });
+        writeLogOnFile('debug', `${name} ${message}`);
     } catch (e) {
         log(`can not write on ${path.join(Const.CONFIGS.server.logs_path, 'debug')} file`, 'err455563', 'error');
     }
 }
 /***************************************** */
 export function errorLog(name: string, error: any, uid?: string) {
-    if (Const.CONFIGS.server.debug_mode && typeof error !== 'string') {
+    if (Const.CONFIGS && Const.CONFIGS.server.debug_mode && typeof error !== 'string') {
         console.error(error);
     }
     log(error, name, 'error');
-    let time = new Date().toTimeString().slice(0, 8);
-    let date = new Date().toISOString().slice(0, 10).replace(/-/g, '.');
     if (typeof error === 'object') {
         error = JSON.stringify(error);
     }
+    writeLogOnFile('errors', `${name} ${uid}::${error}`);
+}
+/***************************************** */
+function writeLogOnFile(type = 'info', text: string) {
     try {
-        fs.writeFileSync(path.join(Const.CONFIGS.server.logs_path, 'errors'), `[${date}-${time}] ${name} ${uid}::${error}\n`, {
-            flag: 'a',
-        });
+        let time = new Date().toTimeString().slice(0, 8);
+        let date = new Date().toISOString().slice(0, 10).replace(/-/g, '.');
+        if (Const.CONFIGS && Const.CONFIGS.server) {
+            fs.writeFileSync(path.join(Const.CONFIGS.server.logs_path, type + '.log'), `[${date}-${time}] ${text}\n`, {
+                flag: 'a',
+            });
+        }
     } catch (e) {
         log(`can not write on ${path.join(Const.CONFIGS.server.logs_path, 'errors')} file`, 'err4553', 'error');
     }
