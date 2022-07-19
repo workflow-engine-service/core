@@ -7,7 +7,7 @@ import { BaseApi } from "../base";
 import { UserTokenResponse } from "./interfaces";
 import mongoose from "mongoose";
 import { WorkflowStateAction, WorkflowStateActionResponse } from "src/interfaces";
-import { WebWorkers } from "src/workers";
+import { WebWorkers } from "../../workers";
 
 export function classApi() {
     return PublicPostApi;

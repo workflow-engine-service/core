@@ -11,6 +11,14 @@ class enter_info_state(WorkflowState):
     ]
 
 
+class finish_state(WorkflowState):
+    name = 'finish'
+    actions = [
+        WorkflowStateAction('approve').redis('app_channel', 'app_channel_resp')
+    ]
+
+
 {{name}}States: List[WorkflowState] = [
-    enter_info_state()
+    enter_info_state(),
+    finish_state()
 ]

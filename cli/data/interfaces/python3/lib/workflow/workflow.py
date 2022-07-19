@@ -1,10 +1,11 @@
 
 
 import json
+from lib.apis.admin_api import WorkflowAdminApi
+from lib.apis.user_api import WorkflowUserApi
 import setup
 from pickle import FALSE
-from typing import List, Literal
-from ..states.StateClass import WorkflowState
+from typing import Dict, List, Literal
 
 from ..fields.FieldClass import FieldClass
 
@@ -44,9 +45,19 @@ class Workflow():
     AUTO_DELETE_AFTER_END = FALSE
     STATES = []
     _stateInstances = []
+    _admin_apis: WorkflowAdminApi
+    _user_apis: WorkflowUserApi
+    _settings: any
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self, settings) -> None:
+        self._settings = settings
+        # if settings.debug_mode:
+        #     print('settings:', json.dumps(str(self._settings)))
+
+        self._admin_apis = WorkflowAdminApi(
+            settings.workflow_base_url, settings.admin_username, settings.admin_secret_key, settings.debug_mode)
+        self._user_apis = WorkflowUserApi(
+            settings.workflow_base_url, settings.admin_username, settings.admin_secret_key, settings.debug_mode)
 
     def startState(self):
         return self.START_STATE
@@ -58,9 +69,8 @@ class Workflow():
         # TODO:
         pass
 
-    def deploy():
-        # TODO:
-        pass
+    def deploy(self):
+        return self._admin_apis.deployWorkflow(json.loads(str(self)))
 
     def __str__(self) -> str:
         schema = {

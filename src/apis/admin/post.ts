@@ -41,8 +41,9 @@ export class AdminPostApi extends BaseApi {
     /************************************** */
     async validateWorkflowCode(code: WorkflowDescriptor): Promise<[WorkflowDescriptor, string]> {
         if (!code) return [code, 'undefined code'];
+        // console.log(code, typeof code)
         // =>check workflow name
-        if (!code.workflow_name || typeof code.workflow_name !== 'string') return [code, 'bad workflow name'];
+        if (!code.workflow_name || typeof code.workflow_name !== 'string') return [code, `bad workflow name '${code.workflow_name}'`];
         // =>normalize code
         if (!code.version) code.version = 1;
         if (!code.fields) code.fields = [];
@@ -56,11 +57,15 @@ export class AdminPostApi extends BaseApi {
         }
         // =>check for exist start state
         if (!code.states.find(i => i.name === code.start_state)) {
-            return [code, 'not found start state'];
+            return [code, 'not found start state at states array'];
         }
         // =>check for exist end state
         if (!code.states.find(i => i.name === code.end_state)) {
-            return [code, 'not found end state'];
+            return [code, 'not found end state at states array'];
+        }
+        // =>check start, end states not same
+        if (code.start_state === code.end_state) {
+            return [code, 'start state, end state can not be same'];
         }
         //TODO:
         return [code, undefined];

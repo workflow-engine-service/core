@@ -11,8 +11,8 @@ import * as path from 'path';
 import * as fs from 'fs';
 /************************************* */
 type CommandName = 'compile' | 'new';
-type CommandArgvName = 'language' | 'input' | 'output' | 'name';
-const VERSION = '0.7';
+type CommandArgvName = 'language' | 'input' | 'output' | 'name' | 'version';
+const VERSION = '0.12';
 /*********************************** */
 
 export async function main(): Promise<number> {
@@ -65,6 +65,12 @@ export async function main(): Promise<number> {
                defaultValue: 'python3',
             },
             {
+               name: 'version',
+               alias: 'v',
+               description: 'version of workflow (default : 1)',
+               defaultValue: 1,
+            },
+            {
                name: 'output',
                alias: 'o',
                description: 'directory path for genrate interface files',
@@ -94,11 +100,15 @@ async function newWorkflow() {
       outputPath = await IN.input('Enter output path');
    }
    outputPath = path.resolve(outputPath);
+   // =>get version
+   let version = ARG.getArgv('version');
    // =>get name
    let name = ARG.getArgv('name');
    if (!name) {
       name = await IN.input('Enter workflow name');
    }
+   // =>add version to name
+   let nameWithVersion = `${name}@v${version}`
    let langDataPath = path.join(await OS.cwd(), 'data', 'interfaces', lang);
    // =>create output dir
    fs.mkdirSync(outputPath, { recursive: true });
@@ -111,6 +121,7 @@ async function newWorkflow() {
    let renderData = {
       base_url: 'http://localhost:8082',
       name,
+      version,
    };
    // =>create 'settings.py' file, if not
    if (!fs.existsSync(path.join(outputPath, 'settings.py'))) {
@@ -120,7 +131,7 @@ async function newWorkflow() {
       })).data);
    }
    // =>create workflow dir
-   let workflowPath = path.join(outputPath, name);
+   let workflowPath = path.join(outputPath, nameWithVersion);
    fs.mkdirSync(workflowPath, { recursive: true });
    let files = [
       {
@@ -157,5 +168,5 @@ async function newWorkflow() {
    }
    // =>add __init__.py file
    // fs.writeFileSync(path.join(workflowPath, '__init__.py'), '');
-   LOG.success(`workflow '${name}' created in '${outputPath}' collection successfully :)`);
+   LOG.success(`workflow '${nameWithVersion}' created in '${outputPath}' collection successfully :)`);
 }
