@@ -82,7 +82,7 @@ export class PublicPostApi extends BaseApi {
     }
     /********************************** */
     async doAction() {
-        // console.log('fields:', this.request.req['fields'], this.request.req['files'])
+        console.log('fields:', this.request.req['fields'], this.request.req['files'])
         // =>get main params
         let processId = this.formDataParam('process_id');
         let stateActionName = this.formDataParam('state_action');

@@ -45,7 +45,7 @@ export interface WorkflowProcessHistoryModel {
 export interface UserModel {
     id: number;
     name: string;
-    role: string;
+    roles: string[];
     email?: string;
     secret_key: string;
     is_admin?: boolean;

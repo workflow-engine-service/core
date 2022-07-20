@@ -64,7 +64,7 @@ export class MongoDB {
                 email: `${user.username}@service.com`,
                 name: user.username,
                 secret_key: await Auth.encryptPassword(user.secretkey),
-                role: user.role || '_admin_',
+                roles: user.role || '_admin_',
                 is_admin: true,
                 info: {},
             });

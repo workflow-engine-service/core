@@ -53,6 +53,9 @@ class WorkflowStateAction():
         self.__set_fields = fields
         return self
 
+    def get_name(self):
+        return self.__name
+
     def __str__(self) -> str:
         schema = {
             'access_roles': self.__access_roles,

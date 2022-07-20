@@ -28,7 +28,7 @@ class WorkflowState():
 
     def getActionByName(self, name: str) -> WorkflowStateAction:
         for act in self.actions:
-            if act.__name == name:
+            if act.get_name() == name:
                 return act
         return None
 

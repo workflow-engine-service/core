@@ -5,6 +5,8 @@ import urllib.request
 import requests
 
 from lib.utils.Dict2Class import Dict2Class
+from lib.utils.multipart_sender import MultiPartForm
+
 user_agent = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64)'
 responses = {
     100: ('Continue', 'Request received, please continue'),
@@ -101,8 +103,27 @@ def _callApi(url: str, values: Dict = {}, method: Literal['POST', 'GET', 'PUT', 
         if headers['Content-Type'] == 'application/json':
             data = json.dumps(values)
             # headers['Content-Length'] = len(data)
+        elif headers['Content-Type'] == 'multipart/form-data':
 
-        data = data.encode('utf-8')  # data should be bytes
+            # myfile = open('path/to/file', 'rb')
+            form = MultiPartForm()
+            for k, v in values.items():
+                form.add_field(k, v)
+            print(values, form.form_data)
+            form.make_result()
+
+            # url = 'http://myurl'
+            # req1 = urllib.request.Request(url)
+            headers['Content-type'] = form.get_content_type()
+            headers['Content-length'] = len(form.form_data)
+            # req1.add_data(form.form_data)
+
+            data = form.form_data
+            # multipart_form_data = {}
+            # for k, v in values.items():
+            #     multipart_form_data[k] = v  # (None, v)
+            # data = multipart_form_data
+        # data = data.encode('utf-8')  # data should be bytes
     if debug_mode:
         print('request: [{}] {}'.format(method, url))
         # print('headers:', headers)
@@ -110,17 +131,20 @@ def _callApi(url: str, values: Dict = {}, method: Literal['POST', 'GET', 'PUT', 
     try:
         response: requests.Response
         if method == 'POST':
-            response = requests.post(url, data, headers=headers)
+            if headers['Content-Type'] == 'multipart/form-data':
+                response = requests.post(url, data=data, headers=headers)
+            else:
+                response = requests.post(url, data, headers=headers)
         elif method == 'GET':
             response = requests.get(url, headers=headers)
-        #TODO:
+        # TODO:
         # req = urllib.request.Request(
         #     url, data, headers=headers, method=method)
         # with urllib.request.urlopen(req, timeout=30) as response:
         response_text = response.text  # response.read().decode("utf-8")
         if headers['accept'] == 'application/json':
             response_text = json.loads(response_text)
-        # print('res:', response)
+        print('res:', response)
         # print(response.read())
         return Dict2Class({
             'body': response_text,

@@ -125,10 +125,15 @@ export class BaseApi {
         if (!roles) {
             roles = ['_all_'];
         }
-        if (!roles.includes('_all_') && !roles.includes(this.request.user().role)) {
-            return false;
+        if (roles.includes('_all_')) {
+            return true;
         }
-        return true;
+        for (const userRole of this.request.user().roles) {
+            if (roles.includes(userRole)) {
+                return true;
+            }
+        }
+        return false;
     }
     /*************************************** */
     async findProcessById(id: string) {

@@ -5,7 +5,7 @@ const metaDataSchema = new mongoose.Schema<UserModel, UserModel>({
     email: String,
     info: Object,
     name: String,
-    role: String,
+    roles: [String],
     is_admin: {
         type: Boolean,
         default: false,

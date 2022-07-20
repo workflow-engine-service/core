@@ -14,4 +14,8 @@ newProcess = {{name}}_workflow.create()
 print(newProcess[0])
 print('[+] get current state of process')
 # get current state info
-print(newProcess[0].currentState())
+state = newProcess[0].currentState()
+print(state)
+# execute 'approve' action of state
+print("[+] execute 'approve' action")
+print(newProcess[0].executeAction(state.getActionByName('approve')))

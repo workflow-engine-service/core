@@ -11,8 +11,8 @@ import * as path from 'path';
 import * as fs from 'fs';
 /************************************* */
 type CommandName = 'compile' | 'new';
-type CommandArgvName = 'language' | 'input' | 'output' | 'name' | 'version';
-const VERSION = '0.14';
+type CommandArgvName = 'language' | 'input' | 'output' | 'name' | 'version' | 'overwrite';
+const VERSION = '0.16';
 /*********************************** */
 
 export async function main(): Promise<number> {
@@ -61,7 +61,7 @@ export async function main(): Promise<number> {
             {
                name: 'language',
                alias: 'l',
-               description: 'language to genrate interface files',
+               description: 'language to generate interface files (default: python3)',
                defaultValue: 'python3',
             },
             {
@@ -74,6 +74,12 @@ export async function main(): Promise<number> {
                name: 'output',
                alias: 'o',
                description: 'directory path for genrate interface files',
+            },
+            {
+               name: 'overwrite',
+               alias: 'ow',
+               type: 'boolean',
+               description: 'overwrite workflow, if exist',
             },
          ],
       }
@@ -132,6 +138,10 @@ async function newWorkflow() {
    }
    // =>create workflow dir
    let workflowPath = path.join(outputPath, nameWithVersion);
+   // => if must overwrite
+   if (ARG.getArgv('overwrite')) {
+      await OS.rmdir(workflowPath);
+   }
    // =>check exist workflow dir
    if (!fs.existsSync(workflowPath)) {
       fs.mkdirSync(workflowPath, { recursive: true });
