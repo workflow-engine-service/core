@@ -49,7 +49,7 @@ class WorkflowStateAction():
         self.__next_state = next_state
         return self
 
-    def set_fields(self, fields: List[str]):
+    def set_fields(self, fields: Dict):
         self.__set_fields = fields
         return self
 

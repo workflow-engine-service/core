@@ -12,7 +12,7 @@ import * as fs from 'fs';
 /************************************* */
 type CommandName = 'compile' | 'new';
 type CommandArgvName = 'language' | 'input' | 'output' | 'name' | 'version';
-const VERSION = '0.12';
+const VERSION = '0.13';
 /*********************************** */
 
 export async function main(): Promise<number> {

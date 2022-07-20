@@ -3,10 +3,8 @@ from typing import Dict, Literal
 import urllib.parse
 import urllib.request
 import requests
-# url = 'http://www.someserver.com/cgi-bin/register.cgi'
-# values = {'name' : 'Michael Foord',
-#           'location' : 'Northampton',
-#           'language' : 'Python' }
+
+from lib.utils.Dict2Class import Dict2Class
 user_agent = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64)'
 responses = {
     100: ('Continue', 'Request received, please continue'),
@@ -113,6 +111,9 @@ def _callApi(url: str, values: Dict = {}, method: Literal['POST', 'GET', 'PUT', 
         response: requests.Response
         if method == 'POST':
             response = requests.post(url, data, headers=headers)
+        elif method == 'GET':
+            response = requests.get(url, headers=headers)
+        #TODO:
         # req = urllib.request.Request(
         #     url, data, headers=headers, method=method)
         # with urllib.request.urlopen(req, timeout=30) as response:
@@ -121,16 +122,16 @@ def _callApi(url: str, values: Dict = {}, method: Literal['POST', 'GET', 'PUT', 
             response_text = json.loads(response_text)
         # print('res:', response)
         # print(response.read())
-        return {
+        return Dict2Class({
             'body': response_text,
             'code': response.status_code,
             'raw': json.dumps(str(response))
-        }
+        })
     except Exception as e:
         # print(e)
-        return {
+        return Dict2Class({
             'code': 404,  # e.code,
             'body': '',  # e.read().decode(),
             'raw': json.dumps(str(e)),
             'error': True
-        }
+        })

@@ -13,6 +13,19 @@ class WorkflowState():
     actions: List[WorkflowStateAction] = []
     events: List[WorkflowStateEvent] = []
 
+    # def loadFromDict(self, obj: Dict):
+    # self.name = obj['name']
+    # if obj['access_roles'] is not None:
+    #     self.access_roles = obj['access_roles']
+    # if obj['meta'] is not None:
+    #     self.meta = obj['meta']
+    # self.actions = []
+    # for action in obj['actions']:
+    #     action = WorkflowStateAction()
+    #     self.actions.append(action)
+    #     # TODO:
+    # self.
+
     def getActionByName(self, name: str) -> WorkflowStateAction:
         for act in self.actions:
             if act.__name == name:

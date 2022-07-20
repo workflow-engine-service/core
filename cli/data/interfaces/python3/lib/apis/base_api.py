@@ -2,7 +2,7 @@
 
 import json
 from typing import Dict
-from lib.workflow.request import callPOSTApi
+from lib.workflow.request import callGETApi, callPOSTApi
 
 
 class BaseApi():
@@ -25,7 +25,7 @@ class BaseApi():
         if self._baseUrl.endswith('/'):
             self._baseUrl = self._baseUrl[:-1]
         # auth admin user
-        self.userToken()
+        # self.userToken()
 
     def _callPOSTApi(self, path: str, data: Dict, headers: Dict = {}):
         if self._token is None:
@@ -34,8 +34,21 @@ class BaseApi():
         headers[self._auth_header_name] = self._token
         response = callPOSTApi(self.absApiUrl(
             path), data, debug_mode=self._debug_mode, headers=headers)
-        if type(response['body']) is str:
-            response['body'] = json.loads(response['body'])
+        if type(response.body) is str:
+            response.body = json.loads(response.body)
+
+        return response
+
+    def _callGETApi(self, path: str, params: Dict, headers: Dict = {}):
+        if self._token is None:
+            self.userToken()
+        # =>set auth token
+        headers[self._auth_header_name] = self._token
+        response = callGETApi(self.absApiUrl(
+            path), params, debug_mode=self._debug_mode, headers=headers)
+        # print('res:', response.body)
+        if type(response.body) is str:
+            response.body = json.loads(response.body)
 
         return response
 
@@ -53,8 +66,8 @@ class BaseApi():
         }, debug_mode=self._debug_mode)
         # print(response, response['code'])
         # if success
-        if response['code'] == 200:
-            self._token = response['body']['data']['access_token']
-            self._refresh_token = response['body']['data']['refresh_token']
-            self._expired_time_token = response['body']['data']['expired_time']
+        if response.code == 200:
+            self._token = response.body['data']['access_token']
+            self._refresh_token = response.body['data']['refresh_token']
+            self._expired_time_token = response.body['data']['expired_time']
             # print(response)

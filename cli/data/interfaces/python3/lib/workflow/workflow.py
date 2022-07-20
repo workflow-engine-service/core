@@ -1,37 +1,16 @@
 
 
 import json
+from WorkflowProcessInitCheck import WorkflowProcessInitCheck
+from lib.workflow.WorkflowClass import WorkflowDefinition
+from lib.process.ProcessClass import WorkflowProcess
 from lib.apis.admin_api import WorkflowAdminApi
 from lib.apis.user_api import WorkflowUserApi
 import setup
 from pickle import FALSE
-from typing import Dict, List, Literal
+from typing import Dict, List, Literal, Tuple
 
 from ..fields.FieldClass import FieldClass
-
-
-class WorkflowProcessInitCheck():
-    _type: str
-    _local_check: str
-    _api_url: str
-
-    def __init__(self) -> None:
-        return self
-
-    def local(self, check: Literal['just_one_user_running_process']):
-        self._type = 'local'
-        self._local_check = check
-
-    def api(self, url: str):
-        self._type = 'api'
-        self.url = url
-
-    def __str__(self) -> str:
-        return json.dumps({
-            'type': self._type,
-            'local_check': self._local_check,
-            'api_url': self._api_url,
-        })
 
 
 class Workflow():
@@ -48,6 +27,7 @@ class Workflow():
     _admin_apis: WorkflowAdminApi
     _user_apis: WorkflowUserApi
     _settings: any
+    _workflow_define: WorkflowDefinition
 
     def __init__(self, settings) -> None:
         self._settings = settings
@@ -58,12 +38,25 @@ class Workflow():
             settings.workflow_base_url, settings.admin_username, settings.admin_secret_key, settings.debug_mode)
         self._user_apis = WorkflowUserApi(
             settings.workflow_base_url, settings.admin_username, settings.admin_secret_key, settings.debug_mode)
+        # =>init workflow define
+        self._workflow_define = WorkflowDefinition(self.NAME, self.VERSION, self.START_STATE, self.END_STATE,
+                                                   self.FIELDS, self.STATES, self.CREATE_ACCESS_ROLES, self.PROCESS_INIT_CHECK, self.AUTO_DELETE_AFTER_END)
 
     def startState(self):
         return self.START_STATE
 
     def endState(self):
         return self.END_STATE
+
+    def create(self) -> Tuple[WorkflowProcess, str]:
+        """
+        create new process from this workflow
+        """
+        response = self._admin_apis.createWorkflowProcess(
+            self.NAME, self.VERSION)
+        if response[0] == True:
+            return WorkflowProcess(response[1], self._workflow_define, self._admin_apis, self._user_apis), 'success'
+        return None, response[1]
 
     def goToState(state: str):
         # TODO:
