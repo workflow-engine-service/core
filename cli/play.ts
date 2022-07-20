@@ -12,7 +12,7 @@ import * as fs from 'fs';
 /************************************* */
 type CommandName = 'compile' | 'new';
 type CommandArgvName = 'language' | 'input' | 'output' | 'name' | 'version';
-const VERSION = '0.13';
+const VERSION = '0.14';
 /*********************************** */
 
 export async function main(): Promise<number> {
@@ -132,41 +132,46 @@ async function newWorkflow() {
    }
    // =>create workflow dir
    let workflowPath = path.join(outputPath, nameWithVersion);
-   fs.mkdirSync(workflowPath, { recursive: true });
-   let files = [
-      {
-         source: path.join('sample', 'sample_class.py'),
-         dest: `${name}.py`,
-      },
-      {
-         source: path.join('sample', 'fields.py'),
-         dest: `fields.py`,
-      },
-      {
-         source: path.join('sample', 'states.py'),
-         dest: `states.py`,
-      },
-      {
-         source: path.join('sample', 'sample_func.py'),
-         dest: `run.py`,
-      },
-      {
-         source: path.join('sample', '__init__.py'),
-         dest: `__init__.py`,
-      },
-      {
-         source: path.join('sample', 'setup.py'),
-         dest: `setup.py`,
-      },
-   ];
-   // =>render files
-   for (const file of files) {
-      fs.writeFileSync(path.join(workflowPath, file.dest), (await TEM.renderString(fs.readFileSync(path.join(langDataPath, file.source)).toString(), {
-         noCache: true,
-         data: renderData,
-      })).data);
+   // =>check exist workflow dir
+   if (!fs.existsSync(workflowPath)) {
+      fs.mkdirSync(workflowPath, { recursive: true });
+      let files = [
+         {
+            source: path.join('sample', 'sample_class.py'),
+            dest: `${name}.py`,
+         },
+         {
+            source: path.join('sample', 'fields.py'),
+            dest: `fields.py`,
+         },
+         {
+            source: path.join('sample', 'states.py'),
+            dest: `states.py`,
+         },
+         {
+            source: path.join('sample', 'sample_func.py'),
+            dest: `run.py`,
+         },
+         {
+            source: path.join('sample', '__init__.py'),
+            dest: `__init__.py`,
+         },
+         {
+            source: path.join('sample', 'setup.py'),
+            dest: `setup.py`,
+         },
+      ];
+      // =>render files
+      for (const file of files) {
+         fs.writeFileSync(path.join(workflowPath, file.dest), (await TEM.renderString(fs.readFileSync(path.join(langDataPath, file.source)).toString(), {
+            noCache: true,
+            data: renderData,
+         })).data);
+      }
+      // =>add __init__.py file
+      // fs.writeFileSync(path.join(workflowPath, '__init__.py'), '');
+      LOG.success(`workflow '${nameWithVersion}' created in '${outputPath}' collection successfully :)`);
+   } else {
+      LOG.warning(`workflow '${nameWithVersion}' before exist and not changed in '${outputPath}' collection`);
    }
-   // =>add __init__.py file
-   // fs.writeFileSync(path.join(workflowPath, '__init__.py'), '');
-   LOG.success(`workflow '${nameWithVersion}' created in '${outputPath}' collection successfully :)`);
 }
