@@ -7,6 +7,7 @@ const metaDataSchema = new mongoose.Schema<WorkerModel, WorkerModel>({
     started_at: Number,
     ended_at: Number,
     response: Object,
+    success: Boolean,
 });
 
 export async function getSchema() {

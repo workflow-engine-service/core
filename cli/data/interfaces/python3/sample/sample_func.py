@@ -1,4 +1,4 @@
-
+import time
 from {{name}} import {{name}}WorkFlow
 
 print('[+] init workflow class')
@@ -22,4 +22,15 @@ worker = newProcess.executeAction(state.getActionByName('approve'))
 print(worker)
 # follow worker
 print("[+] follow up worker created for execute action")
-print(worker.info())
+while True:
+    time.sleep(1)
+    # =>check for success exec action
+    worker.info()
+    if worker.is_success():
+        print('success')
+        break
+    elif not worker.is_pending() and not worker.is_success():
+        print('failed')
+        break
+
+print(worker)

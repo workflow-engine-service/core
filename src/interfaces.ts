@@ -186,6 +186,7 @@ export interface WorkflowStateAction {
     // =>redis
     channel?: string;
     response_channel?: string;
+    redis_instance?: string;
     // =>local
     next_state?: string;
 }
@@ -264,9 +265,9 @@ export interface WorkflowStateActionResponse {
     state_name: string;
     /**
      * message of responsible server (for hook_url, redis types)
-     * saved as hook_message in db
+     * saved as response_message in db
      */
-    message?: string;
+    response_message?: string;
     /**
      * update some fields of process
      */
@@ -276,7 +277,7 @@ export interface WorkflowStateActionResponse {
     _failed?: boolean;
 }
 
-export interface WorkflowStateActionSendParameters {
+export interface WorkflowStateActionSendParametersFields {
     required_fields?: string[];
     optional_fields?: string[];
     state_name: string;
@@ -286,8 +287,12 @@ export interface WorkflowStateActionSendParameters {
     process_id: string;
     user_id: number;
     message?: string;
-    fields?: object;
 
+}
+
+export interface WorkflowStateActionSendParameters extends WorkflowStateActionSendParametersFields {
+
+    fields?: object;
     _process?: WorkflowProcessModel;
     _action?: WorkflowStateAction;
 }

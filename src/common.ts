@@ -165,3 +165,11 @@ export function generateString(length = 10, includeNumbers = true, includeChars 
     }
     return result;
 }
+/***************************************** */
+export async function sleep(timeout = 1000) {
+    return new Promise((res) => {
+        setTimeout(() => {
+            res(true);
+        }, timeout);
+    });
+}

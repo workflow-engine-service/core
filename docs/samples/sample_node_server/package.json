@@ -1,0 +1,8 @@
+{
+    "scripts": {
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "redis": "^4.2.0"
+    }
+}

@@ -10,15 +10,19 @@ class enter_info_state(WorkflowState):
         WorkflowStateAction('approve').redis('app_channel', 'app_channel_resp')
     ]
 
-
-class finish_state(WorkflowState):
-    name = 'finish'
+class process_data_state(WorkflowState):
+    name = 'process_data'
     actions = [
         WorkflowStateAction('approve').redis('app_channel', 'app_channel_resp')
     ]
 
 
+class finish_state(WorkflowState):
+    name = 'finish'
+
+
 {{name}}States: List[WorkflowState] = [
     enter_info_state(),
+    process_data_state(),
     finish_state()
 ]

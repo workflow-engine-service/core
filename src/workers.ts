@@ -31,6 +31,11 @@ export namespace WebWorkers {
                 }
                 // =>start do action
                 let responseFromActionType = await ProcessHelper[functionCallName](params) as WorkflowStateActionResponse;
+                // =>check for exist such state
+                if (!responseFromActionType._failed && responseFromActionType.state_name && !params._process.workflow.states.find(i => i.name === responseFromActionType.state_name)) {
+                    responseFromActionType._failed = true;
+                    responseFromActionType.response_message = `[workflow] not exist such state name '${responseFromActionType.state_name}'`;
+                }
                 // =>check for failed action
                 if (responseFromActionType._failed) {
                     return [false, responseFromActionType];
@@ -39,7 +44,7 @@ export namespace WebWorkers {
                 if (!responseFromActionType.fields) {
                     responseFromActionType.fields = {};
                 }
-                // =>set  extra fields
+                // =>set extra fields
                 if (params._action.set_fields) {
                     for (const key of Object.keys(params._action.set_fields)) {
                         responseFromActionType.fields[key] = params._action.set_fields[key];
@@ -50,17 +55,20 @@ export namespace WebWorkers {
                 return [true, responseFromActionType];
             },
             successResult: async (response) => {
+                debugLog('worker', `success to run action and go to '${response.state_name}' state...`);
                 // =>call 'onLeave' event of state
                 // =>update current state
+                params._process.current_state = response.state_name;
                 // =>update field values
                 // =>add process history
                 // =>call 'onInit' event of state
                 // =>check for end state
-                return {};
+                // =>update process
+                return response;
             },
             failedResult: async (response) => {
                 //TODO:
-                return { msg: 'error' };
+                return { error: response.response_message };
             },
             priority: 2,
         });
@@ -120,20 +128,18 @@ export namespace WebWorkers {
             // =>run worker
             worker.doAction().then(async (res) => {
                 // =>if success
+                worker.success = res[0];
                 if (res[0]) {
-                    worker.success = true;
-                    worker.response = await worker.successResult(res);
+                    worker.response = await worker.successResult(res[1]);
                 }
                 // =>if failed
                 else {
-                    worker.success = false;
-                    worker.response = await worker.failedResult(res);
+                    worker.response = await worker.failedResult(res[1]);
                 }
                 worker.ended_at = new Date().getTime();
                 // =>update  worker
                 await updateWorker(worker);
                 workerRunning--;
-                //TODO:
             });
         }, 100);
     }

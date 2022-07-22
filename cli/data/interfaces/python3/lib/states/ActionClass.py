@@ -18,6 +18,7 @@ class WorkflowStateAction():
     # redis type
     __channel: str
     __response_channel: str
+    __redis_instance: str = None
     # local type
     __next_state: str
 
@@ -38,10 +39,12 @@ class WorkflowStateAction():
         self.__method = method
         return self
 
-    def redis(self, channel: str, response_channel: str, instance: str = ''):
+    def redis(self, channel: str, response_channel: str, instance: str = None):
         self.__type = 'redis'
         self.__channel = channel
         self.__response_channel = response_channel
+        if instance is not None:
+            self.__redis_instance = instance
         return self
 
     def local(self, next_state: str):
@@ -74,5 +77,7 @@ class WorkflowStateAction():
         elif self.__type == 'redis':
             schema['channel'] = self.__channel
             schema['response_channel'] = self.__response_channel
+            if self.__redis_instance is not None:
+                schema['redis_instance'] = self.__redis_instance
 
         return json.dumps(schema)
