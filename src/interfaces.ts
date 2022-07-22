@@ -1,5 +1,5 @@
 import { SwaggerApiParameter, SwaggerApiResponse } from "./document/interfaces";
-import { WorkflowProcessModel } from "./models/models";
+import { WorkerModel, WorkflowProcessModel } from "./models/models";
 import { HttpStatusCode, MiddlewareName, RequestMethodType, SwaggerTagName } from "./types";
 
 
@@ -22,6 +22,16 @@ export interface ServerConfigs {
         wiki_disabled?: boolean;
         swagger_disabled?: boolean;
         swagger_base_url?: string;
+        /**
+         * in seconds
+         * @default 30
+         */
+        worker_timeout?: number;
+        /**
+         * max workers to async running
+         * @default 10
+         */
+        max_worker_running?: number;
     };
     admin_users: ServerAdminUserConfig[];
     auth_user: {
@@ -282,20 +292,10 @@ export interface WorkflowStateActionSendParameters {
     _action?: WorkflowStateAction;
 }
 
-export interface WorkerStruct<R = {}> {
+export interface WorkerStruct<R = {}> extends WorkerModel<R> {
     doAction: () => Promise<[boolean, R]>;
-    successResult: (response: R) => Promise<boolean>;
-    failedResult: (response: R) => Promise<boolean>;
-    id?: string;
-    /**
-     * more is better
-     * @default 1
-     */
-    priority?: number;
-    started_at?: number;
-    ended_at?: number;
-    response?: R;
-
+    successResult: (response: R) => Promise<object>;
+    failedResult: (response: R) => Promise<object>;
 }
 
 export interface WorkflowProcessOnInit {

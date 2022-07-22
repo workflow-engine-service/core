@@ -126,14 +126,14 @@ export const publicApis: ApiRoute[] = [
                 description: `you can add some need fields like files that name starts with 'field.'`
             },
         ],
-        // responses: {
-        //     '200': {
-        //         description: 'success to create new process from a workflow and return process info (includes process id)',
-        //         schema: {
-        //             $ref: "#/definitions/WorkflowProcessModel"
-        //         }
-        //     }
-        // },
+        responses: {
+            '200': {
+                description: 'success to create new worker to do action and return a worker id to follow',
+                schema: {
+                    type: 'string',
+                }
+            }
+        },
     },
     {
         method: 'GET',
@@ -161,5 +161,82 @@ export const publicApis: ApiRoute[] = [
             }
         },
         usedDefinitions: ['WorkflowState'],
+    },
+    {
+        method: 'POST',
+        path: 'workflow/short-action',
+        functionName: 'doShortAction',
+        tags: ['workflow'],
+        des: 'call an access action of process from a workflow',
+        description: `you can send fields as json without uploading files.\n\nyou can add some need fields like numbers, strings (not files) in 'fields' property of body`,
+        parameters: [
+            {
+                name: 'request',
+                in: 'body',
+                required: true,
+                type: 'object',
+                schema: {
+                    type: "object",
+                    properties: {
+                        state_action: {
+                            type: "string",
+                            default: 'approve',
+                            required: true,
+                        },
+                        process_id: {
+                            type: "string",
+                            default: '62cbc3933626b821f73cb9a2',
+                            required: true,
+                        },
+                        message: {
+                            type: "string",
+                            default: 'hello world',
+                            required: false,
+                        },
+                        fields: {
+                            type: "object",
+                            default: '{}',
+                            required: false,
+                        },
+                    },
+                }
+            },
+        ],
+        responses: {
+            '200': {
+                description: 'success to create new worker to do action and return a worker id to follow',
+                schema: {
+                    type: 'string',
+                }
+            }
+        },
+    },
+    {
+        method: 'GET',
+        path: 'worker/info',
+        functionName: 'workerInfo',
+        tags: ['worker'],
+        des: 'get worker details by id',
+        parameters: [
+            {
+                name: 'id',
+                in: 'body',
+                required: true,
+                type: 'string',
+            },
+        ],
+        responses: {
+            '200': {
+                description: 'success to return worker details',
+                schema: {
+                    $ref: "#/definitions/WorkerModel"
+                }
+            },
+            '404': {
+                description: 'not found such worker with ithis id',
+            },
+        },
+        usedDefinitions: ['WorkerModel'],
+
     },
 ];

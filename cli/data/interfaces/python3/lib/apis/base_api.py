@@ -34,6 +34,7 @@ class BaseApi():
         headers[self._auth_header_name] = self._token
         response = callPOSTApi(self.absApiUrl(
             path), data, debug_mode=self._debug_mode, headers=headers)
+        # print('resp:', response.body)
         if type(response.body) is str:
             response.body = json.loads(response.body)
 

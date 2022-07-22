@@ -1,16 +1,20 @@
-import { generateString } from "./common";
+import { debugLog, generateString } from "./common";
 import { WorkerStruct, WorkflowStateActionResponse, WorkflowStateActionSendParameters } from "./interfaces";
 import { Subject } from "rxjs";
 import { ProcessHelper } from "./apis/processHelper";
+import { Const } from "./const";
+import { WorkerModel } from "./models/models";
 
 export namespace WebWorkers {
     let workers: WorkerStruct[] = [];
     let workerFinishedEvent = new Subject<any>();
-    let workerRunning = false;
+    let workerRunning = 0;
+    let maxWorkerRunning = 0;
     /******************************** */
     export async function addActionWorker(params: WorkflowStateActionSendParameters): Promise<string> {
         // =>generate worker id
         let workerId = await addWorker<WorkflowStateActionResponse>({
+            type: 'state_action',
             doAction: async () => {
                 // =>do action by type
                 let functionCallName = 'doActionWithLocal';
@@ -52,11 +56,11 @@ export namespace WebWorkers {
                 // =>add process history
                 // =>call 'onInit' event of state
                 // =>check for end state
-                return true;
+                return {};
             },
             failedResult: async (response) => {
                 //TODO:
-                return true;
+                return { msg: 'error' };
             },
             priority: 2,
         });
@@ -66,30 +70,71 @@ export namespace WebWorkers {
     }
     /******************************** */
     async function addWorker<R = {}>(struct: WorkerStruct<R>) {
-        struct.started_at = new Date().getTime();
-        let id = generateString(20);
-        struct.id = id;
+        if (maxWorkerRunning === 0) {
+            maxWorkerRunning = Const.CONFIGS.server.max_worker_running;
+        }
+        struct.init_at = new Date().getTime();
+        // =>add worker to db
+        let worker = await Const.DB.models.workers.create(struct);
+        struct._id = worker._id;
+        debugLog('worker', `added a new worker by id '${struct._id}' by type '${struct.type}'`);
         workers.push(struct);
-        return id;
+        return struct._id;
+    }
+    /******************************** */
+    async function updateWorker(worker: WorkerStruct) {
+        let data: WorkerModel = {
+            init_at: worker.init_at,
+            priority: worker.priority,
+            type: worker.type,
+        };
+        if (worker.started_at) {
+            data.started_at = worker.started_at;
+        }
+        if (worker.ended_at) {
+            data.ended_at = worker.ended_at;
+        }
+        if (worker.response) {
+            data.response = worker.response;
+        }
+        if (worker.success !== undefined) {
+            data.success = worker.success;
+        }
+        await Const.DB.models.workers.findByIdAndUpdate(worker._id, { $set: data }, { multi: true, upsert: true }).clone();
     }
     /******************************** */
     export async function start() {
         setInterval(async () => {
             // =>check for new worker
             if (workers.length === 0) return;
+            // =>check max worker running
+            if (workerRunning >= maxWorkerRunning) {
+                return;
+            }
             let worker = workers.shift();
-            workerRunning = true;
+            workerRunning++;
+            worker.started_at = new Date().getTime();
+            // =>update  worker
+            await updateWorker(worker);
+            debugLog('worker', `start '${worker._id}' worker ...`);
             // =>run worker
-            let res = await worker.doAction();
-            // =>if success
-            if (res[0]) {
-                await worker.successResult(res);
-            }
-            // =>if failed
-            else {
-                await worker.failedResult(res);
-            }
-            //TODO:
+            worker.doAction().then(async (res) => {
+                // =>if success
+                if (res[0]) {
+                    worker.success = true;
+                    worker.response = await worker.successResult(res);
+                }
+                // =>if failed
+                else {
+                    worker.success = false;
+                    worker.response = await worker.failedResult(res);
+                }
+                worker.ended_at = new Date().getTime();
+                // =>update  worker
+                await updateWorker(worker);
+                workerRunning--;
+                //TODO:
+            });
         }, 100);
     }
 

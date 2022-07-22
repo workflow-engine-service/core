@@ -35,6 +35,7 @@ get a process hash instance and return states of workflow with transitions by fi
     - state_action: string
     - process_id: string
     - message?: string
+    - field.[name]?: string|number
 
 ## /api/v1/user/token [POST]
 > for directly method auth

@@ -10,12 +10,16 @@ print('[+] deploy workflow schema')
 print({{name}}_workflow.deploy())
 # create new process
 print('[+] create workflow process')
-newProcess = {{name}}_workflow.create()
-print(newProcess[0])
+newProcess, message = {{name}}_workflow.create()
+# print(newProcess)
 print('[+] get current state of process')
 # get current state info
-state = newProcess[0].currentState()
+state = newProcess.currentState()
 print(state)
 # execute 'approve' action of state
 print("[+] execute 'approve' action")
-print(newProcess[0].executeAction(state.getActionByName('approve')))
+worker = newProcess.executeAction(state.getActionByName('approve'))
+print(worker)
+# follow worker
+print("[+] follow up worker created for execute action")
+print(worker.info())

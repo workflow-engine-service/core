@@ -12,20 +12,38 @@ class WorkflowUserApi(BaseApi):
             return response.body['data']
         return None
 
+    def workerInfo(self, workerId: str) -> Dict:
+        response = self._callGETApi(
+            '/worker/info', {'id': workerId})
+        if response.code == 200:
+            return response.body['data']
+        return None
+
     def processAction(self, processId: str, state_action: str, message: str = None, fields: Dict = {}) -> Dict:
+        """call short action with no send files
+
+        Args:
+            processId (str): _description_
+            state_action (str): _description_
+            message (str, optional): _description_. Defaults to None.
+            fields (Dict, optional): _description_. Defaults to {}.
+
+        Returns:
+            Dict: _description_
+        """
         data = {
             'process_id': processId,
             'state_action': state_action,
-            'message': message,
         }
+        if message is not None:
+            data['message'] = message
         # =>add fields
+        req_fields = {}
         for key, value in fields.items():
-            data['field.' + key] = value
-
+            req_fields['field.' + key] = value
+        data['fields'] = req_fields
         response = self._callPOSTApi(
-            '/workflow/action', data, {
-                'Content-Type': 'multipart/form-data'
-            })
+            '/workflow/short-action', data)
         if response.code == 200:
             return response.body['data']
         return None

@@ -51,6 +51,13 @@ export async function loadConfigs() {
         if (!Const.CONFIGS.server.swagger_base_url) {
             Const.CONFIGS.server.swagger_base_url = '/api-docs';
         }
+        if (!Const.CONFIGS.server.worker_timeout) {
+            Const.CONFIGS.server.worker_timeout = 30;
+        }
+        if (!Const.CONFIGS.server.max_worker_running) {
+            Const.CONFIGS.server.max_worker_running = 10;
+        }
+
         // =>if 'prod' server mode
         if (Const.SERVER_MODE === 'prod') {
             Const.CONFIGS.server.port = 8080;

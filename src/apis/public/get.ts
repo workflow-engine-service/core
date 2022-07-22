@@ -32,4 +32,15 @@ export class PublicGetApi extends BaseApi {
 
         return this.response(res.state);
     }
+    /******************************* */
+    async workerInfo() {
+        // =>get worker id
+        let workerId = this.param('id');
+        // =>find worker by id
+        let worker = await Const.DB.models.workers.findById(workerId);
+        if (!worker) return this.error404();
+
+        return this.response(worker.toJSON());
+
+    }
 }

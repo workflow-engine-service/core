@@ -4,7 +4,7 @@ export type SwaggerDataType = 'array' | 'string' | 'integer' | 'object' | 'numbe
 export type SwaggerDataTypeFormat = 'int32' | 'int64' | 'string' | 'password' | 'date-time' | 'date' | 'binary' | 'byte' | 'double' | 'float';
 
 export type SwaggerTagName = 'admin' | 'workflow'
-    | 'user';
+    | 'user' | 'worker';
 
 export enum HttpStatusCode {
     HTTP_100_CONTINUE = 100,

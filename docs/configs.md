@@ -41,6 +41,7 @@ server configs like port or disable document services
 | wiki_base_url | string| NO | wiki service base url (default: `/wiki`)|| wiki_disabled | boolean| NO | is wiki service disabled?|
 | swagger_base_url | string| NO | swagger service base url (default: `/api-docs`)|
 | swagger_disabled | boolean| NO | is swagger service disabled?|
+| worker_timeout | number| NO | time for wait a worker to get response (default: 30s)|
 
 ## admin_users `required`
 

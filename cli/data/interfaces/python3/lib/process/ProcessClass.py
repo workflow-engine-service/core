@@ -3,6 +3,7 @@
 from datetime import datetime
 import json
 from typing import Dict, List
+from lib.process.WorkerClass import WorkerClass
 from lib.states.ActionClass import WorkflowStateAction
 from lib.workflow.WorkflowClass import WorkflowDefinition
 from lib.apis.admin_api import WorkflowAdminApi
@@ -72,7 +73,7 @@ class WorkflowProcess():
         response = self._user_api.processAction(
             self._id, action.get_name(), message, fields)
 
-        return response
+        return WorkerClass(response, self._user_api)
 
     def executeActionByName(self, action_name: str, message: str = None, fields: Dict = {}):
         # =>find current state

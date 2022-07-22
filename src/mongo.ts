@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { Const } from "./const";
-import { DeployedWorkflowModel, LogModel, SessionModel, UserModel, WorkflowProcessModel } from "./models/models";
+import { DeployedWorkflowModel, LogModel, SessionModel, UserModel, WorkerModel, WorkflowProcessModel } from "./models/models";
 import * as fs from 'fs';
 import * as path from 'path';
 import { debugLog, errorLog } from "./common";
@@ -14,8 +14,9 @@ export class MongoDB {
         processes?: mongoose.Model<WorkflowProcessModel>;
         logs?: mongoose.Model<LogModel>;
         sessions?: mongoose.Model<SessionModel>;
+        workers?: mongoose.Model<WorkerModel>;
     } = {};
-    modelNames = ['users', 'workflows', 'processes', 'logs', 'sessions'];
+    modelNames = ['users', 'workflows', 'processes', 'logs', 'sessions', 'workers'];
     constructor() {
 
     }

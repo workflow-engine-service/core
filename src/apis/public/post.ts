@@ -81,12 +81,42 @@ export class PublicPostApi extends BaseApi {
         return this.response(res);
     }
     /********************************** */
+    async doShortAction() {
+        let processId = this.param('process_id');
+        let stateActionName = this.param('state_action');
+        let userMessage = this.param('message');
+        // =>collect all fields
+        let fields = this.param('fields', {}, true);
+        // =>normalize fields
+        let normalFields = {};
+        for (const key of Object.keys(fields)) {
+            let normalKey = key;
+            if (!key.startsWith('field.')) {
+                normalKey = 'field.' + key;
+            }
+            normalFields[normalKey] = fields[key];
+        }
+        // =>do action
+        return await this.abstractDoAction(processId, stateActionName, userMessage, normalFields);
+
+    }
+    /********************************** */
     async doAction() {
-        console.log('fields:', this.request.req['fields'], this.request.req['files'])
+        // console.log('fields:', this.request.req['fields'], this.request.req['files'])
         // =>get main params
         let processId = this.formDataParam('process_id');
         let stateActionName = this.formDataParam('state_action');
         let userMessage = this.formDataParam('message');
+        // =>collect all fields
+        let fields = this.allFormDataParams('both');
+        // =>do action
+        return await this.abstractDoAction(processId, stateActionName, userMessage, fields);
+
+    }
+    /********************************** */
+    /********************************** */
+    /********************************** */
+    async abstractDoAction(processId: string, stateActionName: string, userMessage: string, fields: object) {
         let res = await this.getProcessCurrentState(processId);
         // =>if raise error
         if (Array.isArray(res)) {
@@ -102,18 +132,18 @@ export class PublicPostApi extends BaseApi {
             // =>check for required fields
             if (action.required_fields) {
                 for (const field of action.required_fields) {
-                    if (this.formDataParam('field.' + field) === undefined) {
+                    if (fields['field.' + field] === undefined) {
                         return this.error400(`must fill '${field}' field`);
                     }
                 }
             }
-            let fields: object = {};
+            let needFields: object = {};
             // =>collect all required fields, optional fields
             for (const field of [...action.required_fields, ...action.optional_fields]) {
                 // =>validate all required, optional fields
                 //TODO:
-                let value = this.formDataParam('field.' + field);
-                fields[field] = value;
+                let value = fields['field.' + field];
+                needFields[field] = value;
             }
 
             let workerId = await WebWorkers.addActionWorker({
@@ -126,17 +156,12 @@ export class PublicPostApi extends BaseApi {
                 workflow_name: res.process.workflow_name,
                 workflow_version: res.process.workflow_version,
                 message: userMessage,
-                fields,
+                fields: needFields,
                 _action: action,
                 _process: res.process,
             });
 
             return this.response(workerId);
         }
-
     }
-    /********************************** */
-    /********************************** */
-    /********************************** */
-
 }

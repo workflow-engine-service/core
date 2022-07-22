@@ -72,3 +72,18 @@ export interface SessionModel {
     expired_token_at: number;
     created_at: number;
 }
+
+export interface WorkerModel<R = {}> {
+    _id?: string;
+    /**
+     * more is better
+     * @default 1
+     */
+    type: 'state_action';
+    priority?: number;
+    init_at?: number;
+    started_at?: number;
+    ended_at?: number;
+    success?: boolean;
+    response?: R;
+}

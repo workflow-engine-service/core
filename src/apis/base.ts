@@ -119,6 +119,26 @@ export class BaseApi {
         return value;
     }
     /*************************************** */
+    allFormDataParams(type: 'files' | 'both' | 'non_files' = 'non_files') {
+        let params = {};
+        if (type === 'non_files' || type === 'both') {
+            if (typeof (this.request.req['fields']) === 'object') {
+                for (const key of Object.keys(this.request.req['fields'])) {
+                    params[key] = this.request.req['fields'][key];
+                }
+            }
+        }
+        if (type === 'files' || type === 'both') {
+            if (typeof (this.request.req['files']) === 'object') {
+                for (const key of Object.keys(this.request.req['files'])) {
+                    params[key] = this.request.req['files'][key];
+                }
+            }
+        }
+
+        return params;
+    }
+    /*************************************** */
     /*************************************** */
     /*************************************** */
     checkUserRoleHasAccess(roles: string[]) {
