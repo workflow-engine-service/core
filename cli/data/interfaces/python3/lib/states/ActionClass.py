@@ -56,6 +56,14 @@ class WorkflowStateAction():
         self.__set_fields = fields
         return self
 
+    def required_fields(self, fields: List[str]):
+        self.__required_fields = fields
+        return self
+
+    def optional_fields(self, fields: List[str]):
+        self.__optional_fields = fields
+        return self
+
     def get_name(self):
         return self.__name
 

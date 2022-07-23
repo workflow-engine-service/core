@@ -18,7 +18,8 @@ state = newProcess.currentState()
 print(state)
 # execute 'approve' action of state
 print("[+] execute 'approve' action")
-worker = newProcess.executeAction(state.getActionByName('approve'))
+worker = newProcess.executeAction(state.getActionByName(
+    'approve'), fields={'email': 'sample@gmail.com'})
 print(worker)
 # follow worker
 print("[+] follow up worker created for execute action")
@@ -34,6 +35,7 @@ while True:
         break
 
 print(worker)
+print(newProcess.update())
 # go to finish state, if success
 if worker.is_success():
     print('[+] go to finish state')

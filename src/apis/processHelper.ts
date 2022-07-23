@@ -1,7 +1,7 @@
 import { WorkflowStateEventName } from "../types";
 import { Const } from "../const";
 import { WorkflowStateAction, WorkflowStateActionResponse, WorkflowStateActionSendParameters, WorkflowStateActionSendParametersFields, WorkflowStateEvent, WorkflowStateEventSendParametersFields } from "../interfaces";
-import { WorkflowProcessModel } from "../models/models";
+import { WorkflowProcessChangeField, WorkflowProcessModel } from "../models/models";
 import { Redis } from "../redis";
 import { errorLog, debugLog } from "../common";
 
@@ -117,21 +117,25 @@ export namespace ProcessHelper {
         return false;
 
     }
+
     /********************************** */
-
-    async function emitEventWithRedis(event: WorkflowStateEvent, data: WorkflowStateEventSendParametersFields): Promise<boolean> {
-        try {
-            // =>find redis instance
-            let redisInstance = await findRedisInstance(event.redis_instance);
-            // =>publish params to channel
-            await redisInstance.publish(event.channel, data);
-
-            return true;
-
-        } catch (e) {
-            errorLog('event', e);
-            return false;
+    export async function collectChangedFields(params: WorkflowStateActionSendParameters, newFields: object): Promise<WorkflowProcessChangeField[]> {
+        if (!newFields) newFields = {};
+        let changedFields: WorkflowProcessChangeField[] = [];
+        for (const key of Object.keys(newFields)) {
+            // =>find before value
+            let beforeValue = undefined;
+            if (params._process.field_values.find(i => i.name === key)) {
+                beforeValue = params._process.field_values.find(i => i.name === key).value;
+            }
+            // =>Add new change field
+            changedFields.push({
+                name: key,
+                before_value: beforeValue,
+                current_value: newFields[key],
+            });
         }
+        return changedFields;
     }
 
 
@@ -147,5 +151,21 @@ export namespace ProcessHelper {
             redisInstance = Const.REDIS_INSTANCES[0];
         }
         return redisInstance;
+    }
+    /********************************** */
+
+    async function emitEventWithRedis(event: WorkflowStateEvent, data: WorkflowStateEventSendParametersFields): Promise<boolean> {
+        try {
+            // =>find redis instance
+            let redisInstance = await findRedisInstance(event.redis_instance);
+            // =>publish params to channel
+            await redisInstance.publish(event.channel, data);
+
+            return true;
+
+        } catch (e) {
+            errorLog('event', e);
+            return false;
+        }
     }
 }

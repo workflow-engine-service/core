@@ -7,13 +7,16 @@ create new process from a workflow
 ## /api/v1/workflow/list
 get list of workflow instances (processes) for this user
 
-## /api/v1/workflow/history?process_hash=34436dsssafdsq2eDR$e&filter=all|approved
+## /api/v1/workflow/history?process_id=34436dsssafdsq2eDR$e&filter=all|approved
 get a process hash instance and return states of workflow with transitions by filter
 
 ## /api/v1/workflow/fields [GET]
 * parameters
     - process_hash: string
 
+## /api/v1/workflow/process-info [GET] [DONE]
+* parameters
+    - process_id: string
 ## /api/v1/workflow/state-info [GET] [DONE]
 * parameters
     - process_id: string
@@ -30,14 +33,14 @@ get a process hash instance and return states of workflow with transitions by fi
     - message?: string
     - field.[name]?: file|string|number
 
-## /api/v1/workflow/short-action [POST]
+## /api/v1/workflow/short-action [POST] [DONE]
 - parameters
     - state_action: string
     - process_id: string
     - message?: string
     - field.[name]?: string|number
 
-## /api/v1/user/token [POST]
+## /api/v1/user/token [POST] [DONE]
 > for directly method auth
 * parameters:
 - username: string
@@ -57,7 +60,7 @@ get a process hash instance and return states of workflow with transitions by fi
 - lifetime: number (seconds)
 - expired_time: number (timestamp ms)
 
-## /api/v1/worker/info [GET]
+## /api/v1/worker/info [GET] [DONE]
 > for get background worker info
 * parameters:
 - worker_id: string

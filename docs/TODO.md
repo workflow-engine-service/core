@@ -1,8 +1,6 @@
 # TODO Tasks
 
 [ ] validate fields on execute action
-[ ] update field values after success action
-[ ] add process history after success action
 [ ] check for end state
 [ ] enable multi threading for workers
 [ ] emit action event on hook
@@ -17,3 +15,5 @@
 [x] call 'onInit' event of state
 [x] emit action event on redis
 [x] call 'onLeave' event of state
+[x] update field values after success action
+[x] add process history after success action

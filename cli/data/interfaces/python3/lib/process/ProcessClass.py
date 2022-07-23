@@ -30,6 +30,13 @@ class WorkflowProcess():
     _workflow: WorkflowDefinition
 
     def __init__(self, obj: Dict, workflow: WorkflowDefinition,  admin_api: WorkflowAdminApi, user_api: WorkflowUserApi) -> None:
+
+        self._update_by_obj(obj)
+        self._admin_api = admin_api
+        self._user_api = user_api
+        self._workflow = workflow
+
+    def _update_by_obj(self, obj: Dict):
         self.workflow_name = obj['workflow_name']
         self.workflow_version = obj['workflow_version']
         self.current_state = obj['current_state']
@@ -43,10 +50,6 @@ class WorkflowProcess():
                 int(obj['updated_at']) / 1000)
         self.created_by = obj['created_by']
 
-        self._admin_api = admin_api
-        self._user_api = user_api
-        self._workflow = workflow
-
     def __str__(self) -> str:
         return json.dumps({
             'workflow_name': self.workflow_name,
@@ -56,6 +59,13 @@ class WorkflowProcess():
             # TODO:
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S')
         })
+
+    def update(self):
+        response = self._user_api.processInfo(
+            self._id)
+        self._update_by_obj(response)
+
+        return self
 
     def currentState(self) -> WorkflowState:
         """get current state info

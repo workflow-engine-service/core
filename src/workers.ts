@@ -45,6 +45,11 @@ export namespace WebWorkers {
                 if (!responseFromActionType.fields) {
                     responseFromActionType.fields = {};
                 }
+                if (params.fields) {
+                    for (const key of Object.keys(params.fields)) {
+                        responseFromActionType.fields[key] = params.fields[key];
+                    }
+                }
                 // =>set extra fields
                 if (params._action.set_fields) {
                     for (const key of Object.keys(params._action.set_fields)) {
@@ -59,13 +64,37 @@ export namespace WebWorkers {
                 debugLog('worker', `success to run action and go to '${response.state_name}' state...`);
                 // =>call 'onLeave' event of state
                 ProcessHelper.emitStateEvent('onLeave', params._process.current_state, params);
+
+                // =>add process history
+                params._process.history.push({
+                    before_state: params._process.current_state,
+                    current_state: response.state_name,
+                    created_at: new Date().getTime(),
+                    user_id: params.user_id,
+                    message: params.message,
+                    worker_id: workerId,
+                    changed_fields: (await ProcessHelper.collectChangedFields(params, response.fields)),
+                });
+
                 // =>update current state
                 params._process.current_state = response.state_name;
                 // =>update field values
-                // =>add process history
+                if (!response.fields) response.fields = {};
+                for (const key of Object.keys(response.fields)) {
+                    let index = params._process.field_values.findIndex(i => i.name === key);
+                    if (index < 0) {
+                        params._process.field_values.push({
+                            name: key,
+                            value: undefined,
+                        });
+                        index = params._process.field_values.length - 1;
+                    }
+                    params._process.field_values[index].value = response.fields[key];
+                }
                 // =>call 'onInit' event of state
                 ProcessHelper.emitStateEvent('onInit', params._process.current_state, params);
                 // =>check for end state
+                //TODO:
                 // =>update process
                 await Const.DB.models.processes.findByIdAndUpdate(params.process_id, { $set: params._process }, { multi: true, upsert: true }).clone();
                 return response;

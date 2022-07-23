@@ -12,6 +12,13 @@ class WorkflowUserApi(BaseApi):
             return response.body['data']
         return None
 
+    def processInfo(self, processId: str) -> Dict:
+        response = self._callGETApi(
+            '/workflow/process-info', {'process_id': processId})
+        if response.code == 200:
+            return response.body['data']
+        return None
+
     def workerInfo(self, workerId: str) -> Dict:
         response = self._callGETApi(
             '/worker/info', {'id': workerId})

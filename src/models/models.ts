@@ -33,13 +33,17 @@ export interface WorkflowProcessModel {
     updated_at: number;
 }
 
+export interface WorkflowProcessChangeField {
+    name: string; before_value: any; current_value: any;
+}
 export interface WorkflowProcessHistoryModel {
     before_state: string;
     current_state: string;
     user_id: number;
     created_at: number;
     message?: string;
-    changed_fields?: { name: string; before_value: any; current_value: any; }[];
+    worker_id?: string;
+    changed_fields?: WorkflowProcessChangeField[];
 }
 
 export interface UserModel {

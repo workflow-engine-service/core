@@ -33,6 +33,18 @@ export class PublicGetApi extends BaseApi {
         return this.response(res.state);
     }
     /******************************* */
+    async getProcessInfo() {
+        let processId = this.param
+            ('process_id');
+        let res = await this.getProcessCurrentState(processId);
+        // =>if raise error
+        if (Array.isArray(res)) {
+            return res;
+        }
+
+        return this.response(res.process);
+    }
+    /******************************* */
     async workerInfo() {
         // =>get worker id
         let workerId = this.param('id');

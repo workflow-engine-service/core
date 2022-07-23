@@ -8,7 +8,8 @@ from lib.states.StateClass import WorkflowState
 class enter_info_state(WorkflowState):
     name = 'enter_info'
     actions = [
-        WorkflowStateAction('approve').redis('app_channel', 'app_channel_resp')
+        WorkflowStateAction('approve').redis(
+            'app_channel', 'app_channel_resp').required_fields(['email'])
     ]
 
 

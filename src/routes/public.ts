@@ -239,4 +239,31 @@ export const publicApis: ApiRoute[] = [
         usedDefinitions: ['WorkerModel'],
 
     },
+    {
+        method: 'GET',
+        path: 'workflow/process-info',
+        functionName: 'getProcessInfo',
+        tags: ['workflow'],
+        des: 'get process details by id',
+        parameters: [
+            {
+                name: 'process_id',
+                in: 'query',
+                required: true,
+                type: 'string',
+            },
+        ],
+        responses: {
+            '200': {
+                description: 'return process info',
+                schema: {
+                    $ref: "#/definitions/WorkflowProcessModel"
+                }
+            },
+            '404': {
+                description: 'not found such process with this process id'
+            }
+        },
+        usedDefinitions: ['WorkflowProcessModel'],
+    },
 ];

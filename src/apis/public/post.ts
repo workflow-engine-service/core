@@ -96,6 +96,7 @@ export class PublicPostApi extends BaseApi {
             }
             normalFields[normalKey] = fields[key];
         }
+        // console.log('fields:', normalFields)
         // =>do action
         return await this.abstractDoAction(processId, stateActionName, userMessage, normalFields);
 
