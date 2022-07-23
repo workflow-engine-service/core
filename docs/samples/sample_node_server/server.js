@@ -27,9 +27,15 @@ client.on('error', (err) => console.log('Redis Client Error', err));
 
 client.connect().then(async () => {
     await client.subscribe('app_channel', (message) => {
+        message = JSON.parse(message)
         console.log(message); // 'message'
         setTimeout(async () => {
-            let data = 'process_dfata';
+            let data;
+            if (message['state_name'] === 'enter_info') {
+                data = 'process_data';
+            } else {
+                data = 'finish';
+            }
             // let data =JSON.stringify({
 
             // })
@@ -38,5 +44,10 @@ client.connect().then(async () => {
             client1.publish('app_channel_resp', data);
             console.log('publish response after 5s');
         }, 5000);
+    });
+
+
+    await client.subscribe('event_channel', (message) => {
+        console.log('event:', message); // 'message'
     });
 });

@@ -4,16 +4,16 @@ from typing import Literal
 
 
 class WorkflowStateEvent():
-    __name: Literal['onInit', 'onLeave']
+    __name: str
     __type: Literal['redis', 'hook_url']
     # hook_url type
     __url: str
     __method: Literal['get', 'post', 'put', 'delete']
     # redis type
     __channel: str
-    __response_channel: str
+    __redis_instance: str = None
 
-    def __init__(self, name: str):
+    def __init__(self, name: Literal['onInit', 'onLeave']):
         self.__name = name
 
         return None
@@ -24,20 +24,24 @@ class WorkflowStateEvent():
         self.__method = method
         return self
 
-    def redis(self, channel: str, response_channel: str, instance: str = ''):
+    def redis(self, channel: str, instance: str = None):
         self.__type = 'redis'
         self.__channel = channel
-        self.__response_channel = response_channel
+        if instance is not None:
+            self.__redis_instance = instance
         return self
 
     def __str__(self) -> str:
         schema = {
             'name': self.__name,
+            'type': self.__type,
         }
         if self.__type == 'hook_url':
             schema['url'] = self.__url
             schema['method'] = self.__method
         elif self.__type == 'redis':
             schema['channel'] = self.__channel
-            schema['response_channel'] = self.__response_channel
+            if self.__redis_instance is not None:
+                schema['redis_instance'] = self.__redis_instance
+
         return json.dumps(schema)

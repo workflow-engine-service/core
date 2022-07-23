@@ -34,3 +34,7 @@ while True:
         break
 
 print(worker)
+# go to finish state, if success
+if worker.is_success():
+    print('[+] go to finish state')
+    finishWorker = newProcess.executeAction(state.getActionByName('approve'))

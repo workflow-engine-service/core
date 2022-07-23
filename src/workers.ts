@@ -4,6 +4,7 @@ import { Subject } from "rxjs";
 import { ProcessHelper } from "./apis/processHelper";
 import { Const } from "./const";
 import { WorkerModel } from "./models/models";
+import { isMainThread, Worker } from 'worker_threads';
 
 export namespace WebWorkers {
     let workers: WorkerStruct[] = [];
@@ -57,18 +58,24 @@ export namespace WebWorkers {
             successResult: async (response) => {
                 debugLog('worker', `success to run action and go to '${response.state_name}' state...`);
                 // =>call 'onLeave' event of state
+                ProcessHelper.emitStateEvent('onLeave', params._process.current_state, params);
                 // =>update current state
                 params._process.current_state = response.state_name;
                 // =>update field values
                 // =>add process history
                 // =>call 'onInit' event of state
+                ProcessHelper.emitStateEvent('onInit', params._process.current_state, params);
                 // =>check for end state
                 // =>update process
+                await Const.DB.models.processes.findByIdAndUpdate(params.process_id, { $set: params._process }, { multi: true, upsert: true }).clone();
                 return response;
             },
             failedResult: async (response) => {
                 //TODO:
-                return { error: response.response_message };
+                return {
+                    error: response.response_message,
+                    process_id: params.process_id,
+                };
             },
             priority: 2,
         });
@@ -125,6 +132,39 @@ export namespace WebWorkers {
             // =>update  worker
             await updateWorker(worker);
             debugLog('worker', `start '${worker._id}' worker ...`);
+            //TODO:multithreading
+            // if (isMainThread) {
+            //     const workerThread = new Worker('./child_worker.js', {
+            //         workerData: {
+            //             worker,
+            //         },
+            //     });
+            //     // Listen for a message from worker
+            //     workerThread.once("message", async (res) => {
+            //         console.log(`message: ${res}`);
+            //         // workerFinishedEvent.next()
+            //         // =>if success
+            //         worker.success = res[0];
+            //         if (res[0]) {
+            //             worker.response = await worker.successResult(res[1]);
+            //         }
+            //         // =>if failed
+            //         else {
+            //             worker.response = await worker.failedResult(res[1]);
+            //         }
+            //         worker.ended_at = new Date().getTime();
+            //         // =>update  worker
+            //         await updateWorker(worker);
+            //         workerRunning--;
+            //     });
+            //     workerThread.on("error", (error) => {
+            //         console.log(error);
+            //     });
+            //     workerThread.on("exit", (exitCode) => {
+            //         console.log(exitCode);
+            //     });
+
+            // }
             // =>run worker
             worker.doAction().then(async (res) => {
                 // =>if success

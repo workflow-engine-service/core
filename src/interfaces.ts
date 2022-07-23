@@ -1,6 +1,6 @@
 import { SwaggerApiParameter, SwaggerApiResponse } from "./document/interfaces";
 import { WorkerModel, WorkflowProcessModel } from "./models/models";
-import { HttpStatusCode, MiddlewareName, RequestMethodType, SwaggerTagName } from "./types";
+import { HttpStatusCode, MiddlewareName, RequestMethodType, SwaggerTagName, WorkflowStateEventName } from "./types";
 
 
 export interface ServerConfigs {
@@ -155,19 +155,15 @@ export interface WorkflowState {
 }
 
 export interface WorkflowStateEvent {
-    /**
-     * event name
-     * - onInit: when current state be this state
-     * - onLeave: when current state be left this state
-     */
-    name: 'onInit' | 'onLeave';
+
+    name: WorkflowStateEventName;
     type: 'redis' | 'hook_url';
     // =>hook url
     url?: string;
     method?: 'post' | 'put' | 'get' | 'delete';
     // =>redis
     channel?: string;
-    response_channel?: string;
+    redis_instance?: string;
 
 }
 
@@ -275,6 +271,7 @@ export interface WorkflowStateActionResponse {
 
 
     _failed?: boolean;
+    _process?: WorkflowProcessModel;
 }
 
 export interface WorkflowStateActionSendParametersFields {
@@ -288,6 +285,14 @@ export interface WorkflowStateActionSendParametersFields {
     user_id: number;
     message?: string;
 
+}
+
+export interface WorkflowStateEventSendParametersFields {
+    process_id: string;
+    state_name: string;
+    fields?: object;
+    name: WorkflowStateEventName;
+    user_id?: number;
 }
 
 export interface WorkflowStateActionSendParameters extends WorkflowStateActionSendParametersFields {

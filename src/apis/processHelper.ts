@@ -1,7 +1,9 @@
+import { WorkflowStateEventName } from "../types";
 import { Const } from "../const";
-import { WorkflowStateAction, WorkflowStateActionResponse, WorkflowStateActionSendParameters, WorkflowStateActionSendParametersFields } from "../interfaces";
+import { WorkflowStateAction, WorkflowStateActionResponse, WorkflowStateActionSendParameters, WorkflowStateActionSendParametersFields, WorkflowStateEvent, WorkflowStateEventSendParametersFields } from "../interfaces";
 import { WorkflowProcessModel } from "../models/models";
 import { Redis } from "../redis";
+import { errorLog, debugLog } from "../common";
 
 export namespace ProcessHelper {
     export async function doActionWithLocal(params: WorkflowStateActionSendParameters): Promise<WorkflowStateActionResponse> {
@@ -17,12 +19,7 @@ export namespace ProcessHelper {
     export async function doActionWithRedis(params: WorkflowStateActionSendParameters): Promise<WorkflowStateActionResponse> {
         try {
             // =>find redis instance
-            let redisInstance: Redis;
-            if (params._action.redis_instance) {
-                redisInstance = Const.REDIS_INSTANCES.find(i => i.getName() === params._action.redis_instance);
-            } else {
-                redisInstance = Const.REDIS_INSTANCES[0];
-            }
+            let redisInstance = await findRedisInstance(params._action.redis_instance);
             // =>publish params to channel
             await redisInstance.publish<WorkflowStateActionSendParametersFields>(params._action.channel, {
                 required_fields: params.required_fields,
@@ -83,5 +80,72 @@ export namespace ProcessHelper {
         return {
             state_name: null,
         };
+    }
+    /********************************** */
+
+    export async function emitStateEvent(eventName: WorkflowStateEventName, stateName: string, params: WorkflowStateActionSendParameters): Promise<boolean> {
+        // =>find state
+        let state = params._process.workflow.states.find(i => i.name === stateName);
+        // =>find match event
+        if (!state.events) state.events = [];
+        let event = state.events.find(i => i.name === eventName);
+        if (!event) return false;
+        // =>collect send params by event type
+        let data: WorkflowStateEventSendParametersFields = {
+            state_name: stateName,
+            name: eventName,
+            process_id: params.process_id,
+            fields: (await Const.DB.models.processes.findById(params.process_id)).field_values,
+            user_id: params.user_id,
+        };
+        switch (eventName) {
+            case 'onLeave':
+                break;
+            case 'onInit':
+
+                break;
+        }
+        debugLog('event', `emiting event '${eventName}' on '${event.type}'...`);
+        switch (event.type) {
+            case 'redis':
+                return await emitEventWithRedis(event, data);
+            case 'hook_url':
+                // functionCallName = 'doActionWithHookUrl';
+                //TODO:
+                break;
+        }
+        return false;
+
+    }
+    /********************************** */
+
+    async function emitEventWithRedis(event: WorkflowStateEvent, data: WorkflowStateEventSendParametersFields): Promise<boolean> {
+        try {
+            // =>find redis instance
+            let redisInstance = await findRedisInstance(event.redis_instance);
+            // =>publish params to channel
+            await redisInstance.publish(event.channel, data);
+
+            return true;
+
+        } catch (e) {
+            errorLog('event', e);
+            return false;
+        }
+    }
+
+
+    /********************************** */
+    /********************************** */
+    /********************************** */
+    async function findRedisInstance(redis_instance?: string) {
+        // =>find redis instance
+        let redisInstance: Redis;
+        if (redis_instance) {
+            redisInstance = Const.REDIS_INSTANCES.find(i => i.getName() === redis_instance);
+        } else {
+            redisInstance = Const.REDIS_INSTANCES[0];
+        }
+        return redisInstance;
     }
 }

@@ -51,3 +51,10 @@ export enum LogMode {
 export type RequestMethodType = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
 export type MiddlewareName = 'RequestInit' | 'Authentication' | 'FormDataParser' | 'RoutingResolver';
+
+/**
+     * event name
+     * - onInit: when current state be this state
+     * - onLeave: when current state be left this state
+     */
+export type WorkflowStateEventName = 'onInit' | 'onLeave';
