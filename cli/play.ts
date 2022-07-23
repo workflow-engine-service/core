@@ -10,9 +10,9 @@ import * as SET from "@dat/lib/settings";
 import * as path from 'path';
 import * as fs from 'fs';
 /************************************* */
-type CommandName = 'compile' | 'new';
+type CommandName = 'compile' | 'new' | 'sample';
 type CommandArgvName = 'language' | 'input' | 'output' | 'name' | 'version' | 'overwrite';
-const VERSION = '0.17';
+const VERSION = '0.19';
 /*********************************** */
 
 export async function main(): Promise<number> {
@@ -23,30 +23,6 @@ export async function main(): Promise<number> {
 
    // =>define argvs of script
    let res = await ARG.define<CommandName, CommandArgvName>([
-      // {
-      //    name: 'compile',
-      //    description: 'compile json workflow files to interface files for safe typing',
-      //    alias: 'c',
-      //    implement: async () => await compile(),
-      //    argvs: [
-      //       {
-      //          name: 'language',
-      //          alias: 'l',
-      //          description: 'language to genrate interface files',
-      //          defaultValue: 'python3',
-      //       },
-      //       {
-      //          name: 'input',
-      //          alias: 'i',
-      //          description: 'directory path for read json files',
-      //       },
-      //       {
-      //          name: 'output',
-      //          alias: 'o',
-      //          description: 'directory path for genrate interface files',
-      //       },
-      //    ],
-      // },
       {
          name: 'new',
          description: 'create new workflow',
@@ -82,6 +58,32 @@ export async function main(): Promise<number> {
                description: 'overwrite workflow, if exist',
             },
          ],
+      },
+      {
+         name: 'sample',
+         description: 'create a sample workflow',
+         alias: 's',
+         implement: async () => await sampleWorkflow(),
+         argvs: [
+            {
+               name: 'language',
+               alias: 'l',
+               description: 'language to generate interface files (default: python3)',
+               defaultValue: 'python3',
+            },
+            {
+               name: 'output',
+               alias: 'o',
+               description: 'directory path for genrate interface files',
+               defaultValue: './flows',
+            },
+            // {
+            //    name: 'overwrite',
+            //    alias: 'ow',
+            //    type: 'boolean',
+            //    description: 'overwrite workflow, if exist',
+            // },
+         ],
       }
 
    ]);
@@ -116,26 +118,13 @@ async function newWorkflow() {
    // =>add version to name
    let nameWithVersion = `${name}@v${version}`
    let langDataPath = path.join(await OS.cwd(), 'data', 'interfaces', lang);
-   // =>create output dir
-   fs.mkdirSync(outputPath, { recursive: true });
-   // =>if 'lib' exist, rmeove it to update it
-   if (fs.existsSync(path.join(outputPath, 'lib'))) {
-      await OS.rmdir(path.join(outputPath, 'lib'));
-   }
-   // =>copy 'lib' folder
-   await OS.copyDirectory(path.join(langDataPath, 'lib'), path.join(outputPath, 'lib'));
+
+   await updateOutputEnv(outputPath, lang);
    let renderData = {
       base_url: 'http://localhost:8082',
       name,
       version,
    };
-   // =>create 'settings.py' file, if not
-   if (!fs.existsSync(path.join(outputPath, 'settings.py'))) {
-      fs.writeFileSync(path.join(outputPath, 'settings.py'), (await TEM.renderString(fs.readFileSync(path.join(langDataPath, 'settings.py')).toString(), {
-         noCache: true,
-         data: renderData,
-      })).data);
-   }
    // =>create workflow dir
    let workflowPath = path.join(outputPath, nameWithVersion);
    // => if must overwrite
@@ -158,10 +147,10 @@ async function newWorkflow() {
             source: path.join('sample', 'states.py'),
             dest: `states.py`,
          },
-         {
-            source: path.join('sample', 'sample_func.py'),
-            dest: `run.py`,
-         },
+         // {
+         //    source: path.join('sample', 'sample_func.py'),
+         //    dest: `run.py`,
+         // },
          {
             source: path.join('sample', '__init__.py'),
             dest: `__init__.py`,
@@ -183,5 +172,42 @@ async function newWorkflow() {
       LOG.success(`workflow '${nameWithVersion}' created in '${outputPath}' collection successfully :)`);
    } else {
       LOG.warning(`workflow '${nameWithVersion}' before exist and not changed in '${outputPath}' collection`);
+   }
+}
+/*********************************** */
+async function sampleWorkflow() {
+   // =>Get language
+   let lang = ARG.getArgv('language');
+   // =>get output path
+   let outputPath = ARG.getArgv('output');
+   // =>select samples
+   let sampleWorkflow = await IN.select('select sample workflow', ['sample_register_user_redis@v1']);
+   let langsamplesPath = path.join(await OS.cwd(), 'data', 'samples', lang);
+   await updateOutputEnv(outputPath, lang);
+   await OS.copyDirectory(path.join(langsamplesPath, sampleWorkflow), path.join(outputPath, sampleWorkflow));
+   LOG.success(`workflow '${sampleWorkflow}' created in '${outputPath}' collection successfully :)`);
+}
+/*********************************** */
+/*********************************** */
+/*********************************** */
+async function updateOutputEnv(outputPath: string, lang: string) {
+   let langDataPath = path.join(await OS.cwd(), 'data', 'interfaces', lang);
+   // =>create output dir
+   fs.mkdirSync(outputPath, { recursive: true });
+   // =>if 'lib' exist, rmeove it to update it
+   if (fs.existsSync(path.join(outputPath, 'lib'))) {
+      await OS.rmdir(path.join(outputPath, 'lib'));
+   }
+   // =>copy 'lib' folder
+   await OS.copyDirectory(path.join(langDataPath, 'lib'), path.join(outputPath, 'lib'));
+   let renderData = {
+      base_url: 'http://localhost:8082',
+   };
+   // =>create 'settings.py' file, if not
+   if (!fs.existsSync(path.join(outputPath, 'settings.py'))) {
+      fs.writeFileSync(path.join(outputPath, 'settings.py'), (await TEM.renderString(fs.readFileSync(path.join(langDataPath, 'settings.py')).toString(), {
+         noCache: true,
+         data: renderData,
+      })).data);
    }
 }

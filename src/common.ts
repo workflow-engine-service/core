@@ -11,15 +11,32 @@ export async function InitDB() {
     await Const.DB.addAdminUsers();
 }
 /***************************************** */
+function findConfigsFile() {
+    let configsPath: string;
+    let configFilename = 'configs.json';
+    // =>if dev mode
+    if (Const.SERVER_MODE === 'dev') {
+        configFilename = 'configs.dev.json';
+    }
+    // =>if prod mode
+    else if (Const.SERVER_MODE === 'prod') {
+        configFilename = 'configs.json';
+
+    }
+    configsPath = path.join(configFilename);
+    if (!fs.existsSync(configsPath)) {
+        configsPath = path.join(path.dirname(__filename), configFilename);
+    }
+    if (!fs.existsSync(configsPath)) {
+        configsPath = path.join(path.dirname(__filename), '..', 'docker', 'configs', configFilename);
+    }
+
+    return configsPath;
+}
+/***************************************** */
 export async function loadConfigs() {
     try {
-        let configsPath = path.join('configs.json');
-        if (!fs.existsSync(configsPath)) {
-            configsPath = path.join(path.dirname(__filename), 'configs.json');
-        }
-        if (!fs.existsSync(configsPath)) {
-            configsPath = path.join(path.dirname(__filename), '..', 'docker', 'configs', 'configs.json');
-        }
+        let configsPath = findConfigsFile();
         if (fs.existsSync(configsPath)) {
             let configsFile = JSON.parse(fs.readFileSync(configsPath).toString());
             Const.CONFIGS = configsFile;

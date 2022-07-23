@@ -12,7 +12,7 @@
 ## Get Started (for production mode)
 
 - create docker image by `docker build -t workflow_engine:latest -f ./Dockerfile .`
-- copy `configs.json` to `docker/data/app/configs` folder
+- create a `configs.json` file to `docker/data/app/configs` folder (you can copy form `configs.dev.json` file)
 - run docker image by docker-compose: `docker-compose up -d --remove-orphans`
 > for remove dangling images, use `sudo docker rmi $(sudo docker images --filter "dangling=true" -q --no-trunc)`
 
