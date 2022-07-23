@@ -15,6 +15,7 @@ class WorkflowStateAction():
     # hook_url type
     __url: str
     __method: Literal['get', 'post', 'put', 'delete']
+    __headers: Dict = None
     # redis type
     __channel: str
     __response_channel: str
@@ -33,10 +34,11 @@ class WorkflowStateAction():
 
         return None
 
-    def hook_url(self, url: str, method: Literal['get', 'post', 'put', 'delete'] = 'post'):
+    def hook_url(self, url: str, method: Literal['get', 'post', 'put', 'delete'] = 'post', headers: Dict = {}):
         self.__type = 'hook_url'
         self.__url = url
         self.__method = method
+        self.__headers = headers
         return self
 
     def redis(self, channel: str, response_channel: str, instance: str = None):
@@ -82,6 +84,8 @@ class WorkflowStateAction():
         elif self.__type == 'hook_url':
             schema['url'] = self.__url
             schema['method'] = self.__method
+            if self.__headers is not None:
+                schema['headers'] = self.__headers
         elif self.__type == 'redis':
             schema['channel'] = self.__channel
             schema['response_channel'] = self.__response_channel

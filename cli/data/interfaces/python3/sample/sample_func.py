@@ -21,6 +21,9 @@ print("[+] execute 'approve' action")
 worker = newProcess.executeAction(state.getActionByName(
     'approve'), fields={'email': 'sample@gmail.com'})
 print(worker)
+if type(worker) == str:
+    print('error for create worker')
+    exit(1)
 # follow worker
 print("[+] follow up worker created for execute action")
 while True:

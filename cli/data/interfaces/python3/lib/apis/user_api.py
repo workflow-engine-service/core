@@ -1,5 +1,5 @@
 
-from typing import Dict
+from typing import Dict, Tuple
 from base_api import BaseApi
 from lib.workflow.request import callPOSTApi
 
@@ -26,7 +26,7 @@ class WorkflowUserApi(BaseApi):
             return response.body['data']
         return None
 
-    def processAction(self, processId: str, state_action: str, message: str = None, fields: Dict = {}) -> Dict:
+    def processAction(self, processId: str, state_action: str, message: str = None, fields: Dict = {}) -> Tuple[Dict, str]:
         """call short action with no send files
 
         Args:
@@ -52,5 +52,5 @@ class WorkflowUserApi(BaseApi):
         response = self._callPOSTApi(
             '/workflow/short-action', data)
         if response.code == 200:
-            return response.body['data']
-        return None
+            return (response.body['data'], None)
+        return (None, response.body)

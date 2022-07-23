@@ -2,7 +2,7 @@
 
 from datetime import datetime
 import json
-from typing import Dict, List
+from typing import Dict, List, Tuple, Union
 from lib.process.WorkerClass import WorkerClass
 from lib.states.ActionClass import WorkflowStateAction
 from lib.workflow.WorkflowClass import WorkflowDefinition
@@ -79,10 +79,11 @@ class WorkflowProcess():
             if state.name == stateObj['name']:
                 return state
 
-    def executeAction(self, action: WorkflowStateAction, message: str = None, fields: Dict = {}):
+    def executeAction(self, action: WorkflowStateAction, message: str = None, fields: Dict = {}) -> Union[WorkerClass, str]:
         response = self._user_api.processAction(
             self._id, action.get_name(), message, fields)
-
+        if response[0] is None or type(response[0]) is not str:
+            return response[1]
         return WorkerClass(response, self._user_api)
 
     def executeActionByName(self, action_name: str, message: str = None, fields: Dict = {}):
