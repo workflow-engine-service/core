@@ -50,9 +50,27 @@ export namespace WebRoutes {
             });
         }
         app.use(assetsBaseUrl, expressStatic(path.join(__dirname, '..', 'public', 'assets')));
-        // app.get('/', (req, res) => {
-        //     return res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
-        // });
+        app.get('/', (req, res) => {
+            let html = `<html>
+            <body>
+            <h1>Welcome to Workflow Engine</h1>
+            <hr>`;
+            // =>if swagger enabled
+            if (!Const.CONFIGS.server.swagger_disabled) {
+                html += `
+                <p><strong>[+] swagger docs: </strong><a href="${Const.CONFIGS.server.swagger_base_url}">${Const.CONFIGS.server.swagger_base_url}</a></p>`
+            }
+            // =>if wiki enabled
+            if (!Const.CONFIGS.server.wiki_disabled) {
+                html += `
+                <p><strong>[+] wiki docs: </strong><a href="${Const.CONFIGS.server.wiki_base_url}">${Const.CONFIGS.server.wiki_base_url}</a></p>`
+            }
+            html += `
+            </body>
+            </html>`;
+            res.write(html);
+            res.end();
+        });
         // app.use('/assets', expressStatic(path.join(__dirname, '..', 'public', 'assets')));
 
     }
