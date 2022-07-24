@@ -7,9 +7,9 @@ import * as SET from "@dat/lib/settings";
 import * as path from 'path';
 import * as fs from 'fs';
 /************************************* */
-type CommandName = 'compile' | 'new' | 'sample';
-type CommandArgvName = 'language' | 'input' | 'output' | 'name' | 'version' | 'overwrite';
-const VERSION = '0.20';
+type CommandName = 'compile' | 'new' | 'sample' | 'install';
+type CommandArgvName = 'language' | 'input' | 'output' | 'name' | 'version' | 'overwrite' | 'skip-remove-docker-cache';
+const VERSION = '0.23';
 /*********************************** */
 
 export async function main(): Promise<number> {
@@ -81,7 +81,21 @@ export async function main(): Promise<number> {
             //    description: 'overwrite workflow, if exist',
             // },
          ],
-      }
+      },
+      {
+         name: 'install',
+         description: 'install workflow engine as dockerize',
+         alias: 'i',
+         implement: async () => await installWorkflow(),
+         argvs: [
+            {
+               name: 'skip-remove-docker-cache',
+               alias: 's1',
+               description: 'skip to remove docker unused images, containers',
+               type: 'boolean',
+            },
+         ],
+      },
 
    ]);
    if (!res) return 1;
@@ -89,7 +103,50 @@ export async function main(): Promise<number> {
    return 0;
 }
 /*********************************** */
-async function compile() {
+async function installWorkflow() {
+   let dokcerPath = path.join(await OS.cwd(), 'data', 'docker');
+
+   let dokcerTmpPath = path.join(dokcerPath, 'tmp');
+   let prodConfigsPath = path.join(dokcerTmpPath, 'configs.json');
+   let sourceRootPath = path.join(await OS.cwd(), '..');
+   // =>clear docker cache
+   if (!ARG.hasArgv('skip-remove-docker-cache')) {
+      LOG.info('remove stopped docker containers ...');
+      await OS.shell(`sudo docker rm $(sudo docker ps --filter=status=exited --filter=status=dead -q)`);
+      LOG.info('clear unused docker images...');
+      await OS.shell(`sudo docker rmi $(sudo docker images --filter "dangling=true" -q --no-trunc)`);
+   }
+   fs.mkdirSync(dokcerTmpPath, { recursive: true });
+   // =>copy configs.prod.json to tmp
+   if (fs.existsSync(path.join(sourceRootPath, 'configs.prod.json'))) {
+      fs.copyFileSync(path.join(sourceRootPath, 'configs.prod.json'), prodConfigsPath);
+   } else {
+      fs.copyFileSync(path.join(dokcerPath, 'configs.prod.json'), prodConfigsPath);
+   }
+   // =>read configs.json
+   let configs = JSON.parse(fs.readFileSync(prodConfigsPath).toString());
+   // =>read complete configs.json
+   let completeConfigs = JSON.parse(fs.readFileSync(path.join(dokcerPath, 'configs.prod.json')).toString());
+   // =>concat configs.json
+   configs = await concatObjects(configs, completeConfigs);
+   // =>update configs.json
+   configs['mongo']['host'] = 'mongo';
+   // =>save configs.json
+   fs.writeFileSync(prodConfigsPath, JSON.stringify(configs, null, 2));
+   // =>render files
+   let renderFiles = ['Dockerfile', 'docker-compose.yml'];
+   for (const file of renderFiles) {
+      await TEM.saveRenderFile(path.join(dokcerPath, file), dokcerTmpPath, {
+         data: {
+            configs,
+         },
+      });
+   }
+   // =>build image
+   LOG.info('rebuild docker image ...');
+   await OS.shell(`sudo docker build -t workflow_engine:latest -f ./cli/data/docker/tmp/Dockerfile .`, sourceRootPath);
+   LOG.info('run docker compose...');
+   await OS.shell(`sudo docker-compose -f ./docker-compose.yml up -d --remove-orphans`, dokcerTmpPath);
 
 }
 /*********************************** */
@@ -209,4 +266,20 @@ async function updateOutputEnv(outputPath: string, lang: string) {
          data: renderData,
       })).data);
    }
+}
+/*********************************** */
+
+
+async function concatObjects(obj1: object, completeObj2: object) {
+   for (const key of Object.keys(completeObj2)) {
+      // console.log('key:', key, obj1[key], completeObj2[key])
+      if (obj1[key] === undefined) {
+         obj1[key] = completeObj2[key];
+      }
+      else if (typeof completeObj2[key] === 'object') {
+         obj1[key] = await concatObjects(obj1[key], completeObj2[key]);
+         // console.log('object key:', key, obj1[key])
+      }
+   }
+   return obj1;
 }

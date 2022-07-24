@@ -1,4 +1,4 @@
-# Workflow Engine Service
+# Workflow Engine Service - version 0.4 (beta)
 
 ## Get started (for developer mode)
 
@@ -11,10 +11,11 @@
 
 ## Get Started (for production mode)
 
-- create docker image by `docker build -t workflow_engine:latest -f ./Dockerfile .`
-- create a `configs.json` file to `docker/data/app/configs` folder (you can copy form `configs.dev.json` file)
-- run docker image by docker-compose: `docker-compose up -d --remove-orphans`
-> for remove dangling images, use `sudo docker rmi $(sudo docker images --filter "dangling=true" -q --no-trunc)`
+- cd to `cli/` folder
+- run command `dat p i`
+> for install `dat` command, see `cli/README.md` file
+
+> you can create a `configs.prod.json` file and set your custom configs
 
 ## Author
 

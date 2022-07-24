@@ -11,6 +11,10 @@ export interface ServerConfigs {
         name: string;
         username?: string;
         password?: string;
+        /**
+         * used for docker prod
+         */
+        timezone?: string;
     };
     server: {
         port: number;

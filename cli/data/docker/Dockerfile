@@ -15,14 +15,11 @@ RUN npm i --only=production
 # Bundle app source
 COPY . .
 
-RUN mkdir -p docker/configs
-RUN mv configs.json docker/configs
+RUN cp ./cli/data/docker/tmp/configs.json configs.json
 
-# RUN ls
-# RUN ls /app/docker/configs
 # compile sources
 RUN npm run build
 
-EXPOSE 8080
+EXPOSE {{configs.server.port}}
 
 CMD ["node", "build/index.js", "prod"]
