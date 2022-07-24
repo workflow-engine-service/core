@@ -1,3 +1,4 @@
+import { DeployedWorkflowModel } from "src/models/models";
 import { Const } from "../../const";
 import { WorkflowDescriptor } from "../../interfaces";
 import { BaseApi } from "../base";
@@ -23,8 +24,7 @@ export class AdminPostApi extends BaseApi {
         })) {
             return this.error400('duplicate workflow');
         }
-        // =>deploy workflow
-        let res = await Const.DB.models.workflows.create({
+        let deployedWorkflow: DeployedWorkflowModel = {
             name: code.workflow_name,
             version: code.version,
             start_state: code.start_state,
@@ -34,7 +34,18 @@ export class AdminPostApi extends BaseApi {
             },
             fields: code.fields,
             states: code.states,
-        });
+        }
+        if (code.create_access_roles) {
+            deployedWorkflow.settings.create_access_roles = code.create_access_roles;
+        }
+        if (code.read_access_roles) {
+            deployedWorkflow.settings.read_access_roles = code.read_access_roles;
+        }
+        if (code.process_init_check) {
+            deployedWorkflow.settings.process_init_check = code.process_init_check;
+        }
+        // =>deploy workflow
+        let res = await Const.DB.models.workflows.create(deployedWorkflow);
         return this.response(res.toJSON());
     }
 

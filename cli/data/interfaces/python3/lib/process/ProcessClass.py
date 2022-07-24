@@ -84,7 +84,7 @@ class WorkflowProcess():
             self._id, action.get_name(), message, fields)
         if response[0] is None or type(response[0]) is not str:
             return response[1]
-        return WorkerClass(response, self._user_api)
+        return WorkerClass(response[0], self._user_api)
 
     def executeActionByName(self, action_name: str, message: str = None, fields: Dict = {}):
         # =>find current state

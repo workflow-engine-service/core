@@ -20,6 +20,7 @@ class Workflow():
     END_STATE: str = None
     FIELDS: FieldClass = None
     CREATE_ACCESS_ROLES: List[str] = ['_all_']
+    READ_ACCESS_ROLES: List[str] = ['_all_']
     PROCESS_INIT_CHECK: WorkflowProcessInitCheck = None
     AUTO_DELETE_AFTER_END = FALSE
     STATES = []
@@ -70,6 +71,7 @@ class Workflow():
             'workflow_name': self.NAME,
             'version': self.VERSION,
             'create_access_roles': self.CREATE_ACCESS_ROLES,
+            'read_access_roles': self.READ_ACCESS_ROLES,
             'start_state': self.START_STATE,
             'end_state': self.END_STATE,
             'fields': [],

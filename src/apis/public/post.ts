@@ -167,7 +167,7 @@ export class PublicPostApi extends BaseApi {
                 _action: action,
                 _process: res.process,
             });
-
+            // console.log('worker id:', workerId)
             return this.response(workerId);
         }
     }

@@ -3,8 +3,7 @@
 [ ] validate fields on execute action
 [ ] check for end state
 [ ] enable multi threading for workers
-[ ] emit action event on hook
-[ ] do action with hook
+[ ] complete to validate deployed workflow
 
 
 # DONE Tasks
@@ -17,3 +16,6 @@
 [x] call 'onLeave' event of state
 [x] update field values after success action
 [x] add process history after success action
+[x] add `read_access_roles` to workflow
+[x] emit action event on hook
+[x] do action with hook

@@ -179,6 +179,7 @@ export interface WorkflowStateAction {
     // =>hook url
     url?: string;
     method?: 'post' | 'put' | 'get' | 'delete';
+    headers?: object;
     // =>redis
     channel?: string;
     response_channel?: string;
@@ -222,6 +223,11 @@ export interface WorkflowDescriptor {
      * @default ['_all_']
      */
     create_access_roles?: string[];
+    /**
+     * user roles that access to read process from this workflow
+     * @default ['_all_']
+     */
+    read_access_roles?: string[];
     /**
      * default same as workflow name (for interfaces)
      * 

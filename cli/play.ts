@@ -12,7 +12,7 @@ import * as fs from 'fs';
 /************************************* */
 type CommandName = 'compile' | 'new' | 'sample';
 type CommandArgvName = 'language' | 'input' | 'output' | 'name' | 'version' | 'overwrite';
-const VERSION = '0.19';
+const VERSION = '0.20';
 /*********************************** */
 
 export async function main(): Promise<number> {
@@ -180,9 +180,11 @@ async function sampleWorkflow() {
    let lang = ARG.getArgv('language');
    // =>get output path
    let outputPath = ARG.getArgv('output');
-   // =>select samples
-   let sampleWorkflow = await IN.select('select sample workflow', ['sample_register_user_redis@v1']);
    let langsamplesPath = path.join(await OS.cwd(), 'data', 'samples', lang);
+   // =>find language samples
+   let sampleWorkflows = fs.readdirSync(langsamplesPath, { withFileTypes: true }).filter(i => i.isDirectory()).map(i => i.name);
+   // =>select samples
+   let sampleWorkflow = await IN.select('select sample workflow', sampleWorkflows);
    await updateOutputEnv(outputPath, lang);
    await OS.copyDirectory(path.join(langsamplesPath, sampleWorkflow), path.join(outputPath, sampleWorkflow));
    LOG.success(`workflow '${sampleWorkflow}' created in '${outputPath}' collection successfully :)`);

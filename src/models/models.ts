@@ -9,12 +9,13 @@ export interface DeployedWorkflowModel {
     settings: {
         auto_delete_after_end?: boolean;
         create_access_roles?: string[];
+        read_access_roles?: string[];
         process_init_check?: WorkflowProcessOnInit;
     };
     fields: WorkflowField[];
     states: WorkflowState[];
 
-    _id: string;
+    _id?: string;
 }
 
 export interface WorkflowProcessModel {

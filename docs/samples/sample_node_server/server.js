@@ -1,23 +1,39 @@
-var http = require('http'); // 1 - Import Node.js core module
 var redis = require('redis');
+const express = require('express');
+const app = express();
+app.use(
+    express.urlencoded({
+        extended: true,
+    })
+);
 
-var server = http.createServer(function (req, res) {
-    if (req.url == '/') { //check the URL of the current request
+app.use(express.json());
 
-        // set response header
-        res.writeHead(200, { 'Content-Type': 'text/html' });
-
-        // set response content    
-        res.write('<html><body><p>This is home Page.</p></body></html>');
-        res.end();
-
+app.post('/api/hook', (req, res) => {
+    console.log('request headers:', req.headers);
+    console.log('request body:', req.body);
+    let data = {
+        state_name: ''
+    };
+    if (req.body['state_name'] === 'enter_info') {
+        data.state_name = 'process_data';
+    } else {
+        data.state_name = 'finish';
     }
-
+    console.log('response after 5s...');
+    setTimeout(() => {
+        res.json(data);
+    }, 5000);
 });
 
-server.listen(5000); //3 - listen for any incoming requests
+app.put('/api/event', (req, res) => {
+    // console.log('request event headers:', req.headers);
+    console.log('request event body:', req.body);
+});
 
-console.log('Node.js web server at port 5000 is running..')
+app.listen(5000);
+
+console.log('Node.js web server at port 5000 is running..');
 
 
 

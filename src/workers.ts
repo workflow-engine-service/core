@@ -32,6 +32,7 @@ export namespace WebWorkers {
                 }
                 // =>start do action
                 let responseFromActionType = await ProcessHelper[functionCallName](params) as WorkflowStateActionResponse;
+                debugLog('worker', `response from action by type '${params._action.type}' is: next_state: ${responseFromActionType.state_name}, is_failed: ${responseFromActionType._failed}`);
                 // =>check for exist such state
                 if (!responseFromActionType._failed && responseFromActionType.state_name && !params._process.workflow.states.find(i => i.name === responseFromActionType.state_name)) {
                     responseFromActionType._failed = true;
