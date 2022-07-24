@@ -4,12 +4,12 @@
 
 ## /api/v1/admin/users
 
-## /api/v1/admin/user/add [POST]
+## /api/v1/admin/user/add [POST] [DONE]
 * parameters:
 - id?: number
 - name: string
 - email?: string
-- role: string
+- roles: string[]
 - secret_key?: string (for auth user directly)
 - info?: object
 

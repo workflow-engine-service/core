@@ -48,13 +48,14 @@ export interface WorkflowProcessHistoryModel {
 }
 
 export interface UserModel {
-    id: number;
+    id?: number;
     name: string;
     roles: string[];
     email?: string;
-    secret_key: string;
+    secret_key?: string;
     is_admin?: boolean;
-    info?: object;
+    info?: {};
+    created_at?: number;
 }
 export interface LogModel {
     namespace: string;

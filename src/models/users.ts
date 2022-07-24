@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { UserModel } from './models';
 const metaDataSchema = new mongoose.Schema<UserModel, UserModel>({
-    id: String,
+    id: Number,
     email: String,
     info: Object,
     name: String,
@@ -11,6 +11,7 @@ const metaDataSchema = new mongoose.Schema<UserModel, UserModel>({
         default: false,
     },
     secret_key: String,
+    created_at: Number,
 });
 
 export async function getSchema() {

@@ -1,7 +1,7 @@
 import { WorkflowStateEventName } from "../types";
 import { Const } from "../const";
-import { WorkflowStateAction, WorkflowStateActionResponse, WorkflowStateActionSendParameters, WorkflowStateActionSendParametersFields, WorkflowStateEvent, WorkflowStateEventSendParametersFields } from "../interfaces";
-import { WorkflowProcessChangeField, WorkflowProcessModel } from "../models/models";
+import { WorkflowStateActionResponse, WorkflowStateActionSendParameters, WorkflowStateActionSendParametersFields, WorkflowStateEvent, WorkflowStateEventSendParametersFields } from "../interfaces";
+import { WorkflowProcessChangeField } from "../models/models";
 import { Redis } from "../redis";
 import { errorLog, debugLog } from "../common";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";

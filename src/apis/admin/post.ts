@@ -1,4 +1,4 @@
-import { DeployedWorkflowModel } from "src/models/models";
+import { DeployedWorkflowModel, UserModel } from "../../models/models";
 import { Const } from "../../const";
 import { WorkflowDescriptor } from "../../interfaces";
 import { BaseApi } from "../base";
@@ -9,6 +9,10 @@ export function classApi() {
 
 export class AdminPostApi extends BaseApi {
     async deployWorkflow() {
+        // =>check admin access
+        if (!this.request.user().is_admin) {
+            return this.error403('just admin allowed');
+        }
         let code = this.param<WorkflowDescriptor>('code', undefined, true);
 
         // =>validate workflow code
@@ -48,6 +52,42 @@ export class AdminPostApi extends BaseApi {
         let res = await Const.DB.models.workflows.create(deployedWorkflow);
         return this.response(res.toJSON());
     }
+    /************************************** */
+    async userAdd() {
+        // =>check admin access
+        if (!this.request.user().is_admin) {
+            return this.error403('just admin allowed');
+        }
+
+        let userInfo = this.param<UserModel>('user');
+        if (!userInfo || !userInfo.name) return this.error400('bad user name');
+        if (!userInfo.id) {
+            while (true) {
+                userInfo.id = Math.ceil(Math.random() * 1000);
+                if (!await Const.DB.models.users.findOne({ id: userInfo.id })) {
+                    break;
+                }
+            }
+        }
+        // =>check for duplicate user
+        if (await Const.DB.models.users.findOne({
+            $or: [
+                { id: userInfo.id },
+                { name: userInfo.name },
+            ]
+        })) {
+            return this.error400('user exist with id or name');
+        }
+        // console.log('user:', userInfo);
+
+        userInfo.created_at = new Date().getTime();
+
+        let addedUser = await Const.DB.models.users.create(userInfo);
+
+        return this.response(addedUser);
+    }
+    /************************************** */
+    /************************************** */
 
     /************************************** */
     async validateWorkflowCode(code: WorkflowDescriptor): Promise<[WorkflowDescriptor, string]> {
