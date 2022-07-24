@@ -3,6 +3,7 @@
 ## redis `optional`
 
 define some redis server connections used for redis type of state action
+> if you not use any redis server, redis server in dokcer compose not be loaded! 
 ```
 "redis": {
     "redis1": {

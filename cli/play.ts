@@ -8,8 +8,8 @@ import * as path from 'path';
 import * as fs from 'fs';
 /************************************* */
 type CommandName = 'compile' | 'new' | 'sample' | 'install' | 'stop';
-type CommandArgvName = 'language' | 'input' | 'output' | 'name' | 'version' | 'overwrite' | 'skip-remove-docker-cache';
-const VERSION = '0.24';
+type CommandArgvName = 'language' | 'input' | 'output' | 'name' | 'version' | 'overwrite' | 'skip-remove-docker-cache' | 'skip-build-image';
+const VERSION = '0.25';
 const DOCKER_PROJECT_NAME = 'workflow_engine_saas';
 /*********************************** */
 
@@ -95,6 +95,12 @@ export async function main(): Promise<number> {
                description: 'skip to remove docker unused images, containers',
                type: 'boolean',
             },
+            {
+               name: 'skip-build-image',
+               alias: 's2',
+               description: 'skip to build workflow image',
+               type: 'boolean',
+            },
          ],
       },
       {
@@ -128,12 +134,13 @@ async function installWorkflow() {
    if (fs.existsSync(path.join(sourceRootPath, 'configs.prod.json'))) {
       fs.copyFileSync(path.join(sourceRootPath, 'configs.prod.json'), prodConfigsPath);
    } else {
-      fs.copyFileSync(path.join(dokcerPath, 'configs.prod.json'), prodConfigsPath);
+      LOG.warning(`can not find 'configs.prod.json' file to load custom configs`);
+      fs.copyFileSync(path.join(dokcerPath, 'configs.json'), prodConfigsPath);
    }
    // =>read configs.json
    let configs = JSON.parse(fs.readFileSync(prodConfigsPath).toString());
    // =>read complete configs.json
-   let completeConfigs = JSON.parse(fs.readFileSync(path.join(dokcerPath, 'configs.prod.json')).toString());
+   let completeConfigs = JSON.parse(fs.readFileSync(path.join(dokcerPath, 'configs.json')).toString());
    // =>concat configs.json
    configs = await concatObjects(configs, completeConfigs);
    // =>update configs.json
@@ -150,8 +157,10 @@ async function installWorkflow() {
       });
    }
    // =>build image
-   LOG.info('rebuild docker image ...');
-   await OS.shell(`sudo docker build -t workflow_engine:latest -f ./cli/data/docker/tmp/Dockerfile .`, sourceRootPath);
+   if (!ARG.hasArgv('skip-build-image')) {
+      LOG.info('rebuild docker image ...');
+      await OS.shell(`sudo docker build -t workflow_engine:latest -f ./cli/data/docker/tmp/Dockerfile .`, sourceRootPath);
+   }
    LOG.info('run docker compose...');
    await OS.shell(`sudo docker-compose -f ./docker-compose.yml --project-name ${DOCKER_PROJECT_NAME} up -d --remove-orphans `, dokcerTmpPath);
 

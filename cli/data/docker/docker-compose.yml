@@ -3,7 +3,7 @@ version: "3"
 services:
 
   mongo:
-    image: mongo
+    image: {{configs.docker.mongo_image}}
     restart: always
     environment:
       MONGO_INITDB_DATABASE: {{configs.mongo.name}}
@@ -14,8 +14,9 @@ services:
       - ./data/mongo/db:/data/db
     ports:
       - "127.0.0.1:{{configs.mongo.port}}:27017"
+{% if configs.redis %}
   redis:
-    image: redis
+    image: {{configs.docker.redis_image}}
     restart: always
     # command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
 
@@ -23,6 +24,7 @@ services:
       - ./data/redis/redis.conf:/usr/local/etc/redis/redis.conf
     ports:
       - "6379:6379"
+{% endif %}
   app:
     image: workflow_engine:latest
     restart: always

@@ -5,12 +5,6 @@
         "name": "workflow_db",
         "timezone": "Asia/Tehran"
     },
-    "redis": {
-        "redis1": {
-            "host": "127.0.0.1",
-            "port": 6379
-        }
-    },
     "server": {
         "port": 8082,
         "host": "0.0.0.0",
@@ -33,5 +27,9 @@
         "type": "directly",
         "lifetime": 86400,
         "param_name": "access_token"
+    },
+    "docker": {
+        "mongo_image": "mongo",
+        "redis_image": "redis"
     }
 }

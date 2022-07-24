@@ -78,6 +78,9 @@ export async function loadConfigs() {
         if (!Const.CONFIGS.server.max_worker_running) {
             Const.CONFIGS.server.max_worker_running = 10;
         }
+        if (!Const.CONFIGS.redis) {
+            Const.CONFIGS.redis = {};
+        }
 
         // =>if 'prod' server mode
         if (Const.SERVER_MODE === 'prod') {
