@@ -74,9 +74,9 @@ export interface ServerAdminUserConfig {
     username: string;
     secretkey: string;
     /**
-     * @default _admin_
+     * @default [_admin_]
      */
-    role?: string;
+    roles?: string[];
 }
 
 export interface ApiRoute {

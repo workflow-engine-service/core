@@ -7,9 +7,10 @@ import * as SET from "@dat/lib/settings";
 import * as path from 'path';
 import * as fs from 'fs';
 /************************************* */
-type CommandName = 'compile' | 'new' | 'sample' | 'install';
+type CommandName = 'compile' | 'new' | 'sample' | 'install' | 'stop';
 type CommandArgvName = 'language' | 'input' | 'output' | 'name' | 'version' | 'overwrite' | 'skip-remove-docker-cache';
-const VERSION = '0.23';
+const VERSION = '0.24';
+const DOCKER_PROJECT_NAME = 'workflow_engine_saas';
 /*********************************** */
 
 export async function main(): Promise<number> {
@@ -96,6 +97,12 @@ export async function main(): Promise<number> {
             },
          ],
       },
+      {
+         name: 'stop',
+         description: 'stop workflow docker containers',
+         alias: 'stp',
+         implement: async () => await stopDocker(),
+      },
 
    ]);
    if (!res) return 1;
@@ -146,8 +153,16 @@ async function installWorkflow() {
    LOG.info('rebuild docker image ...');
    await OS.shell(`sudo docker build -t workflow_engine:latest -f ./cli/data/docker/tmp/Dockerfile .`, sourceRootPath);
    LOG.info('run docker compose...');
-   await OS.shell(`sudo docker-compose -f ./docker-compose.yml up -d --remove-orphans`, dokcerTmpPath);
+   await OS.shell(`sudo docker-compose -f ./docker-compose.yml --project-name ${DOCKER_PROJECT_NAME} up -d --remove-orphans `, dokcerTmpPath);
 
+}
+/*********************************** */
+
+async function stopDocker() {
+   let dokcerPath = path.join(await OS.cwd(), 'data', 'docker');
+
+   let dokcerTmpPath = path.join(dokcerPath, 'tmp');
+   await OS.shell(`sudo docker-compose -f ./docker-compose.yml --project-name ${DOCKER_PROJECT_NAME} stop `, dokcerTmpPath);
 }
 /*********************************** */
 async function newWorkflow() {

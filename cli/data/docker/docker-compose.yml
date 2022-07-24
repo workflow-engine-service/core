@@ -3,7 +3,7 @@ version: "3"
 services:
 
   mongo:
-    image: dockerhub.ir/mongo
+    image: mongo
     restart: always
     environment:
       MONGO_INITDB_DATABASE: {{configs.mongo.name}}
@@ -29,5 +29,10 @@ services:
     ports:
       - "{{configs.server.port}}:{{configs.server.port}}"
     volumes:
-      - ./data/app/logs:/app/logs
+      - ./data/app/logs:/app/{{configs.server.logs_path}}
+      - ./data/app/uploads:/app/{{configs.server.uploads_path}}
       # - ./data/app/configs:/app/docker/configs
+    depends_on:
+      - mongo
+    links: 
+        - mongo
