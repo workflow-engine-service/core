@@ -173,4 +173,10 @@ export class BaseApi {
         }
         return { state: stateInfo, process };
     }
+    /*************************************** */
+
+    isAdmin() {
+        if (!this.request.user()) return false;
+        return this.request.user().is_admin;
+    }
 }

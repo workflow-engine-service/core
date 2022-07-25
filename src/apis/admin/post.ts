@@ -10,7 +10,7 @@ export function classApi() {
 export class AdminPostApi extends BaseApi {
     async deployWorkflow() {
         // =>check admin access
-        if (!this.request.user().is_admin) {
+        if (!this.isAdmin()) {
             return this.error403('just admin allowed');
         }
         let code = this.param<WorkflowDescriptor>('code', undefined, true);
@@ -55,7 +55,7 @@ export class AdminPostApi extends BaseApi {
     /************************************** */
     async userAdd() {
         // =>check admin access
-        if (!this.request.user().is_admin) {
+        if (!this.isAdmin()) {
             return this.error403('just admin allowed');
         }
 
