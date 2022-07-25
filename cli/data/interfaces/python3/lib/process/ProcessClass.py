@@ -79,7 +79,7 @@ class WorkflowProcess():
             if state.name == stateObj['name']:
                 return state
 
-    def executeAction(self, action: dWorkflowStateAction, message: str = None, fields: Dict = {}) -> Union[WorkerClass, str]:
+    def executeAction(self, action: WorkflowStateAction, message: str = None, fields: Dict = {}) -> Union[WorkerClass, str]:
         response = self._user_api.processAction(
             self._id, action.get_name(), message, fields)
         if response[0] is None or type(response[0]) is not str:

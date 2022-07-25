@@ -1,6 +1,6 @@
 import { DeployedWorkflowModel, WorkflowProcessModel } from "../../models/models";
 import { Auth } from "../../auth";
-import { errorLog, generateString, infoLog } from "../../common";
+import { debugLog, errorLog, generateString, infoLog } from "../../common";
 import { Const } from "../../const";
 import { HttpStatusCode } from "../../types";
 import { BaseApi } from "../base";
@@ -19,8 +19,9 @@ export class PublicPostApi extends BaseApi {
         if (Const.CONFIGS.auth_user.type === 'directly' || Const.CONFIGS.auth_user.type === 'dual') {
             let user = await Auth.authenticate(this.param('username'), this.param('secret_key'));
             if (user) {
+                debugLog('token', JSON.stringify(user));
                 // =>log user
-                infoLog('user', 'login user with id ' + user.name);
+                infoLog('user', `login user with name '${user.name}' `);
                 // =>create new session
                 let res = await Auth.addSession(user, this.request.req);
                 // =>set cookie

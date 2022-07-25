@@ -15,8 +15,10 @@ export function middleware() {
 export class Authentication extends Middleware {
 
    async handle(req: Request, res: Response) {
+      // =>check if root url
+      if (req.path == '/') return true;
       // =>check for exclude urls
-      let excludeUrls = [Const.CONFIGS.server.swagger_base_url, Const.CONFIGS.server.wiki_base_url, WebRoutes.assetsBaseUrl, '/'];
+      let excludeUrls = [Const.CONFIGS.server.swagger_base_url, Const.CONFIGS.server.wiki_base_url, WebRoutes.assetsBaseUrl];
       for (const url of excludeUrls) {
          if (req.path.startsWith(url)) {
             return true;
@@ -39,6 +41,7 @@ export class Authentication extends Middleware {
          // console.log('token:', authToken)
          // =>find user session by token
          const userFind = await this.getUserBySessionToken(authToken);
+         // console.log('userfind:', userFind)
          if (userFind === 'invalid') {
             return this.responseError(req, HttpStatusCode.HTTP_401_UNAUTHORIZED, 'token not valid');
          }
