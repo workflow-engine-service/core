@@ -47,7 +47,7 @@ export async function main(): Promise<number> {
             {
                name: 'output',
                alias: 'o',
-               description: 'directory path for genrate interface files',
+               description: 'directory path for generate interface files',
             },
             {
                name: 'overwrite',

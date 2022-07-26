@@ -1,0 +1,6 @@
+[book]
+authors = ["madkne"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Workflow Engine Service - version 0.4"

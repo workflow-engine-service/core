@@ -141,7 +141,13 @@ export interface ApiRoute {
 export interface WorkflowField {
     name: string;
     type?: 'string' | 'number' | 'file';
+    /**
+     * any data useful for client
+     */
     meta?: object;
+    /**
+     * you can set more validations on field
+     */
     validation?: WorkflowFieldValidation[];
 }
 export interface WorkflowFieldValidation {
@@ -153,8 +159,17 @@ export interface WorkflowFieldValidation {
 export interface WorkflowState {
     name: string;
     meta?: object;
+    /**
+     * roles to view this state (default: `['_all_']`)
+     */
     access_role?: string[];
+    /**
+     * actions of state
+     */
     actions: WorkflowStateAction[];
+    /**
+     * you can define events on state
+     */
     events?: WorkflowStateEvent[];
 }
 
@@ -212,7 +227,9 @@ export interface APIResponse<T = any> {
     error?: any;
 }
 
-
+/**
+ * @edition 20220727
+ */
 export interface WorkflowDescriptor {
     /**
      * @default sample_workflow
@@ -233,21 +250,12 @@ export interface WorkflowDescriptor {
      */
     read_access_roles?: string[];
     /**
-     * default same as workflow name (for interfaces)
-     * 
-     * 
-     */
-    workflow_class_name?: string;
-    /**
      * check when a process wants to start
      */
     process_init_check?: WorkflowProcessOnInit;
     /**
-     * these actions are in all states (for interfaces) 
-     * 
-     * 
+     * delete process after enter to end state
      */
-    shared_actions?: string[];
     auto_delete_after_end?: boolean;
     /**
      * TODO: not implemented yet!
@@ -256,7 +264,13 @@ export interface WorkflowDescriptor {
         event: 'user_add' | 'user_emove' | 'user_update';
         //TODO:
     };
+    /**
+     * start state of process
+     */
     start_state: string;
+    /**
+     * end state of process
+     */
     end_state: string;
     fields?: WorkflowField[];
     states: WorkflowState[];
