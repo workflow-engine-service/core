@@ -7,7 +7,7 @@ import * as SET from "@dat/lib/settings";
 import * as path from 'path';
 import * as fs from 'fs';
 /************************************* */
-type CommandName = 'compile' | 'new' | 'sample' | 'install' | 'stop';
+type CommandName = 'compile' | 'new' | 'sample' | 'install' | 'stop' | 'publish-docs';
 type CommandArgvName = 'language' | 'input' | 'output' | 'name' | 'version' | 'overwrite' | 'skip-remove-docker-cache' | 'skip-build-image';
 const VERSION = '0.25';
 const DOCKER_PROJECT_NAME = 'workflow_engine_saas';
@@ -109,6 +109,12 @@ export async function main(): Promise<number> {
          alias: 'stp',
          implement: async () => await stopDocker(),
       },
+      {
+         name: 'publish-docs',
+         description: 'build and publish docs by mdbook',
+         alias: 'pb',
+         implement: async () => await publishDocs(),
+      },
 
    ]);
    if (!res) return 1;
@@ -117,10 +123,10 @@ export async function main(): Promise<number> {
 }
 /*********************************** */
 async function installWorkflow() {
-   let dokcerPath = path.join(await OS.cwd(), 'data', 'docker');
+   let dockerPath = path.join(await OS.cwd(), 'data', 'docker');
 
-   let dokcerTmpPath = path.join(dokcerPath, 'tmp');
-   let prodConfigsPath = path.join(dokcerTmpPath, 'configs.json');
+   let dockerTmpPath = path.join(dockerPath, 'tmp');
+   let prodConfigsPath = path.join(dockerTmpPath, 'configs.json');
    let sourceRootPath = path.join(await OS.cwd(), '..');
    // =>clear docker cache
    if (!ARG.hasArgv('skip-remove-docker-cache')) {
@@ -129,18 +135,18 @@ async function installWorkflow() {
       LOG.info('clear unused docker images...');
       await OS.shell(`sudo docker rmi $(sudo docker images --filter "dangling=true" -q --no-trunc)`);
    }
-   fs.mkdirSync(dokcerTmpPath, { recursive: true });
+   fs.mkdirSync(dockerTmpPath, { recursive: true });
    // =>copy configs.prod.json to tmp
    if (fs.existsSync(path.join(sourceRootPath, 'configs.prod.json'))) {
       fs.copyFileSync(path.join(sourceRootPath, 'configs.prod.json'), prodConfigsPath);
    } else {
       LOG.warning(`can not find 'configs.prod.json' file to load custom configs`);
-      fs.copyFileSync(path.join(dokcerPath, 'configs.json'), prodConfigsPath);
+      fs.copyFileSync(path.join(dockerPath, 'configs.json'), prodConfigsPath);
    }
    // =>read configs.json
    let configs = JSON.parse(fs.readFileSync(prodConfigsPath).toString());
    // =>read complete configs.json
-   let completeConfigs = JSON.parse(fs.readFileSync(path.join(dokcerPath, 'configs.json')).toString());
+   let completeConfigs = JSON.parse(fs.readFileSync(path.join(dockerPath, 'configs.json')).toString());
    // =>concat configs.json
    configs = await concatObjects(configs, completeConfigs);
    // =>update configs.json
@@ -150,7 +156,7 @@ async function installWorkflow() {
    // =>render files
    let renderFiles = ['Dockerfile', 'docker-compose.yml'];
    for (const file of renderFiles) {
-      await TEM.saveRenderFile(path.join(dokcerPath, file), dokcerTmpPath, {
+      await TEM.saveRenderFile(path.join(dockerPath, file), dockerTmpPath, {
          data: {
             configs,
          },
@@ -162,7 +168,7 @@ async function installWorkflow() {
       await OS.shell(`sudo docker build -t workflow_engine:latest -f ./cli/data/docker/tmp/Dockerfile .`, sourceRootPath);
    }
    LOG.info('run docker compose...');
-   await OS.shell(`sudo docker-compose -f ./docker-compose.yml --project-name ${DOCKER_PROJECT_NAME} up -d --remove-orphans `, dokcerTmpPath);
+   await OS.shell(`sudo docker-compose -f ./docker-compose.yml --project-name ${DOCKER_PROJECT_NAME} up -d --remove-orphans `, dockerTmpPath);
 
 }
 /*********************************** */
@@ -267,6 +273,15 @@ async function sampleWorkflow() {
    await OS.copyDirectory(path.join(langsamplesPath, sampleWorkflow), path.join(outputPath, sampleWorkflow));
    LOG.success(`workflow '${sampleWorkflow}' created in '${outputPath}' collection successfully :)`);
 }
+/*********************************** */
+// async function publishDocs() {
+//    let wesDocsPath = path.join(await OS.cwd(), '..', 'docs', 'wes_book');
+//    await OS.shell(`mdbook build --dest-dir dist`, wesDocsPath);
+//    await OS.shell('git init', path.join(wesDocsPath, 'dist'));
+//    await OS.shell('git remote add origin https://github.com/madkne/workflow-engine-serivce-docs', path.join(wesDocsPath, 'dist'));
+//    // =>push
+//    await OS.shell('git push origin master --force', path.join(wesDocsPath, 'dist'));
+// }
 /*********************************** */
 /*********************************** */
 /*********************************** */
