@@ -5,6 +5,8 @@ for customize default configure, if you in development mode, must edit `configs.
 
 configs json file includes some namespaces that some is required to set (for development mode) and some is optional. 
 
+> after update `configs.prod.json` file (in production mode), you should to reset workflow engine by command `dat p i` ([install command](../cli/install_command.md))
+
 ## config namespaces
 
 - [redis](./redis.md) (*optional*)
@@ -13,4 +15,5 @@ configs json file includes some namespaces that some is required to set (for dev
 - [admin_users](./admin_users.md) (**required**)
 - [auth_user](./auth_user.md) (**required**)
 - [docker](./docker.md) (*optional*) (just for production)
+- [alias](./alias.md.md) (*optional*)
 

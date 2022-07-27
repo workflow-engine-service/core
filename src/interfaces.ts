@@ -37,6 +37,12 @@ export interface ServerConfigs {
          */
         max_worker_running?: number;
     };
+    alias?: {
+        [k: string]: {
+            type: 'hook_url' | 'redis';
+            [k1: string]: any;
+        }
+    },
     admin_users: ServerAdminUserConfig[];
     auth_user: {
         type: 'api_based' | 'directly' | 'dual';
@@ -177,6 +183,7 @@ export interface WorkflowStateEvent {
 
     name: WorkflowStateEventName;
     type: 'redis' | 'hook_url';
+    alias_name?: string;
     // =>hook url
     url?: string;
     method?: 'post' | 'put' | 'get' | 'delete';
@@ -195,6 +202,7 @@ export interface WorkflowStateAction {
     message_required?: boolean;
     meta?: object;
     set_fields?: object;
+    alias_name?: string;
     // =>hook url
     url?: string;
     method?: 'post' | 'put' | 'get' | 'delete';
@@ -228,7 +236,7 @@ export interface APIResponse<T = any> {
 }
 
 /**
- * @edition 20220727
+ * @edition 20220727.1
  */
 export interface WorkflowDescriptor {
     /**

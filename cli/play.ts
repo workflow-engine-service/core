@@ -109,12 +109,12 @@ export async function main(): Promise<number> {
          alias: 'stp',
          implement: async () => await stopDocker(),
       },
-      {
-         name: 'publish-docs',
-         description: 'build and publish docs by mdbook',
-         alias: 'pb',
-         implement: async () => await publishDocs(),
-      },
+      // {
+      //    name: 'publish-docs',
+      //    description: 'build and publish docs by mdbook',
+      //    alias: 'pb',
+      //    implement: async () => await publishDocs(),
+      // },
 
    ]);
    if (!res) return 1;
@@ -135,6 +135,8 @@ async function installWorkflow() {
       LOG.info('clear unused docker images...');
       await OS.shell(`sudo docker rmi $(sudo docker images --filter "dangling=true" -q --no-trunc)`);
    }
+   LOG.info('stop docker services...');
+   await stopDocker();
    fs.mkdirSync(dockerTmpPath, { recursive: true });
    // =>copy configs.prod.json to tmp
    if (fs.existsSync(path.join(sourceRootPath, 'configs.prod.json'))) {

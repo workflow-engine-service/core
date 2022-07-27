@@ -12,6 +12,7 @@ class WorkflowStateAction():
     __message_required: bool
     __meta: Dict
     __set_fields: Dict
+    __alias_name: str = None
     # hook_url type
     __url: str
     __method: Literal['get', 'post', 'put', 'delete']
@@ -34,16 +35,18 @@ class WorkflowStateAction():
 
         return None
 
-    def hook_url(self, url: str, method: Literal['get', 'post', 'put', 'delete'] = 'post', headers: Dict = {}):
+    def hook_url(self, url: str = None, method: Literal['get', 'post', 'put', 'delete'] = 'post', headers: Dict = {}, alias_name: str = None):
         self.__type = 'hook_url'
         self.__url = url
         self.__method = method
         self.__headers = headers
+        self.__alias_name = alias_name
         return self
 
-    def redis(self, channel: str, response_channel: str, instance: str = None):
+    def redis(self, channel: str, response_channel: str, instance: str = None, alias_name: str = None):
         self.__type = 'redis'
         self.__channel = channel
+        self.__alias_name = alias_name
         self.__response_channel = response_channel
         if instance is not None:
             self.__redis_instance = instance
@@ -53,6 +56,11 @@ class WorkflowStateAction():
         self.__type = 'local'
         self.__next_state = next_state
         return self
+
+    def alias(self, name: str):
+        if self.__type != 'hook_url' and self.__type != 'redis':
+            raise Exception("must set type as hook_url or redis")
+        self.__alias_name = name
 
     def set_fields(self, fields: Dict):
         self.__set_fields = fields
@@ -79,6 +87,8 @@ class WorkflowStateAction():
             'message_required': self.__message_required,
             'type': self.__type,
         }
+        if self.__alias_name is not None:
+            schema['alias_name'] = self.__alias_name
         if self.__type == 'local':
             schema['next_state'] = self.__next_state
         elif self.__type == 'hook_url':

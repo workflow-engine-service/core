@@ -1,9 +1,9 @@
 import { WorkflowStateEventName } from "../types";
 import { Const } from "../const";
-import { WorkflowStateActionResponse, WorkflowStateActionSendParameters, WorkflowStateActionSendParametersFields, WorkflowStateEvent, WorkflowStateEventSendParametersFields } from "../interfaces";
+import { WorkflowStateAction, WorkflowStateActionResponse, WorkflowStateActionSendParameters, WorkflowStateActionSendParametersFields, WorkflowStateEvent, WorkflowStateEventSendParametersFields } from "../interfaces";
 import { WorkflowProcessChangeField } from "../models/models";
 import { Redis } from "../redis";
-import { errorLog, debugLog } from "../common";
+import { errorLog, debugLog, applyAliasConfig } from "../common";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 
 export namespace ProcessHelper {
@@ -19,6 +19,8 @@ export namespace ProcessHelper {
 
     export async function doActionWithRedis(params: WorkflowStateActionSendParameters): Promise<WorkflowStateActionResponse> {
         try {
+            // =>check for alias_name
+            params._action = applyAliasConfig<WorkflowStateAction>(params._action);
             // =>find redis instance
             let redisInstance = await findRedisInstance(params._action.redis_instance);
             // =>publish params to channel
@@ -68,7 +70,9 @@ export namespace ProcessHelper {
 
     export async function doActionWithHookUrl(params: WorkflowStateActionSendParameters): Promise<WorkflowStateActionResponse> {
         try {
-            if (!params._action.method) params._action.method = 'get';
+            // =>check for alias_name
+            params._action = applyAliasConfig<WorkflowStateAction>(params._action);
+            if (!params._action.method) params._action.method = 'post';
             let headers = {};
             if (params._action.headers) {
                 headers = { ...headers, ...params._action.headers };
@@ -149,7 +153,7 @@ export namespace ProcessHelper {
 
                 break;
         }
-        debugLog('event', `emiting event '${eventName}' on '${event.type}'...`);
+        debugLog('event', `emitting event '${eventName}' on '${event.type}'...`);
         switch (event.type) {
             case 'redis':
                 return await emitEventWithRedis(event, data);
@@ -212,6 +216,8 @@ export namespace ProcessHelper {
 
     async function emitEventWithRedis(event: WorkflowStateEvent, data: WorkflowStateEventSendParametersFields): Promise<boolean> {
         try {
+            // =>check for alias_name
+            event = applyAliasConfig<WorkflowStateEvent>(event);
             // =>find redis instance
             let redisInstance = await findRedisInstance(event.redis_instance);
             // =>publish params to channel
@@ -228,6 +234,8 @@ export namespace ProcessHelper {
 
     async function emitEventWithHookUrl(event: WorkflowStateEvent, data: WorkflowStateEventSendParametersFields): Promise<boolean> {
         try {
+            // =>check for alias_name
+            event = applyAliasConfig<WorkflowStateEvent>(event);
             if (!event.method) event.method = 'get';
             let headers = {};
             let configs: AxiosRequestConfig<WorkflowStateEventSendParametersFields> = {

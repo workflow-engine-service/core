@@ -31,5 +31,6 @@
     "docker": {
         "mongo_image": "mongo",
         "redis_image": "redis"
-    }
+    },
+    "alias": {}
 }

@@ -20,4 +20,8 @@
 [x] emit action event on hook
 [x] do action with hook
 [x] create mdbook docs
+[x] add alias_name to state action type hook_url
+[x] add alias_name to state action type redis
+[x] add alias_name to state event type hook_url
+[x] add alias_name to state event type redis
 [x] add license and code of conduct

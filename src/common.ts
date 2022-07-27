@@ -81,6 +81,9 @@ export async function loadConfigs() {
         if (!Const.CONFIGS.redis) {
             Const.CONFIGS.redis = {};
         }
+        if (!Const.CONFIGS.alias) {
+            Const.CONFIGS.alias = {};
+        }
 
         // =>if 'prod' server mode
         if (Const.SERVER_MODE === 'prod') {
@@ -99,6 +102,24 @@ export async function loadConfigs() {
         console.error(e);
         return false;
     }
+}
+/***************************************** */
+export function applyAliasConfig<T = object>(obj: T): T {
+
+    if (!obj) return {} as any;
+    if (!obj['alias_name']) return obj;
+    // =>find alias properties
+    let aliasObject = Const.CONFIGS.alias[obj['alias_name']];
+    // =>check type
+    if (obj['type'] !== aliasObject['type']) return obj;
+    // =>set alias properties
+    for (const key of Object.keys(aliasObject)) {
+        obj[key] = aliasObject[key];
+    }
+    if (!aliasObject) return obj;
+
+
+    return obj;
 }
 /***************************************** */
 function log(text: string, label?: string, type: 'info' | 'error' | 'normal' | 'debug' = 'normal') {
