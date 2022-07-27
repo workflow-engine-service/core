@@ -25,3 +25,4 @@
 [x] add alias_name to state event type hook_url
 [x] add alias_name to state event type redis
 [x] add license and code of conduct
+[x] add `send_fields` to state action

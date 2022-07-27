@@ -37,7 +37,7 @@ every type of alias has different properties
 
 | name | type | required | Description |
 | ----------- | ----------- |----------- |----------- |
-|url| string | NO | can be a url like `http://sample.com/hook`. used for 'hook_url' type|
+|url| string | **YES** | can be a url like `http://sample.com/hook`. used for 'hook_url' type|
 |method| string | NO | can be a request method like 'get' or 'post'. used for 'hook_url' type|
 |headers| string[] | NO | headers that can be set on hook request. used for 'hook_url' type|
 
@@ -46,6 +46,6 @@ every type of alias has different properties
 
 | name | type | required | Description |
 | ----------- | ----------- |----------- |----------- |
-|channel|string|NO| publish channel name. used for 'redis' type|
-|response_channel|string|NO| subscribe channel name. used for 'redis' type|
+|channel|string|**YES**| publish channel name. used for 'redis' type|
+|response_channel|string|**YES**| subscribe channel name. used for 'redis' type|
 |redis_instance|string|NO| a redis instance name. used for 'redis' type. (default is first instance defined on configs)|

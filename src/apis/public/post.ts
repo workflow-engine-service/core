@@ -6,7 +6,7 @@ import { HttpStatusCode } from "../../types";
 import { BaseApi } from "../base";
 import { UserTokenResponse } from "./interfaces";
 import mongoose from "mongoose";
-import { WorkflowStateAction, WorkflowStateActionResponse } from "src/interfaces";
+import { WorkflowProcessField, WorkflowStateAction, WorkflowStateActionResponse } from "src/interfaces";
 import { WebWorkers } from "../../workers";
 
 export function classApi() {
@@ -154,11 +154,23 @@ export class PublicPostApi extends BaseApi {
                 needFields[field] = value;
             }
 
+            // =>collect send fields
+            let sendProcessFields: WorkflowProcessField[] = [];
+            if (action.send_fields) {
+                for (const fieldName of action.send_fields) {
+                    // =>find process field
+                    let field = res.process.field_values.find(i => i.name === fieldName);
+                    if (!field) continue;
+                    sendProcessFields.push(field);
+                }
+            }
+
             let workerId = await WebWorkers.addActionWorker({
                 required_fields: action.required_fields,
                 optional_fields: action.optional_fields,
                 process_id: res.process._id,
                 state_action_name: action.name,
+                send_fields: sendProcessFields,
                 state_name: res.state.name,
                 user_id: this.request.user().id,
                 workflow_name: res.process.workflow_name,

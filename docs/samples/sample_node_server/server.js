@@ -36,10 +36,11 @@ app.listen(5000);
 console.log('Node.js web server at port 5000 is running..');
 
 
-
 const client = redis.createClient();
 
-client.on('error', (err) => console.log('Redis Client Error', err));
+client.on('error', (err) => {
+    // console.log('Redis Client Error', err)
+});
 
 client.connect().then(async () => {
     await client.subscribe('app_channel', (message) => {

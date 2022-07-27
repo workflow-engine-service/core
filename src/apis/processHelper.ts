@@ -203,6 +203,7 @@ export namespace ProcessHelper {
         return {
             required_fields: params.required_fields,
             optional_fields: params.optional_fields,
+            send_fields: params.send_fields,
             process_id: params.process_id,
             state_action_name: params.state_action_name,
             state_name: params.state_name,

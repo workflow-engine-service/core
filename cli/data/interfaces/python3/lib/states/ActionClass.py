@@ -13,6 +13,7 @@ class WorkflowStateAction():
     __meta: Dict
     __set_fields: Dict
     __alias_name: str = None
+    __send_fields: List[str]
     # hook_url type
     __url: str
     __method: Literal['get', 'post', 'put', 'delete']
@@ -24,13 +25,14 @@ class WorkflowStateAction():
     # local type
     __next_state: str
 
-    def __init__(self, name: str, access_roles: List[str] = ['_all_'], message_required=False, meta: Dict = {}, required_fields: List[str] = [], optional_fields: List[str] = [], set_fields: List[str] = []):
+    def __init__(self, name: str, access_roles: List[str] = ['_all_'], message_required=False, meta: Dict = {}, required_fields: List[str] = [], optional_fields: List[str] = [], set_fields: List[str] = [], send_fields: List[str] = []):
         self.__name = name
         self.__access_roles = access_roles
         self.__message_required = message_required
         self.__meta = meta
         self.__required_fields = required_fields
         self.__optional_fields = optional_fields
+        self.__send_fields = send_fields
         self.__set_fields = set_fields
 
         return None
@@ -74,6 +76,10 @@ class WorkflowStateAction():
         self.__optional_fields = fields
         return self
 
+    def send_fields(self, fields: List[str]):
+        self.__send_fields = fields
+        return self
+
     def get_name(self):
         return self.__name
 
@@ -83,6 +89,7 @@ class WorkflowStateAction():
             'set_fields': self.__set_fields,
             'required_fields': self.__required_fields,
             'optional_fields': self.__optional_fields,
+            'send_fields': self.__send_fields,
             'name': self.__name,
             'message_required': self.__message_required,
             'type': self.__type,

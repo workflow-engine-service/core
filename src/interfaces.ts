@@ -198,6 +198,7 @@ export interface WorkflowStateAction {
     access_role?: string[];
     required_fields?: string[];
     optional_fields?: string[];
+    send_fields?: string[];
     type: 'hook_url' | 'redis' | 'local';
     message_required?: boolean;
     meta?: object;
@@ -236,7 +237,7 @@ export interface APIResponse<T = any> {
 }
 
 /**
- * @edition 20220727.1
+ * @edition 20220727.2
  */
 export interface WorkflowDescriptor {
     /**
@@ -309,6 +310,8 @@ export interface WorkflowStateActionResponse {
 export interface WorkflowStateActionSendParametersFields {
     required_fields?: string[];
     optional_fields?: string[];
+    // send_fields?: string[];
+    send_fields?: WorkflowProcessField[];
     state_name: string;
     state_action_name: string;
     workflow_name: string;
@@ -316,6 +319,7 @@ export interface WorkflowStateActionSendParametersFields {
     process_id: string;
     user_id: number;
     message?: string;
+
 
 }
 
@@ -328,7 +332,6 @@ export interface WorkflowStateEventSendParametersFields {
 }
 
 export interface WorkflowStateActionSendParameters extends WorkflowStateActionSendParametersFields {
-
     fields?: object;
     _process?: WorkflowProcessModel;
     _action?: WorkflowStateAction;

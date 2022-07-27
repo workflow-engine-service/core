@@ -1,4 +1,4 @@
-# Schema details (20220727.1 edition)
+# Schema details (20220727.2 edition)
 
 ## main schema
 
@@ -52,6 +52,7 @@
 |access_role | string[] | NO | roles to execute this action (default: `['_all_']`)|
 |required_fields| string[] | NO | fields must get from client|
 |optional_fields| string[] | NO | fields that client can send|
+|send_fields| string[] | NO | fields that must be send to app server [^send_fields_note]|
 |type | string | NO | 'hook_url' or 'redis' or 'local' |
 |alias_name| string | NO | name of an alias [^alias_name_note]|
 |meta|object|NO|any data useful for client|
@@ -65,4 +66,9 @@ message_required | boolean | NO | client must send a message or not |
 |redis_instance|string|NO| a redis instance name. used for 'redis' type. (default is first instance defined on configs)|
 |next_state|string|NO| next state to be go. used for 'local' type|
 
+
+-----------
+
 [^alias_name_note] added in 20220727.1
+
+[^send_fields_note] added in 20220727.2

@@ -17,7 +17,7 @@ class process_data_state(WorkflowState):
     name = 'process_data'
     actions = [
         WorkflowStateAction('approve').hook_url(
-            'http://localhost:5000/api/hook', 'post', {'app_name': 'register_user_workflow'})
+            'http://localhost:5000/api/hook', 'post', {'app_name': 'register_user_workflow'}).send_fields(['email', 'phone'])
     ]
 
 
