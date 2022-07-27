@@ -19,3 +19,5 @@
 [x] add `read_access_roles` to workflow
 [x] emit action event on hook
 [x] do action with hook
+[x] create mdbook docs
+[x] add license and code of conduct

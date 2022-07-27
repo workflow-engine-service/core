@@ -22,15 +22,15 @@ export namespace Swagger {
         },
     };
     let info = {
-        title: "Wrokflow Engine Service",
+        title: "Workflow Engine Service (WES)",
         description: "Workflow Engine API Collection",
         license: {
-            name: "MIT",
-            url: "https://opensource.org/licenses/MIT"
+            name: "Creative Commons Attribution Share Alike 4.0 International",
+            url: "https://creativecommons.org/licenses/by/4.0"
         },
         contact: {
-            name: 'madkne',
-            email: 'twsdelavar@gmail.com',
+            // name: 'madkne',
+            // email: 'twsdelavar@gmail.com',
         },
         version: Const.VERSION,
     };
