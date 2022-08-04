@@ -2,6 +2,7 @@ import { DeployedWorkflowModel, UserModel } from "../../models/models";
 import { Const } from "../../const";
 import { WorkflowDescriptor } from "../../interfaces";
 import { BaseApi } from "../base";
+import { Auth } from "../../auth";
 
 export function classApi() {
     return AdminPostApi;
@@ -79,6 +80,10 @@ export class AdminPostApi extends BaseApi {
             return this.error400('user exist with id or name');
         }
         // console.log('user:', userInfo);
+        // =>if set secret key, encrypt it
+        if (userInfo.secret_key) {
+            userInfo.secret_key = await Auth.encryptPassword(userInfo.secret_key);
+        }
 
         userInfo.created_at = new Date().getTime();
 

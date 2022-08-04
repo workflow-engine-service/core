@@ -6,7 +6,7 @@ from lib.workflow.WorkflowClass import WorkflowDefinition
 from lib.process.ProcessClass import WorkflowProcess
 from lib.apis.admin_api import WorkflowAdminApi
 from lib.apis.user_api import WorkflowUserApi
-import setup
+# from . import setup
 from pickle import FALSE
 from typing import Dict, List, Literal, Tuple
 

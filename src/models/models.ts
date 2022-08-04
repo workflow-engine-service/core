@@ -17,7 +17,9 @@ export interface DeployedWorkflowModel {
 
     _id?: string;
 }
-
+/**
+ * 20220727.2 edition
+ */
 export interface WorkflowProcessModel {
     /**
      * hash id

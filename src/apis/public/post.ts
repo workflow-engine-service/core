@@ -125,6 +125,8 @@ export class PublicPostApi extends BaseApi {
     /********************************** */
     /********************************** */
     async abstractDoAction(processId: string, stateActionName: string, userMessage: string, fields: object) {
+        let requiredFieldValues: WorkflowProcessField[] = [];
+        let optionalFieldValues: WorkflowProcessField[] = [];
         let res = await this.getProcessCurrentState(processId);
         // =>if raise error
         if (Array.isArray(res)) {
@@ -146,11 +148,26 @@ export class PublicPostApi extends BaseApi {
                 }
             }
             let needFields: object = {};
-            // =>collect all required fields, optional fields
-            for (const field of [...action.required_fields, ...action.optional_fields]) {
+            // =>collect required fields
+            for (const field of action.required_fields) {
                 // =>validate all required, optional fields
                 //TODO:
                 let value = fields['field.' + field];
+                requiredFieldValues.push({
+                    name: field,
+                    value,
+                });
+                needFields[field] = value;
+            }
+            // =>collect optional fields
+            for (const field of action.optional_fields) {
+                // =>validate all required, optional fields
+                //TODO:
+                let value = fields['field.' + field];
+                optionalFieldValues.push({
+                    name: field,
+                    value,
+                });
                 needFields[field] = value;
             }
 
@@ -166,8 +183,8 @@ export class PublicPostApi extends BaseApi {
             }
 
             let workerId = await WebWorkers.addActionWorker({
-                required_fields: action.required_fields,
-                optional_fields: action.optional_fields,
+                required_fields: requiredFieldValues,
+                optional_fields: optionalFieldValues,
                 process_id: res.process._id,
                 state_action_name: action.name,
                 send_fields: sendProcessFields,

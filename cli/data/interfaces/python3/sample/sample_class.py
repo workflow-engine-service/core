@@ -1,5 +1,5 @@
 
-import setup
+from . import setup
 from fields import {{name}}Fields
 from lib.workflow import workflow
 from states import {{name}}States

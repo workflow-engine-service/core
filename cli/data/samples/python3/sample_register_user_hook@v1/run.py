@@ -1,5 +1,6 @@
 import time
-from sample_register_user_hook import sample_register_user_hook_workFlow
+
+from .sample_register_user_hook import sample_register_user_hook_workFlow
 
 print('[+] init workflow class')
 sample_workFlow = sample_register_user_hook_workFlow()

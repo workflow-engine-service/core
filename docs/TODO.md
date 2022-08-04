@@ -26,3 +26,4 @@
 [x] add alias_name to state event type redis
 [x] add license and code of conduct
 [x] add `send_fields` to state action
+[x] send required, optional fields to action hook or redis

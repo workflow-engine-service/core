@@ -1,10 +1,10 @@
 
-import setup
+from . import setup
 from fields import Fields
 from lib.workflow import workflow
 from states import States
 
-import settings
+from .. import settings
 
 
 class sample_register_user_hook_workFlow(workflow.Workflow):

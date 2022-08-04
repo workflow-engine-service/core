@@ -308,10 +308,6 @@ export interface WorkflowStateActionResponse {
 }
 
 export interface WorkflowStateActionSendParametersFields {
-    required_fields?: string[];
-    optional_fields?: string[];
-    // send_fields?: string[];
-    send_fields?: WorkflowProcessField[];
     state_name: string;
     state_action_name: string;
     workflow_name: string;
@@ -319,6 +315,9 @@ export interface WorkflowStateActionSendParametersFields {
     process_id: string;
     user_id: number;
     message?: string;
+    required_fields?: WorkflowProcessField[];
+    optional_fields?: WorkflowProcessField[];
+    send_fields?: WorkflowProcessField[];
 
 
 }
