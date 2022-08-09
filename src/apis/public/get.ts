@@ -1,3 +1,4 @@
+import { WorkflowProcessModel } from "../../models/models";
 import { Auth } from "../../auth";
 import { infoLog } from "../../common";
 import { Const } from "../../const";
@@ -35,7 +36,14 @@ export class PublicGetApi extends BaseApi {
             if (!this.checkUserRoleHasAccess(res.process.workflow.settings.read_access_roles)) {
                 return this.error403('no access to process info');
             }
-
+            // =>truncate data
+            res.state.events = undefined;
+            if (res.state.actions) {
+                for (const act of res.state.actions) {
+                    act.url = undefined;
+                    act.headers = undefined;
+                }
+            }
             return this.response(res.state);
         } catch (e) {
             return this.error400();
@@ -57,7 +65,39 @@ export class PublicGetApi extends BaseApi {
             }
 
 
-            return this.response(res.process);
+            return this.response(this.truncateProcessInfo(res.process));
+        } catch (e) {
+            return this.error400();
+        }
+    }
+    /******************************* */
+    async getProcessList() {
+        // =>get params
+        let filter_finished_processes = this.paramBoolean('filter_finished_processes', false);
+
+        try {
+
+            // =>iterate all processes
+            let processIds = await Const.DB.models.processes.find({}, { _id: true });
+            if (!processIds) return this.response([]);
+            let processes: WorkflowProcessModel[] = [];
+            for (const pid of processIds) {
+                let processId = pid._id;
+                let res = await this.getProcessCurrentState(processId);
+                // =>if raise error
+                if (Array.isArray(res)) {
+                    continue;
+                }
+                // =>check read process access
+                if (!this.checkUserRoleHasAccess(res.process.workflow.settings.read_access_roles)) {
+                    continue;
+                }
+                // =>truncate data
+                processes.push(this.truncateProcessInfo(res.process));
+
+            }
+
+            return this.response(processes);
         } catch (e) {
             return this.error400();
         }
@@ -75,5 +115,15 @@ export class PublicGetApi extends BaseApi {
         } catch (e) {
             return this.error400();
         }
+    }
+
+    /******************************* */
+    /******************************* */
+    /******************************* */
+    truncateProcessInfo(process: WorkflowProcessModel) {
+        process.workflow = undefined;
+        process.field_values = undefined;
+        process.history = undefined;
+        return process;
     }
 }

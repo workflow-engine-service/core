@@ -8,6 +8,7 @@ import { debugLog } from './common';
 import { Wiki } from './document/wiki';
 import { MiddlewareName } from './types';
 import { WebWorkers } from './workers';
+// import * as cors from 'cors';
 
 export namespace WebServer {
     export let app: Express;
@@ -16,6 +17,9 @@ export namespace WebServer {
 
             app = express();
             app.use(express.json({ limit: '400kb', strict: false }));
+            // =>enable cors policy
+            var cors = require('cors');
+            app.use(cors());
             await loadMiddlewares();
             WebRoutes.routes(app);
             // =>start workers service

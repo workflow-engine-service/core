@@ -103,21 +103,21 @@ export const publicApis: ApiRoute[] = [
                 in: 'formData',
                 required: true,
                 type: 'string',
-                defalut: 'approve',
+                default: 'approve',
             },
             {
                 name: 'process_id',
                 in: 'formData',
                 required: true,
                 type: 'string',
-                defalut: '62cbc3933626b821f73cb9a2',
+                default: '62cbc3933626b821f73cb9a2',
             },
             {
                 name: 'message',
                 in: 'formData',
                 required: false,
                 type: 'string',
-                defalut: 'hello world',
+                default: 'hello world',
             },
             {
                 name: 'field.[fieldName]',
@@ -263,6 +263,35 @@ export const publicApis: ApiRoute[] = [
             '404': {
                 description: 'not found such process with this process id'
             }
+        },
+        usedDefinitions: ['WorkflowProcessModel'],
+    },
+    {
+        method: 'GET',
+        path: 'workflow/list',
+        functionName: 'getProcessList',
+        tags: ['workflow'],
+        des: 'get list of workflow instances (processes) for this user',
+        parameters: [
+            {
+                name: 'filter_finished_processes',
+                in: 'query',
+                required: false,
+                type: 'boolean',
+                default: false,
+            },
+        ],
+        responses: {
+            '200': {
+                description: 'return process list',
+                schema: {
+                    type: 'array',
+                    items: {
+                        $ref: "#/definitions/WorkflowProcessModel"
+
+                    }
+                }
+            },
         },
         usedDefinitions: ['WorkflowProcessModel'],
     },

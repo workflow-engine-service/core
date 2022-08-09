@@ -66,8 +66,8 @@ export interface SwaggerApiParameter {
         type?: SwaggerDataType;
         format?: SwaggerDataTypeFormat;
         enum?: string[];
-        defalut?: any;
+        default?: any;
     };
     collectionFormat?: 'multi';
-    defalut?: any;
+    default?: any;
 }

@@ -4,7 +4,7 @@
 
 ## /api/v1/workflow/create
 create new process from a workflow
-## /api/v1/workflow/list
+## /api/v1/workflow/list [DONE]
 get list of workflow instances (processes) for this user
 
 ## /api/v1/workflow/history?process_id=34436dsssafdsq2eDR$e&filter=all|approved
