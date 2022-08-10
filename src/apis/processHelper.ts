@@ -3,7 +3,7 @@ import { Const } from "../const";
 import { WorkflowStateAction, WorkflowStateActionResponse, WorkflowStateActionSendParameters, WorkflowStateActionSendParametersFields, WorkflowStateEvent, WorkflowStateEventSendParametersFields } from "../interfaces";
 import { WorkflowProcessChangeField } from "../models/models";
 import { Redis } from "../redis";
-import { errorLog, debugLog, applyAliasConfig } from "../common";
+import { errorLog, debugLog, applyAliasConfig, dbLog } from "../common";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 
 export namespace ProcessHelper {
@@ -87,6 +87,7 @@ export namespace ProcessHelper {
             if (params._action.method === 'get') {
                 configs.params = await getWorkflowStateActionSendParameters(params);
             }
+            dbLog({ namespace: 'action', name: 'pre_doActionWithHookUrl', meta: { configs } });
             debugLog('hook', `do action with hook url [${configs.method}] '${configs.url}'`);
             // =>send request
             return new Promise((resolve) => {
@@ -153,6 +154,8 @@ export namespace ProcessHelper {
 
                 break;
         }
+        dbLog({ namespace: 'event', name: 'pre_emitStateEvent', meta: { eventName, event } });
+
         debugLog('event', `emitting event '${eventName}' on '${event.type}'...`);
         switch (event.type) {
             case 'redis':

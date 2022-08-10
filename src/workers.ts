@@ -108,6 +108,7 @@ export namespace WebWorkers {
                 };
             },
             priority: 2,
+            started_by: params.user_id,
         });
 
 

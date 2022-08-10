@@ -4,6 +4,7 @@
 [ ] check for end state
 [ ] enable multi threading for workers
 [ ] complete to validate deployed workflow
+[ ] not create new worker for an action when exist and running
 
 
 # DONE Tasks

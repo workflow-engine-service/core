@@ -1,4 +1,4 @@
-import { WorkflowProcessModel } from "../../models/models";
+import { DeployedWorkflowModel, WorkerModel, WorkflowProcessModel } from "../../models/models";
 import { Auth } from "../../auth";
 import { infoLog } from "../../common";
 import { Const } from "../../const";
@@ -76,7 +76,6 @@ export class PublicGetApi extends BaseApi {
         let filter_finished_processes = this.paramBoolean('filter_finished_processes', false);
 
         try {
-
             // =>iterate all processes
             let processIds = await Const.DB.models.processes.find({}, { _id: true });
             if (!processIds) return this.response([]);
@@ -92,12 +91,43 @@ export class PublicGetApi extends BaseApi {
                 if (!this.checkUserRoleHasAccess(res.process.workflow.settings.read_access_roles)) {
                     continue;
                 }
+                // =>if filter end processes
+                if (filter_finished_processes && res.process.current_state === res.process.workflow.end_state) {
+                    continue;
+                }
                 // =>truncate data
                 processes.push(this.truncateProcessInfo(res.process));
 
             }
 
             return this.response(processes);
+        } catch (e) {
+            return this.error400();
+        }
+    }
+
+    /******************************* */
+    async getWorkflowFieldsList() {
+        // =>get params
+        let workflowName = this.param('workflow_name');
+        let workflowVersion = this.paramNumber('workflow_version');
+        // =>if workflow name not exist
+        if (!workflowName) return this.error400();
+        try {
+            let workflow = await this.getDeployedWorkflow(workflowName, workflowVersion);
+
+            // =>if not found workflow or check access read from this workflow
+            if (!workflow || !this.checkUserRoleHasAccess(workflow.settings.read_access_roles)) {
+                return this.error404(`not found such workflow '${workflowName}:${workflowVersion}'`);
+            }
+            // =>get workflow fields
+            let fields = workflow.fields;
+            if (!fields) fields = [];
+            // for (const field of fields) {
+            // }
+
+            return this.response(fields);
+
         } catch (e) {
             return this.error400();
         }
@@ -117,6 +147,33 @@ export class PublicGetApi extends BaseApi {
         }
     }
 
+    /******************************* */
+    async getWorkersList() {
+        // =>get params
+        let filter_finished_workers = this.paramBoolean('filter_finished_workers', false);
+
+        try {
+            let workers: WorkerModel[] = [];
+            if (filter_finished_workers) {
+                workers = await Const.DB.models.workers.find({ ended_at: { $exist: false } })
+            } else {
+                workers = await Const.DB.models.workers.find({});
+            }
+            if (!workers) return this.response([]);
+            // =>iterate all workers
+            for (const worker of workers) {
+                // =>check access of worker
+                if (!this.isAdmin() && worker.started_by !== this.request.user().id) {
+                    continue;
+                }
+
+            }
+
+            return this.response(workers);
+        } catch (e) {
+            return this.error400();
+        }
+    }
     /******************************* */
     /******************************* */
     /******************************* */

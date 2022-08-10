@@ -91,6 +91,7 @@ export interface WorkerModel<R = {}> {
     priority?: number;
     init_at?: number;
     started_at?: number;
+    started_by?: number;
     ended_at?: number;
     success?: boolean;
     response?: R;

@@ -1,6 +1,6 @@
 import { SwaggerApiParameter, SwaggerApiResponse } from "./document/interfaces";
 import { WorkerModel, WorkflowProcessModel } from "./models/models";
-import { HttpStatusCode, MiddlewareName, RequestMethodType, SwaggerTagName, WorkflowStateEventName } from "./types";
+import { HttpStatusCode, MiddlewareName, RequestMethodType, SwaggerTagName, WorkflowFieldDataType, WorkflowStateEventName } from "./types";
 
 
 export interface ServerConfigs {
@@ -146,7 +146,7 @@ export interface ApiRoute {
 }
 export interface WorkflowField {
     name: string;
-    type?: 'string' | 'number' | 'file';
+    type?: WorkflowFieldDataType;
     /**
      * any data useful for client
      */
@@ -177,6 +177,24 @@ export interface WorkflowState {
      * you can define events on state
      */
     events?: WorkflowStateEvent[];
+
+    jobs?: {
+        startConditions: [
+            { field: 'doing', $eq: true },
+            {}
+        ],
+        schedule: {
+            type: 'daily', // daily|weekly|hourly|monthly|static|minutely
+            times: {
+                timestamp?: 235435435343 //type: static
+                monthday?: 21,//type: monthly|static
+                weekday?: 'sun' | 4,//type: weekly|monthly|static
+                hour?: 3, //type: daily|weekly|monthly|static
+                minute?: 45 //type: daily|weekly|hourly|monthly|static
+                second?: 34 // type: // daily|weekly|hourly|monthly|static|minutely 
+            }[]
+        }
+    }[];
 }
 
 export interface WorkflowStateEvent {

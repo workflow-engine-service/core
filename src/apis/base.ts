@@ -2,7 +2,7 @@ import { Const } from "../const";
 import { APIResponse, WorkflowState } from "../interfaces";
 import { HttpStatusCode, LogMode, RequestMethodType } from "../types";
 import { CoreRequest } from "./request";
-import { WorkflowProcessModel } from "src/models/models";
+import { DeployedWorkflowModel, WorkflowProcessModel } from "../models/models";
 export class BaseApi {
     request: CoreRequest;
     /*************************************** */
@@ -53,17 +53,17 @@ export class BaseApi {
         return this.error(HttpStatusCode.HTTP_403_FORBIDDEN, data);
     }
     /*************************************** */
-    async errorLog(namespace: string, name: string, var1?: any, var2?: any) {
-        await this.log(namespace, name, LogMode.ERROR, var1, var2);
+    async errorLog(namespace: string, name: string, meta?: object) {
+        await this.log(namespace, name, LogMode.ERROR, meta);
         // errorLog('log', '[ERROR] ' + namespace + ':' + name + ' | ' + var1 + ', ' + var2);
     }
     /*************************************** */
-    async infoLog(namespace: string, name: string, var1?: any, var2?: any) {
-        await this.log(namespace, name, LogMode.INFO, var1, var2);
+    async infoLog(namespace: string, name: string, meta?: object) {
+        await this.log(namespace, name, LogMode.INFO, meta);
         // debugLog('log', '[INFO] ' + namespace + ':' + name + ' | ' + var1 + ', ' + var2);
     }
     /*************************************** */
-    async log(namespace: string, name: string, mode: LogMode, var1?: any, var2?: any) {
+    async log(namespace: string, name: string, mode: LogMode, meta?: object) {
         try {
             await Const.DB.models.logs.create({
                 name,
@@ -71,8 +71,7 @@ export class BaseApi {
                 user_id: this.request.user() ? this.request.user().id : undefined,
                 ip: this.request.clientIp(),
                 mode,
-                var1: var1 ? String(var1) : undefined,
-                var2: var2 ? String(var2) : undefined,
+                meta,
                 created_at: new Date().getTime(),
             });
         } catch (e) {
@@ -178,5 +177,27 @@ export class BaseApi {
     isAdmin() {
         if (!this.request.user()) return false;
         return this.request.user().is_admin;
+    }
+    /*************************************** */
+    async getDeployedWorkflow(name: string, version?: number) {
+        let workflow: DeployedWorkflowModel;
+        // =>find workflow by name, version
+        if (version) {
+            workflow = await Const.DB.models.workflows.findOne({
+                name,
+                version,
+            });
+        }
+        // =>find workflow by name, latest version
+        else {
+            let workflows = await Const.DB.models.workflows.find({
+                name,
+            }).sort({ version: -1 }).limit(1);
+            if (workflows.length > 0) {
+                workflow = workflows[0];
+            }
+        }
+
+        return workflow;
     }
 }

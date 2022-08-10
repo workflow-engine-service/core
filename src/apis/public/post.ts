@@ -44,24 +44,9 @@ export class PublicPostApi extends BaseApi {
         try {
             // =>get params
             let name = this.param('name');
-            let version = this.param('version');
-            let workflow: DeployedWorkflowModel;
-            // =>find workflow by name, version
-            if (version) {
-                workflow = await Const.DB.models.workflows.findOne({
-                    name,
-                    version,
-                });
-            }
-            // =>find workflow by name, lastest version
-            else {
-                let workflows = await Const.DB.models.workflows.find({
-                    name,
-                }).sort({ version: -1 }).limit(1);
-                if (workflows.length > 0) {
-                    workflow = workflows[0];
-                }
-            }
+            let version = this.paramNumber('version');
+            let workflow = await this.getDeployedWorkflow(name, version);
+
             // =>if not found workflow
             if (!workflow) return this.error404(`not found such workflow '${name}:${version}'`);
             // =>check access create from this workflow

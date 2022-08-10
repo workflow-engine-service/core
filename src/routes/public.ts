@@ -295,4 +295,67 @@ export const publicApis: ApiRoute[] = [
         },
         usedDefinitions: ['WorkflowProcessModel'],
     },
+    {
+        method: 'GET',
+        path: 'workflow/fields',
+        functionName: 'getWorkflowFieldsList',
+        tags: ['workflow'],
+        des: 'get list of workflow fields, if user access to this workflow',
+        parameters: [
+            {
+                name: 'workflow_name',
+                in: 'query',
+                required: true,
+                type: 'string',
+            },
+            {
+                name: 'workflow_version',
+                in: 'query',
+                required: false,
+                type: 'number',
+            },
+        ],
+        responses: {
+            '200': {
+                description: 'return fields list of workflow',
+                schema: {
+                    type: 'array',
+                    items: {
+                        $ref: "#/definitions/WorkflowField"
+
+                    }
+                }
+            },
+        },
+        usedDefinitions: ['WorkflowField'],
+    },
+    {
+        method: 'GET',
+        path: 'worker/list',
+        functionName: 'getWorkersList',
+        tags: ['worker'],
+        des: 'get list of workers created by this user',
+        parameters: [
+            {
+                name: 'filter_finished_workers',
+                in: 'query',
+                required: false,
+                type: 'boolean',
+                default: false,
+            },
+        ],
+        responses: {
+            '200': {
+                description: 'return workers list',
+                schema: {
+                    type: 'array',
+                    items: {
+                        $ref: "#/definitions/WorkerModel"
+
+                    }
+                }
+            },
+        },
+        usedDefinitions: ['WorkerModel'],
+    },
 ];

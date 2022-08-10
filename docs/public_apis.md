@@ -10,9 +10,9 @@ get list of workflow instances (processes) for this user
 ## /api/v1/workflow/history?process_id=34436dsssafdsq2eDR$e&filter=all|approved
 get a process hash instance and return states of workflow with transitions by filter
 
-## /api/v1/workflow/fields [GET]
+## /api/v1/workflow/fields [GET] [DONE]
 * parameters
-    - process_hash: string
+    - workflow_name: string
 
 ## /api/v1/workflow/process-info [GET] [DONE]
 * parameters

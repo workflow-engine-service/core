@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { Const } from "./const";
 import { MongoDB } from "./mongo";
+import { LogMode, WorkflowNamespace } from "./types";
 /***************************************** */
 export async function InitDB() {
     infoLog('db', 'init mongodb ...');
@@ -117,6 +118,7 @@ export function applyAliasConfig<T = object>(obj: T): T {
         obj[key] = aliasObject[key];
     }
     if (!aliasObject) return obj;
+    dbLog({ namespace: 'config', name: 'detect_alias', meta: { alias: aliasObject } });
 
 
     return obj;
@@ -218,4 +220,22 @@ export async function sleep(timeout = 1000) {
             res(true);
         }, timeout);
     });
+}
+
+export async function dbLog(options: { namespace: WorkflowNamespace, name: string, mode?: LogMode, meta?: object; user_id?: number; ip?: string; }) {
+    try {
+        if (!options.mode) options.mode = LogMode.INFO;
+        await Const.DB.models.logs.create({
+            name: options.name,
+            namespace: options.namespace,
+            user_id: options.user_id,
+            ip: options.ip,
+            mode: options.mode,
+            meta: options.meta,
+            created_at: new Date().getTime(),
+        });
+    } catch (e) {
+        console.trace();
+        errorLog('err66553', e);
+    }
 }

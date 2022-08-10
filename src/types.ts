@@ -58,3 +58,8 @@ export type MiddlewareName = 'RequestInit' | 'Authentication' | 'FormDataParser'
      * - onLeave: when current state be left this state
      */
 export type WorkflowStateEventName = 'onInit' | 'onLeave';
+
+export type WorkflowFieldDataType = 'string' | 'number' | 'file' | 'boolean';
+
+
+export type WorkflowNamespace = 'process' | 'workflow' | 'worker' | 'config' | 'action' | 'event';
