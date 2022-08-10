@@ -205,6 +205,7 @@ export interface WorkflowStateEvent {
     // =>hook url
     url?: string;
     method?: 'post' | 'put' | 'get' | 'delete';
+    headers?: {};
     // =>redis
     channel?: string;
     redis_instance?: string;
@@ -288,7 +289,7 @@ export interface WorkflowDescriptor {
      * TODO: not implemented yet!
      */
     auto_start?: {
-        event: 'user_add' | 'user_emove' | 'user_update';
+        event: 'user_add' | 'user_remove' | 'user_update';
         //TODO:
     };
     /**

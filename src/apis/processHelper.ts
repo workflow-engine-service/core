@@ -241,7 +241,7 @@ export namespace ProcessHelper {
             // =>check for alias_name
             event = applyAliasConfig<WorkflowStateEvent>(event);
             if (!event.method) event.method = 'get';
-            let headers = {};
+            let headers = { ...event.headers };
             let configs: AxiosRequestConfig<WorkflowStateEventSendParametersFields> = {
                 method: event.method,
                 url: event.url,

@@ -178,6 +178,8 @@ export class PublicGetApi extends BaseApi {
     /******************************* */
     /******************************* */
     truncateProcessInfo(process: WorkflowProcessModel) {
+        // =>check if admin
+        if (this.isAdmin()) return process;
         process.workflow = undefined;
         process.field_values = undefined;
         process.history = undefined;
