@@ -1,0 +1,274 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Schema details - Workflow Engine Service - version 0.6</title>
+        <!-- Custom HTML head -->
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../../overview.html"><strong aria-hidden="true">1.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../installation.html"><strong aria-hidden="true">2.</strong> Installation</a></li><li class="chapter-item expanded "><a href="../../concepts/concepts.html"><strong aria-hidden="true">3.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../concepts/workflow/workflow.html"><strong aria-hidden="true">3.1.</strong> Workflow</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../concepts/workflow/schema.html" class="active"><strong aria-hidden="true">3.1.1.</strong> Schema details</a></li></ol></li><li class="chapter-item expanded "><a href="../../concepts/process/process.html"><strong aria-hidden="true">3.2.</strong> Process</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../concepts/process/schema.html"><strong aria-hidden="true">3.2.1.</strong> Schema details</a></li></ol></li><li class="chapter-item expanded "><a href="../../concepts/access_roles.html"><strong aria-hidden="true">3.3.</strong> Access Roles</a></li><li class="chapter-item expanded "><a href="../../concepts/state_event.html"><strong aria-hidden="true">3.4.</strong> State Event</a></li><li class="chapter-item expanded "><a href="../../concepts/state_job.html"><strong aria-hidden="true">3.5.</strong> State Job</a></li><li class="chapter-item expanded "><a href="../../concepts/state_action/state_action.html"><strong aria-hidden="true">3.6.</strong> State Action</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../concepts/state_action/action_response.html"><strong aria-hidden="true">3.6.1.</strong> Action Response</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../cli/cli.html"><strong aria-hidden="true">4.</strong> Command Line Tool</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../cli/new_command.html"><strong aria-hidden="true">4.1.</strong> new</a></li><li class="chapter-item expanded "><a href="../../cli/install_command.html"><strong aria-hidden="true">4.2.</strong> install</a></li></ol></li><li class="chapter-item expanded "><a href="../../configs/configs.html"><strong aria-hidden="true">5.</strong> Configure</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../configs/redis.html"><strong aria-hidden="true">5.1.</strong> redis</a></li><li class="chapter-item expanded "><a href="../../configs/mongo.html"><strong aria-hidden="true">5.2.</strong> mongo</a></li><li class="chapter-item expanded "><a href="../../configs/server.html"><strong aria-hidden="true">5.3.</strong> server</a></li><li class="chapter-item expanded "><a href="../../configs/admin_users.html"><strong aria-hidden="true">5.4.</strong> admin_users</a></li><li class="chapter-item expanded "><a href="../../configs/auth_user.html"><strong aria-hidden="true">5.5.</strong> auth_user</a></li><li class="chapter-item expanded "><a href="../../configs/docker.html"><strong aria-hidden="true">5.6.</strong> docker</a></li><li class="chapter-item expanded "><a href="../../configs/alias.html"><strong aria-hidden="true">5.7.</strong> alias</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Workflow Engine Service - version 0.6</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="schema-details-202208101-edition"><a class="header" href="#schema-details-202208101-edition">Schema details (20220810.1 edition)</a></h1>
+<h2 id="main-schema"><a class="header" href="#main-schema">main schema</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>name</th><th>type</th><th>required</th><th>Description</th></tr></thead><tbody>
+<tr><td>workflow_name</td><td>string</td><td><strong>YES</strong></td><td>name of workflow</td></tr>
+<tr><td>version</td><td>number</td><td>NO</td><td>default is 1</td></tr>
+<tr><td>create_access_roles</td><td>string[]</td><td>NO</td><td>user roles that access to create process from this workflow (default: <code>['_all_']</code>)</td></tr>
+<tr><td>read_access_roles</td><td>string[]</td><td>NO</td><td>user roles that access to read process from this workflow (default: <code>['_all_']</code>)</td></tr>
+<tr><td>process_init_check</td><td><a href="#workflowprocessoninit-schema">WorkflowProcessOnInit</a></td><td>NO</td><td>check when a process wants to start</td></tr>
+<tr><td>auto_delete_after_end</td><td>boolean</td><td>NO</td><td>delete process after enter to end state</td></tr>
+<tr><td>start_state</td><td>string</td><td><strong>YES</strong></td><td>start state of process</td></tr>
+<tr><td>end_state</td><td>string</td><td><strong>YES</strong></td><td>end state of process</td></tr>
+<tr><td>fields</td><td><a href="#workflowfield-schema">WorkflowField</a></td><td>NO</td><td>workflow fields</td></tr>
+<tr><td>states</td><td><a href="#workflowstate-schema">WorkflowState</a></td><td><strong>YES</strong></td><td>workflow states</td></tr>
+</tbody></table>
+</div>
+<h2 id="workflowprocessoninit-schema"><a class="header" href="#workflowprocessoninit-schema">WorkflowProcessOnInit schema</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>name</th><th>type</th><th>required</th><th>Description</th></tr></thead><tbody>
+<tr><td>type</td><td>string</td><td><strong>YES</strong></td><td>can be <code>local</code> or <code>api</code></td></tr>
+<tr><td>local_check</td><td>string</td><td>NO</td><td>check in local mode by workflow engine. options: <code> just_one_user_running_process: every user can only create one running process</code></td></tr>
+<tr><td>api_url</td><td>string</td><td>NO</td><td>api url can only response boolean or a error string like 'you can not create new process'</td></tr>
+</tbody></table>
+</div>
+<h2 id="workflowfield-schema"><a class="header" href="#workflowfield-schema">WorkflowField schema</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>name</th><th>type</th><th>required</th><th>Description</th></tr></thead><tbody>
+<tr><td>name</td><td>string</td><td><strong>YES</strong></td><td>field name</td></tr>
+<tr><td>type</td><td>string</td><td>NO</td><td>'string' or 'number' or 'boolean' or 'file' (default: string)</td></tr>
+<tr><td>meta</td><td>object</td><td>NO</td><td>any data useful for client</td></tr>
+<tr><td>validation</td><td>WorkflowFieldValidation[]</td><td>NO</td><td>you can set more validations on field</td></tr>
+</tbody></table>
+</div>
+<h2 id="workflowstate-schema"><a class="header" href="#workflowstate-schema">WorkflowState schema</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>name</th><th>type</th><th>required</th><th>Description</th></tr></thead><tbody>
+<tr><td>name</td><td>string</td><td><strong>YES</strong></td><td>state name</td></tr>
+<tr><td>access_role</td><td>string[]</td><td>NO</td><td>roles to view this state (default: <code>['_all_']</code>)</td></tr>
+<tr><td>meta</td><td>object</td><td>NO</td><td>any data useful for client</td></tr>
+<tr><td>actions</td><td><a href="#workflowstateaction-schema">WorkflowStateAction</a>[]</td><td>NO</td><td>actions of state</td></tr>
+<tr><td>events</td><td><a href="#workflowstateevent-schema">WorkflowStateEvent</a>[]</td><td>NO</td><td>you can define events on state</td></tr>
+<tr><td>jobs</td><td><a href="#workflowstatejob-schema">WorkflowStateJob</a>[] <sup class="footnote-reference"><a href="#state_job_note">1</a></sup></td><td>NO</td><td>you can define jobs on state</td></tr>
+</tbody></table>
+</div>
+<h2 id="workflowstateaction-schema"><a class="header" href="#workflowstateaction-schema">WorkflowStateAction schema</a></h2>
+<blockquote>
+<p>for more information about state actions, continue from <a href="../state_action/state_action.html">here</a></p>
+</blockquote>
+<div class="table-wrapper"><table><thead><tr><th>name</th><th>type</th><th>required</th><th>Description</th></tr></thead><tbody>
+<tr><td>name</td><td>string</td><td><strong>YES</strong></td><td>action name</td></tr>
+<tr><td>access_role</td><td>string[]</td><td>NO</td><td>roles to execute this action (default: <code>['_all_']</code>)</td></tr>
+<tr><td>required_fields</td><td>string[]</td><td>NO</td><td>fields must get from client</td></tr>
+<tr><td>optional_fields</td><td>string[]</td><td>NO</td><td>fields that client can send</td></tr>
+<tr><td>send_fields</td><td>string[]</td><td>NO</td><td>fields that must be send to app server <sup class="footnote-reference"><a href="#send_fields_note">2</a></sup></td></tr>
+<tr><td>type</td><td>string</td><td>NO</td><td>'hook_url' or 'redis' or 'local'</td></tr>
+<tr><td>alias_name</td><td>string</td><td>NO</td><td>name of an alias <sup class="footnote-reference"><a href="#alias_name_note">3</a></sup></td></tr>
+<tr><td>meta</td><td>object</td><td>NO</td><td>any data useful for client</td></tr>
+<tr><td>message_required</td><td>boolean</td><td>NO</td><td>client must send a message or not</td></tr>
+<tr><td>set_fields</td><td>object</td><td>NO</td><td>fields that can set hardcoded</td></tr>
+<tr><td>url</td><td>string</td><td>NO</td><td>can be a url like <code>http://sample.com/hook</code>. used for 'hook_url' type</td></tr>
+<tr><td>method</td><td>string</td><td>NO</td><td>can be a request method like 'get' or 'post'. used for 'hook_url' type</td></tr>
+<tr><td>headers</td><td>string[]</td><td>NO</td><td>headers that can be set on hook request. used for 'hook_url' type</td></tr>
+<tr><td>channel</td><td>string</td><td>NO</td><td>publish channel name. used for 'redis' type</td></tr>
+<tr><td>response_channel</td><td>string</td><td>NO</td><td>subscribe channel name. used for 'redis' type</td></tr>
+<tr><td>redis_instance</td><td>string</td><td>NO</td><td>a redis instance name. used for 'redis' type. (default is first instance defined on configs)</td></tr>
+<tr><td>next_state</td><td>string</td><td>NO</td><td>next state to be go. used for 'local' type</td></tr>
+</tbody></table>
+</div>
+<h2 id="workflowstateevent-schema"><a class="header" href="#workflowstateevent-schema">WorkflowStateEvent schema</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>name</th><th>type</th><th>required</th><th>Description</th></tr></thead><tbody>
+<tr><td>name</td><td>'onInit' or 'onLeave' or 'onJob'</td><td><strong>YES</strong></td><td>event name</td></tr>
+<tr><td>type</td><td>'redis' or 'hook_url'</td><td><strong>YES</strong></td><td>type of send event</td></tr>
+<tr><td>alias_name</td><td>string</td><td>NO</td><td>name of an alias <sup class="footnote-reference"><a href="#alias_name_note">3</a></sup></td></tr>
+<tr><td>url</td><td>string</td><td>NO</td><td>can be a url like <code>http://sample.com/hook</code>. used for 'hook_url' type</td></tr>
+<tr><td>method</td><td>string</td><td>NO</td><td>can be a request method like 'get' or 'post'. used for 'hook_url' type</td></tr>
+<tr><td>headers</td><td>string[]</td><td>NO</td><td>headers that can be set on hook request. used for 'hook_url' type</td></tr>
+<tr><td>channel</td><td>string</td><td>NO</td><td>publish channel name. used for 'redis' type</td></tr>
+<tr><td>redis_instance</td><td>string</td><td>NO</td><td>a redis instance name. used for 'redis' type. (default is first instance defined on configs)</td></tr>
+</tbody></table>
+</div>
+<h2 id="workflowstatejob-schema"><a class="header" href="#workflowstatejob-schema">WorkflowStateJob schema</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>name</th><th>type</th><th>required</th><th>Description</th></tr></thead><tbody>
+<tr><td>type</td><td>string</td><td><strong>YES</strong></td><td>job type can be &quot;static&quot; or &quot;daily&quot; or &quot;weekly&quot; or &quot;hourly&quot; or &quot;minutely&quot; or &quot;afterTime&quot;</td></tr>
+<tr><td>times</td><td><a href="#workflowstatejobtime-schema">WorkflowStateJobTime</a>[]</td><td><strong>YES</strong></td><td>set times to execute job</td></tr>
+<tr><td>set_fields</td><td>object</td><td>NO</td><td>fields that can set hardcoded</td></tr>
+<tr><td>action_name</td><td>string</td><td>NO</td><td>action to be go.</td></tr>
+</tbody></table>
+</div>
+<h2 id="workflowstatejobtime-schema"><a class="header" href="#workflowstatejobtime-schema">WorkflowStateJobTime schema</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>name</th><th>type</th><th>required</th><th>Description</th></tr></thead><tbody>
+<tr><td>timestamp</td><td>number</td><td>NO</td><td>just used for 'static' type</td></tr>
+<tr><td>day</td><td>number</td><td>NO</td><td>used for 'afterTime' type</td></tr>
+<tr><td>weekday</td><td>number</td><td>NO</td><td>used for 'weekly' and 'static' type (range 1..7)</td></tr>
+<tr><td>hour</td><td>number</td><td>NO</td><td>used for 'afterTime' and 'daily' and 'weekly' and 'static' type (range 1..24)</td></tr>
+<tr><td>minute</td><td>number</td><td>NO</td><td>used for 'afterTime' and 'hourly' and 'daily' and 'weekly'  and 'static' type</td></tr>
+<tr><td>second</td><td>number</td><td>NO</td><td>used for 'afterTime' and 'minutely' and 'hourly' and 'daily' and 'weekly' and 'static' type</td></tr>
+</tbody></table>
+</div>
+<hr />
+<p><sup class="footnote-reference"><a href="#alias_name_note">3</a></sup> added in 20220727.1</p>
+<p><sup class="footnote-reference"><a href="#send_fields_note">2</a></sup> added in 20220727.2</p>
+<p><sup class="footnote-reference"><a href="#state_job_note">1</a></sup> added in 20220810.1</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../concepts/workflow/workflow.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                            <a rel="next" href="../../concepts/process/process.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../concepts/workflow/workflow.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                    <a rel="next" href="../../concepts/process/process.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        <script src="../../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+    </body>
+</html>
