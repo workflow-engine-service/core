@@ -154,11 +154,14 @@
 <tr><td>logs_path</td><td>string</td><td>NO</td><td>local logs folder path for store app logs (default: <code>./logs</code>)</td></tr>
 <tr><td>uploads_path</td><td>string</td><td>NO</td><td>uploads folder path for store users upload files (default: <code>./uploads</code>)</td></tr>
 <tr><td>debug_mode</td><td>boolean</td><td>NO</td><td>activate debug logs</td></tr>
-<tr><td>wiki_base_url</td><td>string</td><td>NO</td><td>wiki service base url (default: <code>/wiki</code>)</td></tr>
+<tr><td>wiki_base_url</td><td>string</td><td>NO</td><td>wiki service base url (default: <code>/wiki</code>) (<strong>deprecated</strong>)</td></tr>
+<tr><td>wiki_disabled</td><td>boolean</td><td>NO</td><td>is wiki service disabled? (<strong>deprecated</strong>)</td></tr>
 <tr><td>swagger_base_url</td><td>string</td><td>NO</td><td>swagger service base url (default: <code>/api-docs</code>)</td></tr>
 <tr><td>swagger_disabled</td><td>boolean</td><td>NO</td><td>is swagger service disabled?</td></tr>
 <tr><td>worker_timeout</td><td>number</td><td>NO</td><td>time for wait a worker to get response (default: 30s)</td></tr>
 <tr><td>max_worker_running</td><td>number</td><td>NO</td><td>max workers to async running (default: 10)</td></tr>
+<tr><td>frontend_path</td><td>string</td><td>NO</td><td>frontend file resources path for serve (if not, means that this service is disabled!)</td></tr>
+<tr><td>frontend_url</td><td>string</td><td>NO</td><td>frontend url (default: <code>/frontend</code>)</td></tr>
 </tbody></table>
 </div>
                     </main>

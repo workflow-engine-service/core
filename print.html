@@ -555,6 +555,11 @@ and set a response channel name that publish on it your response (like next stat
 </blockquote>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="command-line-tool"><a class="header" href="#command-line-tool">Command Line Tool</a></h1>
 <p>we use <a href="https://www.npmjs.com/package/dat-tool">dat-tool</a> tool for integrating a cli for project.</p>
+<p>for use this tool, first need to clone it: </p>
+<pre><code class="language-bash">
+git clone https://github.com/workflow-engine-service/cli cli/
+
+</code></pre>
 <h2 id="install--use"><a class="header" href="#install--use">Install &amp; Use</a></h2>
 <ul>
 <li>install node 12 or higher version</li>
@@ -673,11 +678,14 @@ the <code>install</code> command is used like this</p>
 <tr><td>logs_path</td><td>string</td><td>NO</td><td>local logs folder path for store app logs (default: <code>./logs</code>)</td></tr>
 <tr><td>uploads_path</td><td>string</td><td>NO</td><td>uploads folder path for store users upload files (default: <code>./uploads</code>)</td></tr>
 <tr><td>debug_mode</td><td>boolean</td><td>NO</td><td>activate debug logs</td></tr>
-<tr><td>wiki_base_url</td><td>string</td><td>NO</td><td>wiki service base url (default: <code>/wiki</code>)</td></tr>
+<tr><td>wiki_base_url</td><td>string</td><td>NO</td><td>wiki service base url (default: <code>/wiki</code>) (<strong>deprecated</strong>)</td></tr>
+<tr><td>wiki_disabled</td><td>boolean</td><td>NO</td><td>is wiki service disabled? (<strong>deprecated</strong>)</td></tr>
 <tr><td>swagger_base_url</td><td>string</td><td>NO</td><td>swagger service base url (default: <code>/api-docs</code>)</td></tr>
 <tr><td>swagger_disabled</td><td>boolean</td><td>NO</td><td>is swagger service disabled?</td></tr>
 <tr><td>worker_timeout</td><td>number</td><td>NO</td><td>time for wait a worker to get response (default: 30s)</td></tr>
 <tr><td>max_worker_running</td><td>number</td><td>NO</td><td>max workers to async running (default: 10)</td></tr>
+<tr><td>frontend_path</td><td>string</td><td>NO</td><td>frontend file resources path for serve (if not, means that this service is disabled!)</td></tr>
+<tr><td>frontend_url</td><td>string</td><td>NO</td><td>frontend url (default: <code>/frontend</code>)</td></tr>
 </tbody></table>
 </div><div style="break-before: page; page-break-before: always;"></div><h1 id="admin_users-config-namespace"><a class="header" href="#admin_users-config-namespace"><code>admin_users</code> config namespace</a></h1>
 <p>you must at least one admin user to connect workflow service. set admin users on workflow engine as hard coded</p>
