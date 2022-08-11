@@ -5,7 +5,7 @@ import { MiddlewareName } from "./types";
 
 export namespace Const {
 
-    export const VERSION = '0.68';
+    export const VERSION = '0.69';
 
     export let SERVER_MODE: 'dev' | 'prod' = 'dev';
 
@@ -20,4 +20,10 @@ export namespace Const {
     export let MIDDLEWARES: MiddlewareName[] = ['RequestInit', 'Authentication', 'RoutingResolver'];
 
     export let REDIS_INSTANCES: Redis[] = [];
+
+    export enum RESERVED_ACCESS_ROLES {
+        ALL_ACCESS = '_all_',
+        OWNER_ACCESS = '_owner_',
+    }
+
 }

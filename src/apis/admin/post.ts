@@ -79,6 +79,13 @@ export class AdminPostApi extends BaseApi {
         })) {
             return this.error400('user exist with id or name');
         }
+        // =>check for not set reserved access roles
+        if (!userInfo.roles) userInfo.roles = [];
+        for (const role of userInfo.roles) {
+            if (role === Const.RESERVED_ACCESS_ROLES.ALL_ACCESS || role === Const.RESERVED_ACCESS_ROLES.OWNER_ACCESS) {
+                return this.error400('user can not have a reserved access role!');
+            }
+        }
         // console.log('user:', userInfo);
         // =>if set secret key, encrypt it
         if (userInfo.secret_key) {

@@ -140,12 +140,19 @@ export class BaseApi {
     /*************************************** */
     /*************************************** */
     /*************************************** */
-    checkUserRoleHasAccess(roles: string[]) {
+    checkUserRoleHasAccess(roles: string[], options: {
+        process?: WorkflowProcessModel
+    } = {}) {
         if (!roles) {
-            roles = ['_all_'];
+            roles = [Const.RESERVED_ACCESS_ROLES.ALL_ACCESS];
         }
-        if (roles.includes('_all_')) {
+        // =>if all access
+        if (roles.includes(Const.RESERVED_ACCESS_ROLES.ALL_ACCESS)) {
             return true;
+        }
+        // =>if owner access
+        if (roles.includes(Const.RESERVED_ACCESS_ROLES.OWNER_ACCESS) && options.process) {
+            if (options.process.created_by === this.request.user().id) return true;
         }
         for (const userRole of this.request.user().roles) {
             if (roles.includes(userRole)) {

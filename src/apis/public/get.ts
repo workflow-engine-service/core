@@ -33,7 +33,7 @@ export class PublicGetApi extends BaseApi {
                 return res;
             }
             // =>check read process access
-            if (!this.checkUserRoleHasAccess(res.process.workflow.settings.read_access_roles)) {
+            if (!this.checkUserRoleHasAccess(res.process.workflow.settings.read_access_roles, { process: res.process })) {
                 return this.error403('no access to process info');
             }
             // =>truncate data
@@ -60,7 +60,7 @@ export class PublicGetApi extends BaseApi {
                 return res;
             }
             // =>check read process access
-            if (!this.checkUserRoleHasAccess(res.process.workflow.settings.read_access_roles)) {
+            if (!this.checkUserRoleHasAccess(res.process.workflow.settings.read_access_roles, { process: res.process })) {
                 return this.error403('no access to process info');
             }
 
@@ -88,7 +88,7 @@ export class PublicGetApi extends BaseApi {
                     continue;
                 }
                 // =>check read process access
-                if (!this.checkUserRoleHasAccess(res.process.workflow.settings.read_access_roles)) {
+                if (!this.checkUserRoleHasAccess(res.process.workflow.settings.read_access_roles, {process: res.process})) {
                     continue;
                 }
                 // =>if filter end processes
