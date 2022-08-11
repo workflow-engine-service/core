@@ -401,3 +401,12 @@ export interface WorkflowProcessOnInit {
      */
     api_url?: string;
 }
+
+export interface WorkflowDeployedInfo {
+    workflow_name: string;
+    workflow_version: number;
+    create_access_roles: string[];
+    read_access_roles?: string[];
+    deployed_at: number;
+    deployed_by: number;
+}

@@ -6,6 +6,7 @@ logs
 swagger.json
 docker/data
 configs.prod.json
+configs.dev.json
 cli/data/docker/tmp
 docs/wes_book/book
 cli

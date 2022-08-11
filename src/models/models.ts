@@ -15,6 +15,9 @@ export interface DeployedWorkflowModel {
     fields: WorkflowField[];
     states: WorkflowState[];
 
+    created_at: number;
+    created_by: number;
+
     _id?: string;
 }
 /**

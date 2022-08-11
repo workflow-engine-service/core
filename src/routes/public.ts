@@ -358,4 +358,34 @@ export const publicApis: ApiRoute[] = [
         },
         usedDefinitions: ['WorkerModel'],
     },
+    {
+        method: 'GET',
+        path: 'workflow/deployed-list',
+        functionName: 'getWorkflowList',
+        tags: ['workflow'],
+        des: 'get list of deployed workflows info for this user',
+        parameters: [
+            {
+                name: 'access',
+                in: 'query',
+                required: false,
+                type: 'string',
+                default: 'all',
+                description: `you can set access filter as 'all' or 'create-access' or 'read-access'`
+            },
+        ],
+        responses: {
+            '200': {
+                description: 'return workflow info list',
+                schema: {
+                    type: 'array',
+                    items: {
+                        $ref: "#/definitions/WorkflowDeployedInfo"
+
+                    }
+                }
+            },
+        },
+        usedDefinitions: ['WorkflowDeployedInfo'],
+    },
 ];

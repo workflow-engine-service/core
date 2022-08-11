@@ -7,6 +7,7 @@
 [ ] add jobs on states
 [ ] run state jobs as workers
 [ ] implement authenticate methods
+[ ] manage uploaded files
 
 # Testing Tasks
 [ ] not create new worker for an action when exist and running
@@ -36,4 +37,5 @@
 [x] add `send_fields` to state action
 [x] send required, optional fields to action hook or redis
 [x] connect frontend app to workflow
+[x] get workflows list api
 

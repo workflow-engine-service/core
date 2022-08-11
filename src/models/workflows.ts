@@ -8,6 +8,8 @@ const metaDataSchema = new mongoose.Schema<DeployedWorkflowModel, DeployedWorkfl
     settings: Object,
     fields: Array,
     states: Array,
+    created_at: Number,
+    created_by: Number,
 });
 
 export async function getSchema() {

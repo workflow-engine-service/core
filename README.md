@@ -1,4 +1,4 @@
-# Workflow Engine Service - version 0.6 (beta)
+# Workflow Engine Service - version 0.7 (beta)
 
 WES (workflow engine service) is a workflow engine that can be expose some useful api endpoints for clients and servers and reduced coding for your application. More features of WES :
 
@@ -34,6 +34,7 @@ WES (workflow engine service) is a workflow engine that can be expose some usefu
 3. run monogo service (run: `sudo docker run -p 27017:27017 --name mongo -d mongo`)
 > you can access monogo cli with `docker exec -it mongo mongosh --quiet`
 4. install dependencies with `npm i`
+5. copy from `configs.dev.sample.json` file and create `configs.dev.json` file
 6. run server with `npm run dev`. you can see on `http://localhost:8082`
 
 ## Get Started (for production mode)

@@ -1,10 +1,11 @@
 import { DeployedWorkflowModel, WorkerModel, WorkflowProcessModel } from "../../models/models";
 import { Auth } from "../../auth";
-import { infoLog } from "../../common";
+import { absUrl, errorLog, infoLog } from "../../common";
 import { Const } from "../../const";
 import { HttpStatusCode } from "../../types";
 import { BaseApi } from "../base";
 import { UserTokenResponse } from "./interfaces";
+import { WorkflowDeployedInfo } from "src/interfaces";
 
 export function classApi() {
     return PublicGetApi;
@@ -14,10 +15,13 @@ export class PublicGetApi extends BaseApi {
     async urls() {
         let urls = {};
         if (!Const.CONFIGS.server.wiki_disabled) {
-            urls['wiki'] = Const.CONFIGS.server.wiki_base_url;
+            urls['wiki'] = absUrl(Const.CONFIGS.server.wiki_base_url);
         }
         if (!Const.CONFIGS.server.swagger_disabled) {
-            urls['swagger'] = Const.CONFIGS.server.swagger_base_url;
+            urls['swagger'] = absUrl(Const.CONFIGS.server.swagger_base_url);
+        }
+        if (Const.CONFIGS.server.frontend_path) {
+            urls['frontend'] = absUrl(Const.CONFIGS.server.frontend_url);
         }
         return this.response(urls);
     }
@@ -88,7 +92,7 @@ export class PublicGetApi extends BaseApi {
                     continue;
                 }
                 // =>check read process access
-                if (!this.checkUserRoleHasAccess(res.process.workflow.settings.read_access_roles, {process: res.process})) {
+                if (!this.checkUserRoleHasAccess(res.process.workflow.settings.read_access_roles, { process: res.process })) {
                     continue;
                 }
                 // =>if filter end processes
@@ -155,7 +159,7 @@ export class PublicGetApi extends BaseApi {
         try {
             let workers: WorkerModel[] = [];
             if (filter_finished_workers) {
-                workers = await Const.DB.models.workers.find({ ended_at: { $exist: false } })
+                workers = await Const.DB.models.workers.find({ ended_at: { $exist: false } });
             } else {
                 workers = await Const.DB.models.workers.find({});
             }
@@ -171,6 +175,41 @@ export class PublicGetApi extends BaseApi {
 
             return this.response(workers);
         } catch (e) {
+            return this.error400();
+        }
+    }
+    /******************************* */
+    async getWorkflowList() {
+        try {
+            // =>get params
+            let access = this.param<'all' | 'create-access' | 'read-access'>('access', 'all');
+            // =>get all workflows
+            let workflows = await Const.DB.models.workflows.find();
+            let list: WorkflowDeployedInfo[] = [];
+            // =>iterate
+            for (const flow of workflows) {
+                // =>check for create access
+                if ((access === 'all' || access === 'create-access') && !this.checkUserRoleHasAccess(flow.settings.create_access_roles)) {
+                    continue;
+                }
+                // =>check for read access
+                if ((access === 'all' || access === 'read-access') && !this.checkUserRoleHasAccess(flow.settings.read_access_roles)) {
+                    continue;
+                }
+
+                list.push({
+                    workflow_name: flow.name,
+                    workflow_version: flow.version,
+                    create_access_roles: flow.settings.create_access_roles,
+                    read_access_roles: flow.settings.read_access_roles,
+                    deployed_at: flow.created_at,
+                    deployed_by: flow.created_by,
+                });
+            }
+
+            return this.response(list);
+        } catch (e) {
+            errorLog('err456232', e);
             return this.error400();
         }
     }

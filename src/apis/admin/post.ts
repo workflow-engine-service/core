@@ -39,6 +39,8 @@ export class AdminPostApi extends BaseApi {
             },
             fields: code.fields,
             states: code.states,
+            created_at: new Date().getTime(),
+            created_by: this.request.user().id,
         }
         if (code.create_access_roles) {
             deployedWorkflow.settings.create_access_roles = code.create_access_roles;

@@ -61,9 +61,14 @@ export namespace WebRoutes {
                 <p><strong>[+] swagger docs: </strong><a href="${Const.CONFIGS.server.swagger_base_url}">${Const.CONFIGS.server.swagger_base_url}</a></p>`
             }
             // =>if wiki enabled
-            if (!Const.CONFIGS.server.wiki_disabled) {
+            // if (!Const.CONFIGS.server.wiki_disabled) {
+            //     html += `
+            //     <p><strong>[+] wiki docs: </strong><a href="${Const.CONFIGS.server.wiki_base_url}">${Const.CONFIGS.server.wiki_base_url}</a></p>`
+            // }
+            // =>if frontend enabled
+            if (Const.CONFIGS.server.frontend_path) {
                 html += `
-                <p><strong>[+] wiki docs: </strong><a href="${Const.CONFIGS.server.wiki_base_url}">${Const.CONFIGS.server.wiki_base_url}</a></p>`
+                <p><strong>[+] frontend site: </strong><a href="${Const.CONFIGS.server.frontend_url}">${Const.CONFIGS.server.frontend_url}</a></p>`;
             }
             html += `
             </body>
@@ -144,7 +149,6 @@ export namespace WebRoutes {
                 } catch (e) {
                     errorLog('err438', e);
                     res.status(500).end();
-                    // return Global.ErrorHandler.switchHandler(this.coreRequest, HttpStatusCode.HTTP_500_INTERNAL_SERVER_ERROR, config('DEBUG_MODE') ? e : '');
                 }
             });
         }

@@ -3,4 +3,4 @@ authors = ["madkne"]
 language = "en"
 multilingual = true
 src = "src"
-title = "Workflow Engine Service - version 0.6"
+title = "Workflow Engine Service - version 0.7"
