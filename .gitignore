@@ -9,3 +9,4 @@ configs.prod.json
 cli/data/docker/tmp
 docs/wes_book/book
 cli
+frontend

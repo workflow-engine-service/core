@@ -8,7 +8,6 @@
 [ ] run state jobs as workers
 [ ] add _owner_ role
 [ ] implement authenticate methods
-[ ] connect frontend app to workflow
 
 # Testing Tasks
 [ ] not create new worker for an action when exist and running
@@ -36,3 +35,5 @@
 [x] add license and code of conduct
 [x] add `send_fields` to state action
 [x] send required, optional fields to action hook or redis
+[x] connect frontend app to workflow
+

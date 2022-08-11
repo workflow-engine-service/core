@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import * as os from "os";
 import { Const } from "./const";
 import { MongoDB } from "./mongo";
 import { LogMode, WorkflowNamespace } from "./types";
@@ -61,6 +62,9 @@ export async function loadConfigs() {
         if (!Const.CONFIGS.server.logs_path) {
             Const.CONFIGS.server.logs_path = 'logs';
         }
+        if (!Const.CONFIGS.server.tmp_path) {
+            Const.CONFIGS.server.tmp_path = path.join(os.tmpdir(), 'workflow_service');
+        }
         if (!Const.CONFIGS.server.uploads_path) {
             Const.CONFIGS.server.uploads_path = 'uploads';
         }
@@ -78,6 +82,9 @@ export async function loadConfigs() {
         }
         if (!Const.CONFIGS.server.max_worker_running) {
             Const.CONFIGS.server.max_worker_running = 10;
+        }
+        if (!Const.CONFIGS.server.frontend_url) {
+            Const.CONFIGS.server.frontend_url = '/frontend';
         }
         if (!Const.CONFIGS.redis) {
             Const.CONFIGS.redis = {};
@@ -221,7 +228,7 @@ export async function sleep(timeout = 1000) {
         }, timeout);
     });
 }
-
+/***************************************** */
 export async function dbLog(options: { namespace: WorkflowNamespace, name: string, mode?: LogMode, meta?: object; user_id?: number; ip?: string; }) {
     try {
         if (!options.mode) options.mode = LogMode.INFO;
@@ -238,4 +245,10 @@ export async function dbLog(options: { namespace: WorkflowNamespace, name: strin
         console.trace();
         errorLog('err66553', e);
     }
+}
+/***************************************** */
+export function absUrl(path: string) {
+    if (path.startsWith('/')) path = path.substring(1);
+    return `http://${Const.CONFIGS.server.host}:${Const.CONFIGS.server.port}/${path}`;
+
 }

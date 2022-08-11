@@ -14,7 +14,9 @@
         "port": 8082,
         "host": "localhost",
         "logs_path": "./logs",
-        "debug_mode": true
+        "debug_mode": true,
+        "frontend_path": "./frontend/dist",
+        "frontend_url": "/frontend"
     },
     "admin_users": [
         {

@@ -12,6 +12,21 @@ WES (workflow engine service) is a workflow engine that can be expose some usefu
 8. using mongodb and docker
 9. cli support
 
+## use cli
+
+- clone `https://github.com/workflow-engine-service/cli` into `cli/` directory.
+
+## use frontend
+
+- clone `https://github.com/workflow-engine-service/angular-frontend` into `frontend/` directory.
+
+### development mode
+
+- go to `configs.dev.json` and set `frontend_path: "./frontend/dist"` and `frontend_url: "/frontend"` into `server` namespace
+> for development: go to `frontend/` directory and command `npm i` and after develop codes build project with `ng b`
+
+
+
 ## Get started (for developer mode)
 
 1. install node >= 12

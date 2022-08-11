@@ -65,6 +65,7 @@
         ".vscode",
         "build",
         "storage",
-        "cli"
+        "cli",
+        "frontend"
     ]
 }

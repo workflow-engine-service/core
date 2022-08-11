@@ -22,10 +22,19 @@ export interface ServerConfigs {
         logs_path?: string;
         uploads_path?: string;
         debug_mode?: boolean;
+        tmp_path?: string;
+        /**
+         * @deprecated
+         */
         wiki_base_url?: string;
+        /**
+         * @deprecated
+         */
         wiki_disabled?: boolean;
         swagger_disabled?: boolean;
         swagger_base_url?: string;
+        frontend_path?: string;
+        frontend_url?: string;
         /**
          * in seconds
          * @default 30

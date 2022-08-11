@@ -18,7 +18,7 @@ export class Authentication extends Middleware {
       // =>check if root url
       if (req.path == '/') return true;
       // =>check for exclude urls
-      let excludeUrls = [Const.CONFIGS.server.swagger_base_url, Const.CONFIGS.server.wiki_base_url, WebRoutes.assetsBaseUrl];
+      let excludeUrls = [Const.CONFIGS.server.swagger_base_url, Const.CONFIGS.server.wiki_base_url, Const.CONFIGS.server.frontend_url, WebRoutes.assetsBaseUrl];
       for (const url of excludeUrls) {
          if (req.path.startsWith(url)) {
             return true;

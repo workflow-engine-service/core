@@ -2,7 +2,7 @@ import { Express, static as expressStatic } from 'express';
 import * as path from 'path';
 import * as fs from 'fs';
 import { ApiRoute } from './interfaces';
-import { errorLog } from './common';
+import { absUrl, debugLog, errorLog } from './common';
 import { CoreRequest } from './apis/request';
 import { HttpStatusCode } from './types';
 import { adminApis } from './routes/admin';
@@ -71,6 +71,83 @@ export namespace WebRoutes {
             res.write(html);
             res.end();
         });
+
+        // =>serve frontend
+        if (Const.CONFIGS.server.frontend_path) {
+            app.get(`${Const.CONFIGS.server.frontend_url}*`, async (req, res) => {
+                try {
+                    //=>extract app file path
+                    let filename = req.path.split('/').pop();
+                    // console.log(filename, filename.match(/\.\w+$/))
+                    if (!filename.match(/\.\w+$/)) {
+                        filename = 'index.html';
+                    }
+                    // console.log('fgh', filename, this.request.path)
+                    let filePath = path.join(Const.CONFIGS.server.frontend_path, filename);
+                    // =>abs file path
+                    if (fs.existsSync(path.join(__dirname, filePath))) {
+                        filePath = path.join(__dirname, filePath);
+                    } else if (fs.existsSync(path.join(__dirname, '..', filePath))) {
+                        filePath = path.join(__dirname, '..', filePath);
+                    }
+                    // =>parse index file
+                    if (filename === 'index.html') {
+                        let html = fs.readFileSync(filePath).toString();
+                        const replaceResourcePath = (html: string, find: RegExp, fileName: RegExp, replacer: string) => {
+                            let finalHtml = html;
+                            // =>match exp
+                            if (html.match(find)) {
+                                let matches = html.match(find);
+                                let match = matches[0];
+                                // console.log('match:', match)
+                                // =>get filename
+                                let fname = match.match(fileName);
+                                // =>replace with real path
+                                if (fname) {
+                                    finalHtml = html.replace(find, replacer.replace(':filename', `http://${Const.CONFIGS.server.host}:${Const.CONFIGS.server.port}${Const.CONFIGS.server.frontend_url}/${fname[0]}`));
+                                }
+                            }
+                            return finalHtml;
+                        };
+                        // =>replace base href
+                        html = replaceResourcePath(html, /<base href=\"\/.*\">/, /.*/, `<base href="${Const.CONFIGS.server.frontend_url}">`);
+                        // =>replace styles file path
+                        html = replaceResourcePath(html, /\<link rel=\"stylesheet\" href=\"styles.*\.css\"\>/, /styles\..*css/, '<link rel="stylesheet" href=":filename">');
+                        // =>replace js files path
+                        let jsFiles = ['runtime', 'polyfills', 'main'];
+                        for (const jsFile of jsFiles) {
+                            // =>replace runtime js file path
+                            html = replaceResourcePath(html, new RegExp(`\<script src=\"${jsFile}.*\.js\" type=\"module\">\<\/script\>`), new RegExp(`${jsFile}.*\.js`), '<script src=":filename" type="module"></script>');
+
+                        }
+
+                        // =>set some server variables
+                        if (!/\/\/ SERVER VARIABLES/.test(html)) {
+                            html = html.replace(/\<\/html\>/, `<script>
+                           // SERVER VARIABLES
+                           var _global_configs_ = {
+                                API_ENDPOINT: '${absUrl('/api/v1')}',
+                                AUTH_HEADER_NAME: '${Const.CONFIGS.auth_user.header_name}'
+                            }
+                           </script>
+                           </html>`);
+                        }
+                        // console.log('index.html:', html);
+                        // =>update index.html
+                        filePath = path.join(Const.CONFIGS.server.tmp_path, 'frontend_index.html');
+                        fs.writeFileSync(filePath, html);
+                    }
+
+                    // =>response file
+                    debugLog('frontend', `server frontend file: '${filePath}'`);
+                    res.sendFile(filePath);
+                } catch (e) {
+                    errorLog('err438', e);
+                    res.status(500).end();
+                    // return Global.ErrorHandler.switchHandler(this.coreRequest, HttpStatusCode.HTTP_500_INTERNAL_SERVER_ERROR, config('DEBUG_MODE') ? e : '');
+                }
+            });
+        }
         // app.use('/assets', expressStatic(path.join(__dirname, '..', 'public', 'assets')));
 
     }

@@ -23,6 +23,7 @@ async function main() {
     }
     // =>create required dirs
     fs.mkdirSync(Const.CONFIGS.server.logs_path, { recursive: true });
+    fs.mkdirSync(Const.CONFIGS.server.tmp_path, { recursive: true });
     // =>init mongo db
     await InitDB();
     // =>init webserver

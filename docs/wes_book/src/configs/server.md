@@ -25,9 +25,13 @@ sample code:
 | logs_path | string | NO | local logs folder path for store app logs (default: `./logs`) |
 | uploads_path | string | NO | uploads folder path for store users upload files (default: `./uploads`) | 
 |debug_mode | boolean | NO | activate debug logs |
-| wiki_base_url | string| NO | wiki service base url (default: `/wiki`)|| wiki_disabled | boolean| NO | is wiki service disabled?|
+| wiki_base_url | string| NO | wiki service base url (default: `/wiki`) (**deprecated**)|
+| wiki_disabled | boolean| NO | is wiki service disabled? (**deprecated**)|
 | swagger_base_url | string| NO | swagger service base url (default: `/api-docs`)|
 | swagger_disabled | boolean| NO | is swagger service disabled?|
 | worker_timeout | number| NO | time for wait a worker to get response (default: 30s)|
 | max_worker_running | number| NO | max workers to async running (default: 10)|
+| frontend_path | string| NO | frontend file resources path for serve (if not, means that this service is disabled!)|
+| frontend_url | string| NO | frontend url (default: `/frontend`) |
+
 
