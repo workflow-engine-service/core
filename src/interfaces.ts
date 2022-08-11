@@ -1,6 +1,6 @@
 import { SwaggerApiParameter, SwaggerApiResponse } from "./document/interfaces";
 import { WorkerModel, WorkflowProcessModel } from "./models/models";
-import { HttpStatusCode, MiddlewareName, RequestMethodType, SwaggerTagName, WorkflowFieldDataType, WorkflowStateEventName } from "./types";
+import { HttpStatusCode, MiddlewareName, RequestMethodType, SwaggerTagName, WorkflowFieldDataType, WorkflowStateEventName, WorkflowStateJobScheduleType } from "./types";
 
 
 export interface ServerConfigs {
@@ -178,23 +178,7 @@ export interface WorkflowState {
      */
     events?: WorkflowStateEvent[];
 
-    jobs?: {
-        startConditions: [
-            { field: 'doing', $eq: true },
-            {}
-        ],
-        schedule: {
-            type: 'daily', // daily|weekly|hourly|monthly|static|minutely
-            times: {
-                timestamp?: 235435435343 //type: static
-                monthday?: 21,//type: monthly|static
-                weekday?: 'sun' | 4,//type: weekly|monthly|static
-                hour?: 3, //type: daily|weekly|monthly|static
-                minute?: 45 //type: daily|weekly|hourly|monthly|static
-                second?: 34 // type: // daily|weekly|hourly|monthly|static|minutely 
-            }[]
-        }
-    }[];
+    jobs?: WorkflowStateJob[];
 }
 
 export interface WorkflowStateEvent {
@@ -210,6 +194,40 @@ export interface WorkflowStateEvent {
     channel?: string;
     redis_instance?: string;
 
+}
+
+export interface WorkflowStateJobTime {
+
+    /**
+     * type: static
+     */
+    timestamp?: number;
+    /**
+     * type: afterTime|static
+     */
+    day?: number;
+    /**
+     * type: weekly|monthly|static
+     */
+    weekday?: number;
+    /**
+     * daily|weekly|monthly|static
+     */
+    hour?: number;
+    /**
+     * type: daily|weekly|hourly|monthly|static
+     */
+    minute?: number;
+    /**
+     * type: daily|weekly|hourly|monthly|static|minutely 
+     */
+    second?: number;
+}
+export interface WorkflowStateJob {
+    type: WorkflowStateJobScheduleType;
+    times: WorkflowStateJobTime[];
+    set_fields?: object;
+    action_name?: string;
 }
 
 export interface WorkflowStateAction {
@@ -256,7 +274,7 @@ export interface APIResponse<T = any> {
 }
 
 /**
- * @edition 20220727.2
+ * @edition 20220810.1
  */
 export interface WorkflowDescriptor {
     /**
@@ -333,6 +351,7 @@ export interface WorkflowStateActionSendParametersFields {
     workflow_version: number;
     process_id: string;
     user_id: number;
+    owner_id: number;
     message?: string;
     required_fields?: WorkflowProcessField[];
     optional_fields?: WorkflowProcessField[];

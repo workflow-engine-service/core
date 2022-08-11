@@ -181,6 +181,7 @@ export class PublicPostApi extends BaseApi {
                 fields: needFields,
                 _action: action,
                 _process: res.process,
+                owner_id: res.process.created_by,
             });
             // console.log('worker id:', workerId)
             return this.response(workerId);

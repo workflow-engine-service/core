@@ -8,6 +8,8 @@
     - [Process](./concepts/process/process.md)
         - [Schema details](./concepts/process/schema.md)
     - [Access Roles](./concepts/access_roles.md)
+    - [State Event](./concepts/state_event.md)
+    - [State Job](./concepts/state_job.md)
     - [State Action](./concepts/state_action/state_action.md)
         - [Action Response](./concepts/state_action/action_response.md)
 - [Command Line Tool](./cli/cli.md)

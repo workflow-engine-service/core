@@ -1,4 +1,4 @@
-# Workflow Engine Service - version 0.5 (beta)
+# Workflow Engine Service - version 0.6 (beta)
 
 WES (workflow engine service) is a workflow engine that can be expose some useful api endpoints for clients and servers and reduced coding for your application. More features of WES :
 

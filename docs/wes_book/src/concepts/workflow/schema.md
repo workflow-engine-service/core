@@ -1,4 +1,4 @@
-# Schema details (20220727.2 edition)
+# Schema details (20220810.1 edition)
 
 ## main schema
 
@@ -40,7 +40,8 @@
 |access_role | string[] | NO | roles to view this state (default: `['_all_']`)|
 |meta|object|NO|any data useful for client|
 |actions|[WorkflowStateAction](#workflowstateaction-schema)[]|NO|actions of state|
-|events|WorkflowStateEvent[]|NO|you can define events on state|
+|events|[WorkflowStateEvent](#workflowstateevent-schema)[]|NO|you can define events on state|
+|jobs|[WorkflowStateJob](#workflowstatejob-schema)[] [^state_job_note]|NO|you can define jobs on state|
 
 ## WorkflowStateAction schema
 
@@ -67,8 +68,46 @@ message_required | boolean | NO | client must send a message or not |
 |next_state|string|NO| next state to be go. used for 'local' type|
 
 
+## WorkflowStateEvent schema
+
+| name | type | required | Description |
+| ----------- | ----------- |----------- |----------- |
+| name | 'onInit' or 'onLeave' or 'onJob' | **YES** | event name | 
+|type | 'redis' or 'hook_url' | **YES** |  type of send event |
+|alias_name| string | NO | name of an alias [^alias_name_note]|
+|url| string | NO | can be a url like `http://sample.com/hook`. used for 'hook_url' type|
+|method| string | NO | can be a request method like 'get' or 'post'. used for 'hook_url' type|
+|headers| string[] | NO | headers that can be set on hook request. used for 'hook_url' type|
+|channel|string|NO| publish channel name. used for 'redis' type|
+|redis_instance|string|NO| a redis instance name. used for 'redis' type. (default is first instance defined on configs)|
+
+
+## WorkflowStateJob schema 
+
+| name | type | required | Description |
+| ----------- | ----------- |----------- |----------- |
+| type | string | **YES** | job type can be "static" or "daily" or "weekly" or "hourly" or "minutely" or "afterTime" | 
+|times | [WorkflowStateJobTime](#workflowstatejobtime-schema)[] | **YES** | set times to execute job|
+|set_fields | object | NO | fields that can set hardcoded|
+|action_name|string|NO| action to be go. |
+
+
+## WorkflowStateJobTime schema
+
+| name | type | required | Description |
+| ----------- | ----------- |----------- |----------- |
+| timestamp | number | NO | just used for 'static' type |  
+| day | number | NO | used for 'afterTime' type | 
+| weekday | number | NO | used for 'weekly' and 'static' type (range 1..7) | 
+| hour | number | NO | used for 'afterTime' and 'daily' and 'weekly' and 'static' type (range 1..24) | 
+| minute | number | NO | used for 'afterTime' and 'hourly' and 'daily' and 'weekly'  and 'static' type | 
+| second | number | NO | used for 'afterTime' and 'minutely' and 'hourly' and 'daily' and 'weekly' and 'static' type | 
+
+
 -----------
 
 [^alias_name_note] added in 20220727.1
 
 [^send_fields_note] added in 20220727.2
+
+[^state_job_note] added in 20220810.1

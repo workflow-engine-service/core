@@ -4,8 +4,16 @@
 [ ] check for end state
 [ ] enable multi threading for workers
 [ ] complete to validate deployed workflow
-[ ] not create new worker for an action when exist and running
+[ ] add jobs on states
+[ ] run state jobs as workers
+[ ] add _owner_ role
+[ ] implement authenticate methods
+[ ] connect frontend app to workflow
 
+# Testing Tasks
+[ ] not create new worker for an action when exist and running
+[ ] add headers to event requests
+[ ] add `owner_id` to action request
 
 # DONE Tasks
 [x] init workflow core

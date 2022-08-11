@@ -214,6 +214,7 @@ export namespace ProcessHelper {
             workflow_name: params.workflow_name,
             workflow_version: params.workflow_version,
             message: params.message,
+            owner_id: params.owner_id,
         };
     }
     /********************************** */

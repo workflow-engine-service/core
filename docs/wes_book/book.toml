@@ -1,6 +1,6 @@
 [book]
 authors = ["madkne"]
 language = "en"
-multilingual = false
+multilingual = true
 src = "src"
-title = "Workflow Engine Service - version 0.5"
+title = "Workflow Engine Service - version 0.6"

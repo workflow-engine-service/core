@@ -1,4 +1,4 @@
-import { debugLog, generateString } from "./common";
+import { dbLog, debugLog, generateString } from "./common";
 import { WorkerStruct, WorkflowStateActionResponse, WorkflowStateActionSendParameters } from "./interfaces";
 import { Subject } from "rxjs";
 import { ProcessHelper } from "./apis/processHelper";
@@ -13,6 +13,14 @@ export namespace WebWorkers {
     let maxWorkerRunning = 0;
     /******************************** */
     export async function addActionWorker(params: WorkflowStateActionSendParameters): Promise<string> {
+        // =>check before worker added and not end for this action
+        if (await Const.DB.models.workers.find({
+            ended_at: { $exist: false },
+            type: 'state_action',
+            started_by: params.user_id,
+        })) {
+            throw new Error(`a worker running on '${params.state_action_name}' action`);
+        }
         // =>generate worker id
         let workerId = await addWorker<WorkflowStateActionResponse>({
             type: 'state_action',
@@ -124,6 +132,7 @@ export namespace WebWorkers {
         let worker = await Const.DB.models.workers.create(struct);
         struct._id = worker._id;
         debugLog('worker', `added a new worker by id '${struct._id}' by type '${struct.type}'`);
+        dbLog({ namespace: 'worker', name: 'add_worker', meta: { struct }, user_id: struct.started_by });
         workers.push(struct);
         return struct._id;
     }

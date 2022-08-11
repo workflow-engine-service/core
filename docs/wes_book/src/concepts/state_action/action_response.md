@@ -1,6 +1,6 @@
 # State Action Response
 
-when you use `hook_url` or `redis` types for state action, your server receive an object that contains:
+when you use `hook_url` or `redis` types for state action, your server receive an object that contains (send parameters):
 
 | name | type | Description |
 | ----------- | ----------- |----------- |
@@ -10,6 +10,7 @@ when you use `hook_url` or `redis` types for state action, your server receive a
 | workflow_version | number | workflow version | 
 | process_id | number | current process id | 
 | user_id | number | user that call this action | 
+| owner_id | number | user that create this process | 
 | message | string | message that user send on call this action  | 
 | required_fields | [WorkflowProcessField[]](../process/schema.md#workflowprocessfield-schema) | all required fields that user send them  | 
 | optional_fields | [WorkflowProcessField[]](../process/schema.md#workflowprocessfield-schema) | all optional fields that user send them  | 

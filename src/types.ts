@@ -56,10 +56,13 @@ export type MiddlewareName = 'RequestInit' | 'Authentication' | 'FormDataParser'
      * event name
      * - onInit: when current state be this state
      * - onLeave: when current state be left this state
+     * -onJob: when a job executed
      */
-export type WorkflowStateEventName = 'onInit' | 'onLeave';
+export type WorkflowStateEventName = 'onInit' | 'onLeave' | 'onJob';
 
 export type WorkflowFieldDataType = 'string' | 'number' | 'file' | 'boolean';
 
 
 export type WorkflowNamespace = 'process' | 'workflow' | 'worker' | 'config' | 'action' | 'event';
+
+export type WorkflowStateJobScheduleType = 'static' | 'daily' | 'weekly' | 'hourly' | 'minutely' | 'afterTime'; 
