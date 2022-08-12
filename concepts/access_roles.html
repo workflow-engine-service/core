@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Access Roles - Workflow Engine Service - version 0.6</title>
+        <title>Access Roles - Workflow Engine Service - version 0.7</title>
         <!-- Custom HTML head -->
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
@@ -104,7 +104,7 @@
                         </button>
                     </div>
 
-                    <h1 class="menu-title">Workflow Engine Service - version 0.6</h1>
+                    <h1 class="menu-title">Workflow Engine Service - version 0.7</h1>
 
                     <div class="right-buttons">
                         <a href="../print.html" title="Print this book" aria-label="Print this book">
@@ -135,10 +135,16 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="access-roles"><a class="header" href="#access-roles">Access Roles</a></h1>
-<p>every user that call one of endpoint api, must be authorized. and every user can have some roles. (just a label)</p>
+<p>every user that want to call one of the endpoint apis, must be authorized. and every user can have some roles. (just a label)</p>
 <p>for example, a user can be <code>manager</code> and <code>normal_user</code> and <code>supporter</code> and these are just labels that save for every user.</p>
-<p>but if you want all users access to read a process or execute an action, how?
-we have a reserved access role for this. this is <code>_all_</code>. in default of all access roles on every where is <code>_all_</code>.</p>
+<h2 id="reserved-roles"><a class="header" href="#reserved-roles">reserved roles</a></h2>
+<p>exist some reserved access roles:</p>
+<h3 id="_all_"><a class="header" href="#_all_"><code>_all_</code></a></h3>
+<p>means all authorized users have access.</p>
+<p>default of all access roles on every where is <code>_all_</code>.</p>
+<h3 id="_owner_"><a class="header" href="#_owner_"><code>_owner_</code></a></h3>
+<p>means just owner of process has access</p>
+<p>used in states and actions</p>
 
                     </main>
 
