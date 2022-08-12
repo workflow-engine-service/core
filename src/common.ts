@@ -177,7 +177,7 @@ export function debugLog(name: string, message: string) {
     }
 }
 /***************************************** */
-export function errorLog(name: string, error: any, uid?: string) {
+export function errorLog(name: string, error: any, uid?: number) {
     if (Const.CONFIGS && Const.CONFIGS.server.debug_mode && typeof error !== 'string') {
         console.error(error);
     }

@@ -62,5 +62,54 @@ export const adminApis: ApiRoute[] = [
         ],
         usedDefinitions: ['UserModel']
     },
+    {
+        method: 'GET',
+        path: 'user/list',
+        functionName: 'usersList',
+        tags: ['admin'],
+        des: 'get list of users',
+        parameters: [],
+        responses: {
+            '200': {
+                description: 'successful operation',
+                schema: {
+                    type: 'array',
+                    items: {
+                        $ref: "#/definitions/UserModel"
+                    }
+                }
+            },
+        },
+        usedDefinitions: ['UserModel']
+    },
+    {
+        method: 'GET',
+        path: 'workflow/schema',
+        functionName: 'getWorkflowSchema',
+        tags: ['admin', 'workflow'],
+        des: 'get schema of a deployed workflow',
+        parameters: [
+            {
+                in: 'query',
+                name: 'workflow_name',
+                required: true,
+            },
+            {
+                in: 'query',
+                name: 'workflow_version',
+                required: false,
+                type: 'number',
+            },
+        ],
+        responses: {
+            '200': {
+                description: 'successful operation',
+                schema: {
+                    $ref: "#/definitions/DeployedWorkflowModel"
+                }
+            },
+        },
+        usedDefinitions: ['DeployedWorkflowModel']
+    },
 
 ];

@@ -13,14 +13,7 @@ export namespace WebWorkers {
     let maxWorkerRunning = 0;
     /******************************** */
     export async function addActionWorker(params: WorkflowStateActionSendParameters): Promise<string> {
-        // =>check before worker added and not end for this action
-        if (await Const.DB.models.workers.find({
-            ended_at: { $exist: false },
-            type: 'state_action',
-            started_by: params.user_id,
-        })) {
-            throw new Error(`a worker running on '${params.state_action_name}' action`);
-        }
+
         // =>generate worker id
         let workerId = await addWorker<WorkflowStateActionResponse>({
             type: 'state_action',
@@ -114,6 +107,11 @@ export namespace WebWorkers {
                     error: response.response_message,
                     process_id: params.process_id,
                 };
+            },
+            meta: {
+                process: params.process_id,
+                state: params.state_name,
+                action: params.state_action_name,
             },
             priority: 2,
             started_by: params.user_id,

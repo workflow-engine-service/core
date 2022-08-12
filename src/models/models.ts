@@ -97,5 +97,6 @@ export interface WorkerModel<R = {}> {
     started_by?: number;
     ended_at?: number;
     success?: boolean;
+    meta?: object;
     response?: R;
 }

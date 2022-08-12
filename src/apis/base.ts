@@ -1,6 +1,6 @@
 import { Const } from "../const";
 import { APIResponse, WorkflowState } from "../interfaces";
-import { HttpStatusCode, LogMode, RequestMethodType } from "../types";
+import { HttpStatusCode, LogMode, RequestMethodType, WorkflowNamespace } from "../types";
 import { CoreRequest } from "./request";
 import { DeployedWorkflowModel, WorkflowProcessModel } from "../models/models";
 export class BaseApi {
@@ -53,17 +53,17 @@ export class BaseApi {
         return this.error(HttpStatusCode.HTTP_403_FORBIDDEN, data);
     }
     /*************************************** */
-    async errorLog(namespace: string, name: string, meta?: object) {
+    async errorLog(namespace: WorkflowNamespace, name: string, meta?: object) {
         await this.log(namespace, name, LogMode.ERROR, meta);
         // errorLog('log', '[ERROR] ' + namespace + ':' + name + ' | ' + var1 + ', ' + var2);
     }
     /*************************************** */
-    async infoLog(namespace: string, name: string, meta?: object) {
+    async infoLog(namespace: WorkflowNamespace, name: string, meta?: object) {
         await this.log(namespace, name, LogMode.INFO, meta);
         // debugLog('log', '[INFO] ' + namespace + ':' + name + ' | ' + var1 + ', ' + var2);
     }
     /*************************************** */
-    async log(namespace: string, name: string, mode: LogMode, meta?: object) {
+    async log(namespace: WorkflowNamespace, name: string, mode: LogMode, meta?: object) {
         try {
             await Const.DB.models.logs.create({
                 name,
