@@ -86,6 +86,9 @@ export async function loadConfigs() {
         if (!Const.CONFIGS.server.frontend_url) {
             Const.CONFIGS.server.frontend_url = '/frontend';
         }
+        if (Const.CONFIGS.server.frontend_path && !Const.CONFIGS.server.frontend_assets_path) {
+            Const.CONFIGS.server.frontend_assets_path = path.join(Const.CONFIGS.server.frontend_path, 'assets');
+        }
         if (!Const.CONFIGS.redis) {
             Const.CONFIGS.redis = {};
         }

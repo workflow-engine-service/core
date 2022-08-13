@@ -32,6 +32,7 @@ sample code:
 | worker_timeout | number| NO | time for wait a worker to get response (default: 30s)|
 | max_worker_running | number| NO | max workers to async running (default: 10)|
 | frontend_path | string| NO | frontend file resources path for serve (if not, means that this service is disabled!)|
+| frontend_assets_path | string| NO | frontend assets resources path for serve (if not, set `/assets`)|
 | frontend_url | string| NO | frontend url (default: `/frontend`) |
 
 

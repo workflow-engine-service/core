@@ -34,6 +34,10 @@ export interface ServerConfigs {
         swagger_disabled?: boolean;
         swagger_base_url?: string;
         frontend_path?: string;
+        /**
+         * @default /assets
+         */
+        frontend_assets_path?: string;
         frontend_url?: string;
         /**
          * in seconds

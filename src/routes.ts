@@ -76,9 +76,11 @@ export namespace WebRoutes {
             res.write(html);
             res.end();
         });
-
         // =>serve frontend
         if (Const.CONFIGS.server.frontend_path) {
+            // =>serve assets files
+            app.use(Const.CONFIGS.server.frontend_url + '/assets', expressStatic(Const.CONFIGS.server.frontend_assets_path));
+            // =>serve main files
             app.get(`${Const.CONFIGS.server.frontend_url}*`, async (req, res) => {
                 try {
                     //=>extract app file path
@@ -132,6 +134,7 @@ export namespace WebRoutes {
                            // SERVER VARIABLES
                            var _global_configs_ = {
                                 API_ENDPOINT: '${absUrl('/api/v1')}',
+                                ASSETS_BASE_URL: '${Const.CONFIGS.server.frontend_url + '/assets'}',
                                 AUTH_HEADER_NAME: '${Const.CONFIGS.auth_user.header_name}'
                             }
                            </script>
@@ -144,6 +147,10 @@ export namespace WebRoutes {
                     }
 
                     // =>response file
+                    if (!fs.existsSync(filePath)) {
+                        res.status(404).end();
+                        return;
+                    }
                     debugLog('frontend', `server frontend file: '${filePath}'`);
                     res.sendFile(filePath);
                 } catch (e) {
