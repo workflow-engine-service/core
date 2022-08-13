@@ -49,7 +49,7 @@ export namespace WebRoutes {
                 return res.sendFile(path.join(__dirname, '..', 'public', 'pages', 'wiki.html'));
             });
         }
-        app.use(assetsBaseUrl, expressStatic(path.join(__dirname, '..', 'public', 'assets')));
+        // app.use(assetsBaseUrl, expressStatic(path.join(__dirname, '..', 'public', 'assets')));
         app.get('/', (req, res) => {
             let html = `<html>
             <body>
@@ -109,7 +109,7 @@ export namespace WebRoutes {
                                 let fname = match.match(fileName);
                                 // =>replace with real path
                                 if (fname) {
-                                    finalHtml = html.replace(find, replacer.replace(':filename', `http://${Const.CONFIGS.server.host}:${Const.CONFIGS.server.port}${Const.CONFIGS.server.frontend_url}/${fname[0]}`));
+                                    finalHtml = html.replace(find, replacer.replace(':filename', absUrl(`${Const.CONFIGS.server.frontend_url}/${fname[0]}`)));
                                 }
                             }
                             return finalHtml;

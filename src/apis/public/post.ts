@@ -156,8 +156,12 @@ export class PublicPostApi extends BaseApi {
                 // =>collect required fields
                 for (const field of action.required_fields) {
                     // =>validate all required, optional fields
-                    //TODO:
                     let value = fields['field.' + field];
+                    let respValidate = await this.validateFieldValue(res.process, field, value);
+                    if (!respValidate.success) {
+                        return this.error400(respValidate.error);
+                    }
+
                     requiredFieldValues.push({
                         name: field,
                         value,
@@ -210,5 +214,31 @@ export class PublicPostApi extends BaseApi {
             errorLog('err546325', e, this.request.user().id);
             return this.error400('bad request');
         }
+    }
+
+
+    async validateFieldValue(process: WorkflowProcessModel, fieldName: string, fieldValue: any): Promise<{ success: boolean; error?: string; }> {
+        // =>find field by name
+        let field = process.workflow.fields.find(i => i.name === fieldName);
+        // =>check if field exist
+        if (!field) return { success: false, error: `not exist '${fieldName}' field` };
+        // =>check field value type
+        let badType = false;
+        if (field.type === 'string' && typeof fieldValue !== 'string') {
+            badType = true;
+        }
+        else if (field.type === 'number' && typeof fieldValue !== 'number') {
+            badType = true;
+        }
+        else if (field.type === 'boolean' && typeof fieldValue !== 'boolean') {
+            badType = true;
+        }
+        if (badType) {
+            return { success: false, error: `'${fieldValue}' value not match with data type '${field.type}' for '${fieldName}' field` };
+        }
+        //TODO:
+
+
+        return { success: true };
     }
 }
