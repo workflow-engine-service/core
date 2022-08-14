@@ -302,7 +302,7 @@ finally you can run dev server with <code>npm run dev</code> and you can see on 
 
 
 </code></pre>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="schema-details-202208101-edition"><a class="header" href="#schema-details-202208101-edition">Schema details (20220810.1 edition)</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="schema-details-202208141-edition"><a class="header" href="#schema-details-202208141-edition">Schema details (20220814.1 edition)</a></h1>
 <h2 id="main-schema"><a class="header" href="#main-schema">main schema</a></h2>
 <div class="table-wrapper"><table><thead><tr><th>name</th><th>type</th><th>required</th><th>Description</th></tr></thead><tbody>
 <tr><td>workflow_name</td><td>string</td><td><strong>YES</strong></td><td>name of workflow</td></tr>
@@ -357,7 +357,8 @@ finally you can run dev server with <code>npm run dev</code> and you can see on 
 <tr><td>meta</td><td>object</td><td>NO</td><td>any data useful for client</td></tr>
 <tr><td>message_required</td><td>boolean</td><td>NO</td><td>client must send a message or not</td></tr>
 <tr><td>set_fields</td><td>object</td><td>NO</td><td>fields that can set hardcoded</td></tr>
-<tr><td>url</td><td>string</td><td>NO</td><td>can be a url like <code>http://sample.com/hook</code>. used for 'hook_url' type</td></tr>
+<tr><td>base_url</td><td>string</td><td>NO</td><td>base url for relative url like <code>http://sample.com</code> <sup class="footnote-reference"><a href="#hook_base_url_note">4</a></sup></td></tr>
+<tr><td>url</td><td>string</td><td>NO</td><td>can be a url like <code>http://sample.com/hook</code> or <code>/hook</code>. used for 'hook_url' type</td></tr>
 <tr><td>method</td><td>string</td><td>NO</td><td>can be a request method like 'get' or 'post'. used for 'hook_url' type</td></tr>
 <tr><td>headers</td><td>string[]</td><td>NO</td><td>headers that can be set on hook request. used for 'hook_url' type</td></tr>
 <tr><td>channel</td><td>string</td><td>NO</td><td>publish channel name. used for 'redis' type</td></tr>
@@ -371,7 +372,8 @@ finally you can run dev server with <code>npm run dev</code> and you can see on 
 <tr><td>name</td><td>'onInit' or 'onLeave' or 'onJob'</td><td><strong>YES</strong></td><td>event name</td></tr>
 <tr><td>type</td><td>'redis' or 'hook_url'</td><td><strong>YES</strong></td><td>type of send event</td></tr>
 <tr><td>alias_name</td><td>string</td><td>NO</td><td>name of an alias <sup class="footnote-reference"><a href="#alias_name_note">3</a></sup></td></tr>
-<tr><td>url</td><td>string</td><td>NO</td><td>can be a url like <code>http://sample.com/hook</code>. used for 'hook_url' type</td></tr>
+<tr><td>base_url</td><td>string</td><td>NO</td><td>base url for relative url like <code>http://sample.com</code> <sup class="footnote-reference"><a href="#hook_base_url_note">4</a></sup></td></tr>
+<tr><td>url</td><td>string</td><td>NO</td><td>can be a url like <code>http://sample.com/hook</code> or <code>/hook</code>. used for 'hook_url' type</td></tr>
 <tr><td>method</td><td>string</td><td>NO</td><td>can be a request method like 'get' or 'post'. used for 'hook_url' type</td></tr>
 <tr><td>headers</td><td>string[]</td><td>NO</td><td>headers that can be set on hook request. used for 'hook_url' type</td></tr>
 <tr><td>channel</td><td>string</td><td>NO</td><td>publish channel name. used for 'redis' type</td></tr>
@@ -400,6 +402,7 @@ finally you can run dev server with <code>npm run dev</code> and you can see on 
 <p><sup class="footnote-reference"><a href="#alias_name_note">3</a></sup> added in 20220727.1</p>
 <p><sup class="footnote-reference"><a href="#send_fields_note">2</a></sup> added in 20220727.2</p>
 <p><sup class="footnote-reference"><a href="#state_job_note">1</a></sup> added in 20220810.1</p>
+<p><sup class="footnote-reference"><a href="#hook_base_url_note">4</a></sup> added in 20220814.1</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="process"><a class="header" href="#process">Process</a></h1>
 <p>A process is an instance of a deployed workflow. you can create new process like this:</p>
 <pre><code class="language-bash">curl -X 'POST' \
@@ -510,6 +513,7 @@ finally you can run dev server with <code>npm run dev</code> and you can see on 
 </blockquote>
 <h4 id="hook_url"><a class="header" href="#hook_url">hook_url</a></h4>
 <p>when your server must be determine that next state is which or you can manage action execute by your self app server.</p>
+<p>you can use <code>base_url</code> property and set your relative path in <code>url</code> property. (also you can set <code>base_url</code> with <code>alias</code>)</p>
 <p>for this you need to set a endpoint url as <code>url</code>, and your accept request method like <code>get</code> or <code>post</code> (default is <code>post</code> method)</p>
 <p>and you can set custom headers on hook request that raised by workflow engine like a authenticate token:</p>
 <pre><code class="language-json">&quot;headers&quot;: {
