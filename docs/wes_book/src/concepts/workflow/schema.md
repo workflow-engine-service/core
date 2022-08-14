@@ -1,4 +1,4 @@
-# Schema details (20220810.1 edition)
+# Schema details (20220814.1 edition)
 
 ## main schema
 
@@ -59,7 +59,8 @@
 |meta|object|NO|any data useful for client|
 message_required | boolean | NO | client must send a message or not | 
 |set_fields | object | NO | fields that can set hardcoded|
-|url| string | NO | can be a url like `http://sample.com/hook`. used for 'hook_url' type|
+|base_url| string | NO | base url for relative url like `http://sample.com` [^hook_base_url_note] |
+|url| string | NO | can be a url like `http://sample.com/hook` or `/hook`. used for 'hook_url' type|
 |method| string | NO | can be a request method like 'get' or 'post'. used for 'hook_url' type|
 |headers| string[] | NO | headers that can be set on hook request. used for 'hook_url' type|
 |channel|string|NO| publish channel name. used for 'redis' type|
@@ -75,7 +76,8 @@ message_required | boolean | NO | client must send a message or not |
 | name | 'onInit' or 'onLeave' or 'onJob' | **YES** | event name | 
 |type | 'redis' or 'hook_url' | **YES** |  type of send event |
 |alias_name| string | NO | name of an alias [^alias_name_note]|
-|url| string | NO | can be a url like `http://sample.com/hook`. used for 'hook_url' type|
+|base_url| string | NO | base url for relative url like `http://sample.com` [^hook_base_url_note] |
+|url| string | NO | can be a url like `http://sample.com/hook` or `/hook`. used for 'hook_url' type|
 |method| string | NO | can be a request method like 'get' or 'post'. used for 'hook_url' type|
 |headers| string[] | NO | headers that can be set on hook request. used for 'hook_url' type|
 |channel|string|NO| publish channel name. used for 'redis' type|
@@ -111,3 +113,5 @@ message_required | boolean | NO | client must send a message or not |
 [^send_fields_note] added in 20220727.2
 
 [^state_job_note] added in 20220810.1
+
+[^hook_base_url_note] added in 20220814.1

@@ -65,4 +65,6 @@ export type WorkflowFieldDataType = 'string' | 'number' | 'file' | 'boolean';
 
 export type WorkflowNamespace = 'process' | 'workflow' | 'worker' | 'config' | 'action' | 'event';
 
-export type WorkflowStateJobScheduleType = 'static' | 'daily' | 'weekly' | 'hourly' | 'minutely' | 'afterTime'; 
+export type WorkflowStateJobScheduleType = 'static' | 'daily' | 'weekly' | 'hourly' | 'minutely' | 'afterTime';
+
+export type WorkflowStateActionType = 'hook_url' | 'redis' | 'local';

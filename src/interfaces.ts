@@ -1,6 +1,6 @@
 import { SwaggerApiParameter, SwaggerApiResponse } from "./document/interfaces";
 import { WorkerModel, WorkflowProcessModel } from "./models/models";
-import { HttpStatusCode, MiddlewareName, RequestMethodType, SwaggerTagName, WorkflowFieldDataType, WorkflowStateEventName, WorkflowStateJobScheduleType } from "./types";
+import { HttpStatusCode, MiddlewareName, RequestMethodType, SwaggerTagName, WorkflowFieldDataType, WorkflowStateActionType, WorkflowStateEventName, WorkflowStateJobScheduleType } from "./types";
 
 
 export interface ServerConfigs {
@@ -200,6 +200,7 @@ export interface WorkflowStateEvent {
     type: 'redis' | 'hook_url';
     alias_name?: string;
     // =>hook url
+    base_url?: string;
     url?: string;
     method?: 'post' | 'put' | 'get' | 'delete';
     headers?: {};
@@ -249,12 +250,17 @@ export interface WorkflowStateAction {
     required_fields?: string[];
     optional_fields?: string[];
     send_fields?: string[];
-    type: 'hook_url' | 'redis' | 'local';
+    type: WorkflowStateActionType;
     message_required?: boolean;
     meta?: object;
     set_fields?: object;
     alias_name?: string;
     // =>hook url
+    base_url?: string;
+    /**
+     * can be absolute (without using base_url)
+     * or can be relative (with using base_url)
+     */
     url?: string;
     method?: 'post' | 'put' | 'get' | 'delete';
     headers?: object;
@@ -287,7 +293,7 @@ export interface APIResponse<T = any> {
 }
 
 /**
- * @edition 20220810.1
+ * @edition 20220814.1
  */
 export interface WorkflowDescriptor {
     /**

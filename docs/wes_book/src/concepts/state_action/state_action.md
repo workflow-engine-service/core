@@ -10,6 +10,8 @@ every action can be one of these types for execute:
 
 when your server must be determine that next state is which or you can manage action execute by your self app server.
 
+you can use `base_url` property and set your relative path in `url` property. (also you can set `base_url` with `alias`)
+
 for this you need to set a endpoint url as `url`, and your accept request method like `get` or `post` (default is `post` method)
 
 and you can set custom headers on hook request that raised by workflow engine like a authenticate token:

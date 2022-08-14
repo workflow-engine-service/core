@@ -255,3 +255,13 @@ export function absUrl(path: string) {
     return `http://${Const.CONFIGS.server.host}:${Const.CONFIGS.server.port}/${path}`;
 
 }
+/***************************************** */
+export function makeAbsoluteUrl(url: string, baseUrl?: string) {
+    if (!baseUrl) return url;
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('ftp://')) return url;
+
+    if (baseUrl.endsWith('/')) baseUrl = baseUrl.substring(0, baseUrl.length - 1);
+    if (url.startsWith('/')) url = url.substring(1);
+
+    return baseUrl + '/' + url;
+}

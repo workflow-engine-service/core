@@ -3,7 +3,7 @@ import { Const } from "../const";
 import { WorkflowStateAction, WorkflowStateActionResponse, WorkflowStateActionSendParameters, WorkflowStateActionSendParametersFields, WorkflowStateEvent, WorkflowStateEventSendParametersFields } from "../interfaces";
 import { WorkflowProcessChangeField } from "../models/models";
 import { Redis } from "../redis";
-import { errorLog, debugLog, applyAliasConfig, dbLog } from "../common";
+import { errorLog, debugLog, applyAliasConfig, dbLog, makeAbsoluteUrl } from "../common";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 
 export namespace ProcessHelper {
@@ -79,7 +79,7 @@ export namespace ProcessHelper {
             }
             let configs: AxiosRequestConfig<WorkflowStateActionSendParametersFields> = {
                 method: params._action.method,
-                url: params._action.url,
+                url: makeAbsoluteUrl(params._action.url, params._action.base_url),
                 headers,
                 data: await getWorkflowStateActionSendParameters(params),
                 timeout: Const.CONFIGS.server.worker_timeout * 1000,
@@ -245,7 +245,7 @@ export namespace ProcessHelper {
             let headers = { ...event.headers };
             let configs: AxiosRequestConfig<WorkflowStateEventSendParametersFields> = {
                 method: event.method,
-                url: event.url,
+                url: makeAbsoluteUrl(event.url, event.base_url),
                 headers,
                 data,
             };

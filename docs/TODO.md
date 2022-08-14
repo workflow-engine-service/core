@@ -8,13 +8,13 @@
 [ ] run state jobs as workers
 [ ] implement authenticate methods
 [ ] manage uploaded files
-[ ] add pagination to apis
 
 # Testing Tasks
 [ ] not create new worker for an action when exist and running
 [ ] add headers to event requests
 [ ] add `owner_id` to action request
 [ ] add _owner_ role
+[ ] add base_url to hook types (action, event)
 
 # DONE Tasks
 [x] init workflow core
@@ -41,4 +41,5 @@
 [x] get workflows list api
 [x] add api for users list
 [x] add api for get workflow schema
+[x] add pagination to apis
 
