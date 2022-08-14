@@ -104,7 +104,7 @@ export class PublicGetApi extends BaseApi {
 
             }
 
-            return this.response(processes);
+            return this.paginateResponse(processes);
         } catch (e) {
             return this.error400();
         }
@@ -207,7 +207,7 @@ export class PublicGetApi extends BaseApi {
                 });
             }
 
-            return this.response(list);
+            return this.paginateResponse(list);
         } catch (e) {
             errorLog('err456232', e);
             return this.error400();
