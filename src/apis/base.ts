@@ -80,7 +80,7 @@ export class BaseApi {
         }
     }
     /*************************************** */
-    response<T = any>(result?: T, code: HttpStatusCode = HttpStatusCode.HTTP_200_OK, message?: string): [string, HttpStatusCode] {
+    response<T = any>(result?: T, code: HttpStatusCode = HttpStatusCode.HTTP_200_OK, message?: string, applyObjects?: object): [string, HttpStatusCode] {
         // =>if result is not set
         if (result == undefined) {
             result = '' as any;
@@ -90,6 +90,9 @@ export class BaseApi {
             success: false,
             statusCode: code,
             responseTime: (new Date().getTime()) - this.request.startResponseTime,
+        }
+        if (applyObjects) {
+            resp = { ...resp, ...applyObjects };
         }
         // =>check for success response
         if (code >= 200 && code < 300) {
@@ -102,6 +105,30 @@ export class BaseApi {
 
         return [JSON.stringify(resp), code];
     }
+    /*************************************** */
+    paginateResponse<T = any>(result: T[]): [string, HttpStatusCode] {
+        // =>get params
+        let pageSize = this.paramNumber('page_size', 10);
+        let page = this.paramNumber('page', 1);
+        let pagination = {
+            page_size: pageSize,
+            page,
+            page_count: Math.ceil(result.length / pageSize),
+        };
+        // =>calc offset
+        let startOffset = (page * pageSize) - pageSize;
+        let endOffset = startOffset + pageSize;
+        // =>not enough results
+        if (result.length <= startOffset) {
+            return this.response([], HttpStatusCode.HTTP_200_OK, undefined, { pagination });
+        }
+        if (result.length <= endOffset) endOffset = result.length - 1;
+        // =>get page of results
+        let paginateResults = result.slice(startOffset, endOffset);
+
+        return this.response(paginateResults, HttpStatusCode.HTTP_200_OK, undefined, { pagination });
+    }
+
     /*************************************** */
     error(code: HttpStatusCode = HttpStatusCode.HTTP_400_BAD_REQUEST, data?: string | object) {
         return this.response(data, code);

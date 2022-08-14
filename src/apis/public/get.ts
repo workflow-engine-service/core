@@ -173,7 +173,7 @@ export class PublicGetApi extends BaseApi {
 
             }
 
-            return this.response(workers);
+            return this.paginateResponse(workers);
         } catch (e) {
             return this.error400();
         }

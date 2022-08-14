@@ -8,6 +8,7 @@
 [ ] run state jobs as workers
 [ ] implement authenticate methods
 [ ] manage uploaded files
+[ ] add pagination to apis
 
 # Testing Tasks
 [ ] not create new worker for an action when exist and running
