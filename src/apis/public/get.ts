@@ -50,6 +50,7 @@ export class PublicGetApi extends BaseApi {
             }
             return this.response(res.state);
         } catch (e) {
+            errorLog('err524223', e);
             return this.error400();
         }
     }
@@ -71,6 +72,7 @@ export class PublicGetApi extends BaseApi {
 
             return this.response(this.truncateProcessInfo(res.process));
         } catch (e) {
+            errorLog('err3256223', e);
             return this.error400();
         }
     }
@@ -106,6 +108,7 @@ export class PublicGetApi extends BaseApi {
 
             return this.paginateResponse(processes);
         } catch (e) {
+            errorLog('err32423', e);
             return this.error400();
         }
     }
@@ -133,6 +136,7 @@ export class PublicGetApi extends BaseApi {
             return this.response(fields);
 
         } catch (e) {
+            errorLog('err3242433', e);
             return this.error400();
         }
     }
@@ -147,6 +151,7 @@ export class PublicGetApi extends BaseApi {
 
             return this.response(worker.toJSON());
         } catch (e) {
+            errorLog('err22332', e);
             return this.error400();
         }
     }
@@ -175,6 +180,7 @@ export class PublicGetApi extends BaseApi {
 
             return this.paginateResponse(workers);
         } catch (e) {
+            errorLog('err324223', e);
             return this.error400();
         }
     }

@@ -188,6 +188,11 @@ export function errorLog(name: string, error: any, uid?: number) {
     if (typeof error === 'object') {
         error = JSON.stringify(error);
     }
+    // =>add error on db
+    try {
+        dbLog({ namespace: 'other', name, mode: LogMode.ERROR, user_id: uid, meta: { error } });
+    } catch (e) { }
+
     writeLogOnFile('errors', `${name} ${uid}::${error}`);
 }
 /***************************************** */
