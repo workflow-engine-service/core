@@ -3,7 +3,7 @@ import { APIResponse, WorkflowState } from "../interfaces";
 import { HttpStatusCode, LogMode, RequestMethodType, WorkflowNamespace } from "../types";
 import { CoreRequest } from "./request";
 import { DeployedWorkflowModel, WorkflowProcessModel } from "../models/models";
-import { errorLog } from "src/common";
+import { errorLog } from "../common";
 export class BaseApi {
     request: CoreRequest;
     /*************************************** */
