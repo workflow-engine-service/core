@@ -93,12 +93,15 @@ export namespace WebWorkers {
                     }
                     params._process.field_values[index].value = response.fields[key];
                 }
+
+
+                // =>update process
+                await Const.DB.models.processes.findByIdAndUpdate(params.process_id, { $set: params._process }, { multi: true, upsert: true }).clone();
                 // =>call 'onInit' event of state
                 ProcessHelper.emitStateEvent('onInit', params._process.current_state, params);
                 // =>check for end state
                 //TODO:
-                // =>update process
-                await Const.DB.models.processes.findByIdAndUpdate(params.process_id, { $set: params._process }, { multi: true, upsert: true }).clone();
+
                 return response;
             },
             failedResult: async (response) => {
