@@ -3,6 +3,7 @@ import { APIResponse, WorkflowState } from "../interfaces";
 import { HttpStatusCode, LogMode, RequestMethodType, WorkflowNamespace } from "../types";
 import { CoreRequest } from "./request";
 import { DeployedWorkflowModel, WorkflowProcessModel } from "../models/models";
+import { errorLog } from "src/common";
 export class BaseApi {
     request: CoreRequest;
     /*************************************** */
@@ -195,16 +196,21 @@ export class BaseApi {
     }
     /*************************************** */
     async getProcessCurrentState(processId: string): Promise<{ state: WorkflowState, process: WorkflowProcessModel } | [string, HttpStatusCode]> {
-        // =>find process by id
-        let process = await this.findProcessById(processId);
-        if (!process) return this.error404('not found such process');
-        // =>find current state info
-        let stateInfo = process.workflow.states.find(i => i.name === process.current_state);
-        // =>check access state
-        if (!this.checkUserRoleHasAccess(stateInfo.access_role)) {
-            return this.error403('no access to state info');
+        try {
+            // =>find process by id
+            let process = await this.findProcessById(processId);
+            if (!process) return this.error404('not found such process');
+            // =>find current state info
+            let stateInfo = process.workflow.states.find(i => i.name === process.current_state);
+            // =>check access state
+            if (!this.checkUserRoleHasAccess(stateInfo.access_role)) {
+                return this.error403('no access to state info');
+            }
+            return { state: stateInfo, process };
+        } catch (e) {
+            errorLog('err2352352', e);
+            return this.error400('bad process');
         }
-        return { state: stateInfo, process };
     }
     /*************************************** */
 
