@@ -16,7 +16,7 @@ export class AdminGetApi extends BaseApi {
         for (const user of users) {
             user.secret_key = undefined;
         }
-        return this.response(users);
+        return this.paginateResponse(users);
     }
 
     async getWorkflowSchema() {

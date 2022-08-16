@@ -123,10 +123,10 @@ export class BaseApi {
         if (result.length <= startOffset) {
             return this.response([], HttpStatusCode.HTTP_200_OK, undefined, { pagination });
         }
-        if (result.length <= endOffset) endOffset = result.length - 1;
+        if (result.length <= endOffset) endOffset = result.length;
         // =>get page of results
         let paginateResults = result.slice(startOffset, endOffset);
-
+        // console.log(result, startOffset, endOffset)
         return this.response(paginateResults, HttpStatusCode.HTTP_200_OK, undefined, { pagination });
     }
 
@@ -181,6 +181,9 @@ export class BaseApi {
         // =>if owner access
         if (roles.includes(Const.RESERVED_ACCESS_ROLES.OWNER_ACCESS) && options.process) {
             if (options.process.created_by === this.request.user().id) return true;
+        }
+        if (!this.request.user().roles) {
+            this.request.user().roles = [];
         }
         for (const userRole of this.request.user().roles) {
             if (roles.includes(userRole)) {

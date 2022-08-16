@@ -81,23 +81,22 @@ export namespace Auth {
         if (!token.startsWith(tokenSign)) return 'invalid';
         // =>find user session by token
         const session = await Const.DB.models.sessions.findOne({ token });
-        if (session) {
-            // =>check expired token
-            if (new Date().getTime() > session.expired_token_at) {
-                return 'expired';
-            }
-            let user = await Const.DB.models.users.findOne({ user_id: session.user_id })
-            // =>if not found user
-            if (!user) {
-                return 'invalid';
-            }
-            // =>update session
-            session.checked_token_at = new Date().getTime();
-            await session.save();
-
-            return user;
+        if (!session) return 'invalid';
+        // =>check expired token
+        if (new Date().getTime() > session.expired_token_at) {
+            return 'expired';
         }
-        return 'invalid';
+        let user = await Const.DB.models.users.findOne({ id: session.user_id });
+        // console.log('session:', { session, user })
+        // =>if not found user
+        if (!user) {
+            return 'invalid';
+        }
+        // =>update session
+        session.checked_token_at = new Date().getTime();
+        await session.save();
+
+        return user;
     }
     /********************************* */
     export async function getUserByApiToken(token: string): Promise<UserModel | 'expired' | 'invalid'> {

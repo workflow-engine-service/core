@@ -195,11 +195,15 @@ export class PublicGetApi extends BaseApi {
             // =>iterate
             for (const flow of workflows) {
                 // =>check for create access
-                if ((access === 'all' || access === 'create-access') && !this.checkUserRoleHasAccess(flow.settings.create_access_roles)) {
+                if (access === 'create-access' && !this.checkUserRoleHasAccess(flow.settings.create_access_roles)) {
                     continue;
                 }
                 // =>check for read access
-                if ((access === 'all' || access === 'read-access') && !this.checkUserRoleHasAccess(flow.settings.read_access_roles)) {
+                if (access === 'read-access' && !this.checkUserRoleHasAccess(flow.settings.read_access_roles)) {
+                    continue;
+                }
+                // => check for any read or write(all)
+                if (access === 'all' && !this.checkUserRoleHasAccess(flow.settings.read_access_roles) && !this.checkUserRoleHasAccess(flow.settings.create_access_roles)) {
                     continue;
                 }
 
