@@ -1,6 +1,6 @@
 import { SwaggerApiParameter, SwaggerApiResponse } from "./document/interfaces";
 import { WorkerModel, WorkflowProcessModel } from "./models/models";
-import { HttpStatusCode, MiddlewareName, RequestMethodType, SwaggerTagName, WorkflowFieldDataType, WorkflowStateActionType, WorkflowStateEventName, WorkflowStateJobScheduleType } from "./types";
+import { HookMethodType, HttpStatusCode, MiddlewareName, RequestMethodType, SwaggerTagName, WorkflowFieldDataType, WorkflowStateActionType, WorkflowStateEventName, WorkflowStateJobScheduleType } from "./types";
 
 
 export interface ServerConfigs {
@@ -170,8 +170,28 @@ export interface WorkflowField {
     validation?: WorkflowFieldValidation[];
 }
 export interface WorkflowFieldValidation {
-    builtin_check: 'file_type' | 'file_size' | 'email';
-    builtin_params?: object;
+    type: 'max_length' | 'min_length' | 'accept_pattern' | 'reject_pattern' | 'email' | 'min' | 'max' | 'api' | 'file_type' | 'file_size';
+    /**
+     * for types: max_length| 'min_length' | 'min' | 'max'|'file_type' | 'file_size'
+     */
+    value?: number | string[];
+    /**
+     * for types: 'accept_pattern' | 'reject_pattern'
+     */
+    regex_value?: {
+        pattern: string;
+        flags?: string[];
+    };
+    /**
+     * for types: 'api'
+     * also supports 'alias'
+     */
+    api_value?: {
+        url: string;
+        base_url?: string;
+        method?: HookMethodType;
+        headers?: object;
+    }
     error?: string;
 }
 
@@ -202,7 +222,7 @@ export interface WorkflowStateEvent {
     // =>hook url
     base_url?: string;
     url?: string;
-    method?: 'post' | 'put' | 'get' | 'delete';
+    method?: HookMethodType;
     headers?: {};
     // =>redis
     channel?: string;
@@ -262,7 +282,7 @@ export interface WorkflowStateAction {
      * or can be relative (with using base_url)
      */
     url?: string;
-    method?: 'post' | 'put' | 'get' | 'delete';
+    method?: HookMethodType;
     headers?: object;
     // =>redis
     channel?: string;
@@ -286,10 +306,14 @@ export interface APIResponse<T = any> {
     data: T;
     responseTime?: number;
     statusCode: HttpStatusCode;
-    paginate?: {
-        //TODO:
-    },
+    paginate?: APIResponsePagination,
     error?: any;
+}
+
+export interface APIResponsePagination {
+    page_size: number;
+    page: number;
+    page_count: number;
 }
 
 /**

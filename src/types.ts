@@ -68,3 +68,5 @@ export type WorkflowNamespace = 'process' | 'workflow' | 'worker' | 'config' | '
 export type WorkflowStateJobScheduleType = 'static' | 'daily' | 'weekly' | 'hourly' | 'minutely' | 'afterTime';
 
 export type WorkflowStateActionType = 'hook_url' | 'redis' | 'local';
+
+export type HookMethodType = 'post' | 'put' | 'get' | 'delete';

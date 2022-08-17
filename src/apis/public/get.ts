@@ -224,6 +224,10 @@ export class PublicGetApi extends BaseApi {
         }
     }
     /******************************* */
+    async getUserInfo() {
+        return this.response(this.request.user());
+    }
+    /******************************* */
     /******************************* */
     /******************************* */
     truncateProcessInfo(process: WorkflowProcessModel) {

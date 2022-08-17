@@ -388,4 +388,22 @@ export const publicApis: ApiRoute[] = [
         },
         usedDefinitions: ['WorkflowDeployedInfo'],
     },
+    {
+        method: 'GET',
+        path: 'user/info',
+        functionName: 'getUserInfo',
+        tags: ['user'],
+        des: 'get info of this user',
+        parameters: [
+        ],
+        responses: {
+            '200': {
+                description: 'return user info',
+                schema: {
+                    $ref: "#/definitions/UserModel"
+                }
+            },
+        },
+        usedDefinitions: ['UserModel'],
+    },
 ];

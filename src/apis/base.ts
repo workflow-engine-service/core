@@ -1,5 +1,5 @@
 import { Const } from "../const";
-import { APIResponse, WorkflowState } from "../interfaces";
+import { APIResponse, APIResponsePagination, WorkflowState } from "../interfaces";
 import { HttpStatusCode, LogMode, RequestMethodType, WorkflowNamespace } from "../types";
 import { CoreRequest } from "./request";
 import { DeployedWorkflowModel, WorkflowProcessModel } from "../models/models";
@@ -111,7 +111,7 @@ export class BaseApi {
         // =>get params
         let pageSize = this.paramNumber('page_size', 10);
         let page = this.paramNumber('page', 1);
-        let pagination = {
+        let pagination: APIResponsePagination = {
             page_size: pageSize,
             page,
             page_count: Math.ceil(result.length / pageSize),

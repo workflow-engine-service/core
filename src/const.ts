@@ -5,7 +5,7 @@ import { MiddlewareName } from "./types";
 
 export namespace Const {
 
-    export const VERSION = '0.79';
+    export const VERSION = '0.81';
 
     export let SERVER_MODE: 'dev' | 'prod' = 'dev';
 
