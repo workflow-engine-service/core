@@ -12,7 +12,7 @@ sudo docker run -p 27017:27017 --name mongo -d mongo
 
 then you need to install npm dependencies of project by `npm i` on project root directory.
 finally you can run dev server with `npm run dev` and you can see on `http://localhost:8082`
-## production mode :
+## production mode
 
 first go to `cli/` directory and then run command `dat p i` and Done!
 > for install `dat` command, see [Command Line Tool](./cli/cli.md)

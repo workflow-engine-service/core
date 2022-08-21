@@ -376,7 +376,7 @@ export interface APIResponsePagination {
 }
 
 /**
- * @edition 20220814.1
+ * @edition 20220821.1
  */
 export interface WorkflowDescriptor {
     /**

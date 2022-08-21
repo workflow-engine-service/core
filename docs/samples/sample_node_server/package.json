@@ -1,9 +1,0 @@
-{
-    "scripts": {
-        "start": "node server.js"
-    },
-    "dependencies": {
-        "express": "^4.18.1",
-        "redis": "^4.2.0"
-    }
-}

@@ -1,4 +1,4 @@
-# Schema details (20220814.1 edition)
+# Schema details (20220821.1 edition)
 
 ## main schema
 
@@ -40,8 +40,8 @@
 |access_role | string[] | NO | roles to view this state (default: `['_all_']`)|
 |meta|object|NO|any data useful for client|
 |actions|[WorkflowStateAction](#workflowstateaction-schema)[]|NO|actions of state|
-|events|[WorkflowStateEvent](#workflowstateevent-schema)[]|NO|you can define events on state|
-|jobs|[WorkflowStateJob](#workflowstatejob-schema)[] [^state_job_note]|NO|you can define jobs on state|
+|events|[WorkflowStateEvent](#workflowstateevent-schema)|NO|you can define events on state|
+|jobs|[WorkflowStateJob](#workflowstatejob-schema)[]  [^3] |NO|you can define jobs on state|
 
 ## WorkflowStateAction schema
 
@@ -53,13 +53,13 @@
 |access_role | string[] | NO | roles to execute this action (default: `['_all_']`)|
 |required_fields| string[] | NO | fields must get from client|
 |optional_fields| string[] | NO | fields that client can send|
-|send_fields| string[] | NO | fields that must be send to app server [^send_fields_note]|
+|send_fields| string[] | NO | fields that must be send to app server [^2]|
 |type | string | NO | 'hook_url' or 'redis' or 'local' |
-|alias_name| string | NO | name of an alias [^alias_name_note]|
+|alias_name| string | NO | name of an alias [^2]|
 |meta|object|NO|any data useful for client|
 message_required | boolean | NO | client must send a message or not | 
 |set_fields | object | NO | fields that can set hardcoded|
-|base_url| string | NO | base url for relative url like `http://sample.com` [^hook_base_url_note] |
+|base_url| string | NO | base url for relative url like `http://sample.com` [^4] |
 |url| string | NO | can be a url like `http://sample.com/hook` or `/hook`. used for 'hook_url' type|
 |method| string | NO | can be a request method like 'get' or 'post'. used for 'hook_url' type|
 |headers| string[] | NO | headers that can be set on hook request. used for 'hook_url' type|
@@ -75,8 +75,8 @@ message_required | boolean | NO | client must send a message or not |
 | ----------- | ----------- |----------- |----------- |
 | name | 'onInit' or 'onLeave' or 'onJob' | **YES** | event name | 
 |type | 'redis' or 'hook_url' | **YES** |  type of send event |
-|alias_name| string | NO | name of an alias [^alias_name_note]|
-|base_url| string | NO | base url for relative url like `http://sample.com` [^hook_base_url_note] |
+|alias_name| string | NO | name of an alias [^1]|
+|base_url| string | NO | base url for relative url like `http://sample.com` [^4] |
 |url| string | NO | can be a url like `http://sample.com/hook` or `/hook`. used for 'hook_url' type|
 |method| string | NO | can be a request method like 'get' or 'post'. used for 'hook_url' type|
 |headers| string[] | NO | headers that can be set on hook request. used for 'hook_url' type|
@@ -91,7 +91,9 @@ message_required | boolean | NO | client must send a message or not |
 | repeat | number | NO | default is 0 that unlimited to repeat job | 
 |times | [WorkflowStateJobTime](#workflowstatejobtime-schema) | **YES** | set times to execute job|
 |set_fields | object | NO | fields that can set hardcoded|
-|action_name|string|NO| action to be go. |
+|action_name|string|NO| action to will execute |
+|state_name | string | NO | state to will go [^5]| 
+|_id|string|NO|you can set an id or process automatically set it [^5]|
 
 
 ## WorkflowStateJobTime schema
@@ -105,12 +107,15 @@ message_required | boolean | NO | client must send a message or not |
 | second | number | NO | range 1..60 | 
 
 
------------
+## Reference
 
-[^alias_name_note] added in 20220727.1
+[^1]: added in 20220727.1
 
-[^send_fields_note] added in 20220727.2
+[^2]: added in 20220727.2
 
-[^state_job_note] added in 20220810.1
+[^3]: added in 20220810.1
 
-[^hook_base_url_note] added in 20220814.1
+[^4]: added in 20220814.1
+
+[^5]: added in 20220821.1
+
