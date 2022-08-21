@@ -39,6 +39,11 @@ function findConfigsFile(useDev = false) {
 export async function loadConfigs() {
     try {
         let configsPath = findConfigsFile();
+        // =>if test mode
+        if (Const.SERVER_MODE === 'test') {
+            configsPath = path.join(path.dirname(__filename), '..', 'configs.test.json');
+            // console.log(configsPath, fs.existsSync(configsPath))
+        }
         // =>if server mode prod and not exist configs
         if (!fs.existsSync(configsPath) && Const.SERVER_MODE === 'prod') {
             configsPath = findConfigsFile(true);
@@ -154,7 +159,9 @@ function log(text: string, label?: string, type: 'info' | 'error' | 'normal' | '
 }
 /***************************************** */
 export function infoLog(name: string, message: string) {
-    log(message, name, 'info');
+    if (Const.SERVER_MODE !== 'test') {
+        log(message, name, 'info');
+    }
     try {
         if (typeof message === 'object') {
             message = JSON.stringify(message);
@@ -169,7 +176,9 @@ export function infoLog(name: string, message: string) {
 export function debugLog(name: string, message: string) {
     // console.log(settings('DEBUG_MODE'))
     if (!Const.CONFIGS || !Const.CONFIGS.server.debug_mode) return;
-    log(message, name, 'debug');
+    if (Const.SERVER_MODE !== 'test') {
+        log(message, name, 'debug');
+    }
     try {
         if (typeof message === 'object') {
             message = JSON.stringify(message);
@@ -194,7 +203,7 @@ export function errorLog(name: string, error: any, uid?: number) {
         dbLog({ namespace: 'other', name, mode: LogMode.ERROR, user_id: uid, meta: { error, jsonError } });
     } catch (e) { }
 
-    writeLogOnFile('errors', `${name} ${uid}::${error}`);
+    writeLogOnFile('errors', `${name} ${uid ? uid : ''}::${error}`);
 }
 /***************************************** */
 function writeLogOnFile(type = 'info', text: string) {
@@ -241,6 +250,7 @@ export async function sleep(timeout = 1000) {
 export async function dbLog(options: { namespace: WorkflowNamespace, name: string, mode?: LogMode, meta?: object; user_id?: number; ip?: string; }) {
     try {
         if (!options.mode) options.mode = LogMode.INFO;
+        if (!Const.DB?.models?.logs) return;
         await Const.DB.models.logs.create({
             name: options.name,
             namespace: options.namespace,
@@ -251,7 +261,7 @@ export async function dbLog(options: { namespace: WorkflowNamespace, name: strin
             created_at: new Date().getTime(),
         });
     } catch (e) {
-        console.trace();
+        // console.trace();
         errorLog('err66553', e);
     }
 }
@@ -271,3 +281,26 @@ export function makeAbsoluteUrl(url: string, baseUrl?: string) {
 
     return baseUrl + '/' + url;
 }
+/***************************************** */
+
+export function clone<T=any>(obj: T): T {
+    return JSON.parse(JSON.stringify(obj));
+}
+/***************************************** */
+/**
+ * 
+ * @param filePath without '.js' extension
+ */
+export async function importFile(filePath: string) {
+    // =>if 'test' mode
+    if (Const.SERVER_MODE === 'test') {
+        filePath += '.ts';
+    } else {
+        filePath += '.js';
+    }
+    if (!fs.existsSync(filePath)) {
+        errorLog('import', `not found file in '${filePath}' path`);
+        return undefined;
+    }
+    return await import(filePath);
+} 

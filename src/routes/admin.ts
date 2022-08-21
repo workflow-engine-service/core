@@ -111,5 +111,25 @@ export const adminApis: ApiRoute[] = [
         },
         usedDefinitions: ['DeployedWorkflowModel']
     },
+    {
+        method: 'DELETE',
+        path: 'user/delete',
+        functionName: 'userDelete',
+        tags: ['admin'],
+        des: 'remove a user from workflow',
+        responses: {
+            '200': {
+                description: 'successful operation',
+            },
+        },
+        parameters: [
+            {
+                name: 'id',
+                in: 'query',
+                required: true,
+                type: 'number',
+            },
+        ],
+    },
 
 ];

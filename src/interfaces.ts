@@ -1,6 +1,6 @@
 import { SwaggerApiParameter, SwaggerApiResponse } from "./document/interfaces";
 import { WorkerModel, WorkflowProcessModel } from "./models/models";
-import { HookMethodType, HttpStatusCode, MiddlewareName, RequestMethodType, SwaggerTagName, WorkflowFieldDataType, WorkflowStateActionType, WorkflowStateEventName, WorkflowStateJobScheduleType } from "./types";
+import { HookMethodType, HttpStatusCode, MiddlewareName, RequestMethodType, SwaggerTagName, WorkflowFieldDataType, WorkflowStateActionType, WorkflowStateEventName } from "./types";
 
 
 export interface ServerConfigs {
@@ -34,6 +34,7 @@ export interface ServerConfigs {
         swagger_disabled?: boolean;
         swagger_base_url?: string;
         frontend_path?: string;
+
         /**
          * @default /assets
          */
@@ -49,6 +50,10 @@ export interface ServerConfigs {
          * @default 10
          */
         max_worker_running?: number;
+        /**
+         * auto fill by system
+         */
+        __base_src_path?: string;
     };
     alias?: {
         [k: string]: {
@@ -237,31 +242,85 @@ export interface WorkflowStateJobTime {
      */
     timestamp?: number;
     /**
-     * type: afterTime|static
+     * type: afterTime (day of month)
      */
     day?: number;
+    // /**
+    //  * type: weekly|monthly
+    //  */
+    // weekday?: number;
     /**
-     * type: weekly|monthly|static
-     */
-    weekday?: number;
-    /**
-     * daily|weekly|monthly|static
+     * daily|weekly|monthly|afterTime|static
      */
     hour?: number;
     /**
-     * type: daily|weekly|hourly|monthly|static
+     * type: daily|weekly|hourly|afterTime|monthly|static
      */
     minute?: number;
     /**
-     * type: daily|weekly|hourly|monthly|static|minutely 
+     * type: daily|weekly|hourly|afterTime|monthly|static|minutely 
      */
     second?: number;
 }
 export interface WorkflowStateJob {
-    type: WorkflowStateJobScheduleType;
-    times: WorkflowStateJobTime[];
+    _id?: string;
+    // type: WorkflowStateJobScheduleType;
+    /**
+     * @default 0 (unlimited repeat)
+     */
+    repeat?: number;
+    time: WorkflowStateJobTime;
+    /**
+     * fields to will set after time seen
+     */
     set_fields?: object;
+    /**
+     * state to will execute after time seen
+     */
     action_name?: string;
+    /**
+     * next state to will go after time seen
+     */
+    state_name?: string;
+}
+
+export interface WorkflowStateJobResponse {
+    set_fields?: object;
+    next_state?: string;
+    _process?: WorkflowProcessModel;
+    error?: string;
+    actionWorkerId?: string;
+}
+
+export interface WorkflowProcessResponse {
+
+    process?: WorkflowProcessModel;
+}
+
+export interface WorkflowBaseWorkerSendParameters {
+    process_id: string;
+    user_id?: number;
+    _process?: WorkflowProcessModel;
+}
+
+export interface WorkflowActiveJobSendParameters extends WorkflowBaseWorkerSendParameters, WorkflowActiveJob {
+    _state?: WorkflowState;
+}
+
+export interface WorkflowCreateProcessSendParameters extends WorkflowBaseWorkerSendParameters, Omit<WorkflowProcessModel, '_id' | 'updated_at'> {
+    _id?: string;
+    updated_at?: number;
+}
+
+export interface WorkflowProcessJob extends WorkflowStateJob {
+    state_name: string;
+}
+
+export interface WorkflowActiveJob extends WorkflowStateJob {
+    state_name: string;
+    process_id: string;
+    started_at?: number;
+    current_repeat?: number;
 }
 
 export interface WorkflowStateAction {
@@ -411,9 +470,8 @@ export interface WorkflowStateEventSendParametersFields {
     user_id?: number;
 }
 
-export interface WorkflowStateActionSendParameters extends WorkflowStateActionSendParametersFields {
+export interface WorkflowStateActionSendParameters extends WorkflowBaseWorkerSendParameters, WorkflowStateActionSendParametersFields {
     fields?: object;
-    _process?: WorkflowProcessModel;
     _action?: WorkflowStateAction;
 }
 

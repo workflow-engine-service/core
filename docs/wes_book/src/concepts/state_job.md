@@ -8,35 +8,23 @@ every job can schedule with `static` type or `weekly` or `daily` or `hourly` or 
 ```
 "jobs": [
     {
-        "type": "daily",
-        "times": [
-            {
-                "hour": 5,
-            }
-            {
-                "hour": 15,
-                "minute": 30,
-            }
-        ],
+        "times": {
+            "hour": 15,
+            "minute": 30,
+        },
         "set_fields": {"my_field": 0}
     }
 ]
 ```
 
-every day in `5:00` and `15:30`, `my_field` will be reset!
-
-
-you can also another type named `afterTime`. this type execute job after a passed time. like 5 hours after current state started 
+this execute job after a passed time. like 5 hours after current state started 
 
 ```
 "jobs": [
     {
-        type: "afterTime",
-        times: [
-            {
-                hour: 5,
-            }
-        ],
+        times: {
+            hour: 5,
+        },
         "set_fields": {"expired": true},
         "action_name": "expired_state"
 

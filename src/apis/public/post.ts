@@ -6,8 +6,10 @@ import { HttpStatusCode } from "../../types";
 import { BaseApi } from "../base";
 import { UserTokenResponse } from "./interfaces";
 import mongoose from "mongoose";
-import { WorkflowProcessField, WorkflowStateAction, WorkflowStateActionResponse } from "src/interfaces";
+import { WorkflowProcessField, WorkflowProcessJob, WorkflowStateAction, WorkflowStateActionResponse } from "src/interfaces";
 import { WebWorkers } from "../../workers";
+import { WorkflowEvents } from "../../events";
+import { ProcessHelper } from "../processHelper";
 
 export function classApi() {
     return PublicPostApi;
@@ -15,6 +17,7 @@ export function classApi() {
 
 export class PublicPostApi extends BaseApi {
     async token() {
+        debugLog('token', `user with '${this.param('username')}' username try to login...`);
         // =>check if directly method
         if (Const.CONFIGS.auth_user.type === 'directly' || Const.CONFIGS.auth_user.type === 'dual') {
             let user = await Auth.authenticate(this.param('username'), this.param('secret_key'));
@@ -50,23 +53,33 @@ export class PublicPostApi extends BaseApi {
             // =>if not found workflow
             if (!workflow) return this.error404(`not found such workflow '${name}:${version}'`);
             // =>check access create from this workflow
-            if (!this.checkUserRoleHasAccess(workflow.settings.create_access_roles)) {
+            if (!this.checkUserRoleHasAccess(workflow?.settings?.create_access_roles)) {
                 return this.error403(`no access to create process from '${workflow.name}:${workflow.version}' workflow`);
             }
-            // =>create new process
-            let res = await Const.DB.models.processes.create({
+
+            // =>create process worker to add process
+            let workerId = await WebWorkers.addProcessWorker({
                 workflow_name: name,
                 workflow_version: workflow.version,
                 current_state: workflow.start_state,
                 field_values: [],
                 history: [],
+                jobs: [],
                 workflow: workflow,
                 created_at: new Date().getTime(),
                 created_by: this.request.user().id,
+                process_id: undefined,
             });
-            if (!res) return this.error400();
 
-            return this.response(res);
+            return new Promise((res) => {
+                // =>listen on process create event
+                let processCreateEvent = WorkflowEvents.ProcessCreate$.subscribe(it => {
+                    // =>if this  worker
+                    if (it.worker_id !== workerId) return;
+                    res(this.response(it.process));
+                    processCreateEvent.unsubscribe();
+                });
+            });
         } catch (e) {
             errorLog('create_process', e);
             return this.error400();
@@ -111,104 +124,18 @@ export class PublicPostApi extends BaseApi {
     /********************************** */
     async abstractDoAction(processId: string, stateActionName: string, userMessage: string, fields: object) {
         try {
-            let requiredFieldValues: WorkflowProcessField[] = [];
-            let optionalFieldValues: WorkflowProcessField[] = [];
             let res = await this.getProcessCurrentState(processId);
             // =>if raise error
             if (Array.isArray(res)) {
                 return res;
             } else {
-                // =>find selected action with name
-                let action = res.state.actions.find(i => i.name === stateActionName);
-                if (!action) return this.error404('not found such action');
-                // =>check before worker added and not end for this action
-                let existWorker = await Const.DB.models.workers.find({
-                    ended_at: { $exists: false },
-                    type: 'state_action',
-                    meta: { $exists: true },
-                    "meta.process": processId,
-                    "meta.state": res.state.name,
-                    "meta.action": action.name,
-
-                });
-                if (existWorker && existWorker.length > 0) {
-                    this.infoLog('worker', 'exist_worker_on_action', {
-                        worker: existWorker,
-                        action: action.name,
-                        state: res.state.name,
-                        process: processId,
-                    });
-                    return this.error400(`a worker running on '${action.name}' action`);
+                // =>execute action
+                let execAction = await ProcessHelper.executeStateAction(res.process, res.state, stateActionName, userMessage, fields, this.request.user().id);
+                // =>if error
+                if (execAction.error) {
+                    return this.error400(execAction.error);
                 }
-                // =>check for message required
-                if (action.message_required && (!userMessage || String(userMessage).trim().length < 1)) {
-                    return this.error400('message required');
-                }
-                // =>check for required fields
-                if (action.required_fields) {
-                    for (const field of action.required_fields) {
-                        if (fields['field.' + field] === undefined) {
-                            return this.error400(`must fill '${field}' field`);
-                        }
-                    }
-                }
-                let needFields: object = {};
-                // =>collect required fields
-                for (const field of action.required_fields) {
-                    // =>validate all required, optional fields
-                    let value = fields['field.' + field];
-                    let respValidate = await this.validateFieldValue(res.process, field, value);
-                    if (!respValidate.success) {
-                        return this.error400(respValidate.error);
-                    }
-
-                    requiredFieldValues.push({
-                        name: field,
-                        value,
-                    });
-                    needFields[field] = value;
-                }
-                // =>collect optional fields
-                for (const field of action.optional_fields) {
-                    // =>validate all required, optional fields
-                    //TODO:
-                    let value = fields['field.' + field];
-                    optionalFieldValues.push({
-                        name: field,
-                        value,
-                    });
-                    needFields[field] = value;
-                }
-
-                // =>collect send fields
-                let sendProcessFields: WorkflowProcessField[] = [];
-                if (action.send_fields) {
-                    for (const fieldName of action.send_fields) {
-                        // =>find process field
-                        let field = res.process.field_values.find(i => i.name === fieldName);
-                        if (!field) continue;
-                        sendProcessFields.push(field);
-                    }
-                }
-
-                let workerId = await WebWorkers.addActionWorker({
-                    required_fields: requiredFieldValues,
-                    optional_fields: optionalFieldValues,
-                    process_id: res.process._id,
-                    state_action_name: action.name,
-                    send_fields: sendProcessFields,
-                    state_name: res.state.name,
-                    user_id: this.request.user().id,
-                    workflow_name: res.process.workflow_name,
-                    workflow_version: res.process.workflow_version,
-                    message: userMessage,
-                    fields: needFields,
-                    _action: action,
-                    _process: res.process,
-                    owner_id: res.process.created_by,
-                });
-                // console.log('worker id:', workerId)
-                return this.response(workerId);
+                return this.response(execAction.workerId);
             }
         } catch (e) {
             errorLog('err546325', e, this.request.user().id);
@@ -217,28 +144,4 @@ export class PublicPostApi extends BaseApi {
     }
 
 
-    async validateFieldValue(process: WorkflowProcessModel, fieldName: string, fieldValue: any): Promise<{ success: boolean; error?: string; }> {
-        // =>find field by name
-        let field = process.workflow.fields.find(i => i.name === fieldName);
-        // =>check if field exist
-        if (!field) return { success: false, error: `not exist '${fieldName}' field` };
-        // =>check field value type
-        let badType = false;
-        if (field.type === 'string' && typeof fieldValue !== 'string') {
-            badType = true;
-        }
-        else if (field.type === 'number' && typeof fieldValue !== 'number') {
-            badType = true;
-        }
-        else if (field.type === 'boolean' && typeof fieldValue !== 'boolean') {
-            badType = true;
-        }
-        if (badType) {
-            return { success: false, error: `'${fieldValue}' value not match with data type '${field.type}' for '${fieldName}' field` };
-        }
-        //TODO:
-
-
-        return { success: true };
-    }
 }

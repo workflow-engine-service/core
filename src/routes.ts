@@ -2,7 +2,7 @@ import { Express, static as expressStatic } from 'express';
 import * as path from 'path';
 import * as fs from 'fs';
 import { ApiRoute } from './interfaces';
-import { absUrl, debugLog, errorLog } from './common';
+import { absUrl, debugLog, errorLog, importFile } from './common';
 import { CoreRequest } from './apis/request';
 import { HttpStatusCode } from './types';
 import { adminApis } from './routes/admin';
@@ -23,14 +23,15 @@ export namespace WebRoutes {
                 // =>init core request class
                 let coreRequest = req.body[Const.CoreRequestKey] as CoreRequest;
                 // =>find target class file
-                let classFilePath = path.join(path.dirname(__filename), 'apis', api.type, api.method.toLowerCase() + '.js');
-                if (!fs.existsSync(classFilePath)) {
+                let classFilePath = path.join(path.dirname(__filename), 'apis', api.type, api.method.toLowerCase());
+                // =>init api class
+                let classFile = await importFile(classFilePath);
+                // =>not found
+                if (!classFile) {
                     errorLog('route', `not found request class file: '${classFilePath}'`);
                     coreRequest.response('', HttpStatusCode.HTTP_404_NOT_FOUND);
                     return;
                 }
-                // =>init api class
-                let classFile = await import(classFilePath);
                 let apiClassInstance = new (classFile.classApi())(coreRequest);
                 // console.log('req:', api.functionName, apiClassInstance['request'], classFilePath);
                 // =>call api function

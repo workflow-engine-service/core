@@ -4,10 +4,11 @@ import { WebRoutes } from './routes';
 import * as path from 'path';
 import * as fs from 'fs';
 import { Swagger } from './document/swagger';
-import { debugLog } from './common';
+import { debugLog, errorLog, importFile } from './common';
 import { Wiki } from './document/wiki';
 import { MiddlewareName } from './types';
 import { WebWorkers } from './workers';
+import { WorkflowJob } from './jobs';
 // import * as cors from 'cors';
 
 export namespace WebServer {
@@ -24,6 +25,9 @@ export namespace WebServer {
             WebRoutes.routes(app);
             // =>start workers service
             WebWorkers.start();
+            // =>start workflow job service
+            WorkflowJob.start();
+
 
 
             app.listen(Const.CONFIGS.server.port, async () => {
@@ -65,7 +69,11 @@ export namespace WebServer {
     }
 
     export async function loadMiddleware(middle: MiddlewareName) {
-        let middleFile = await import(path.join(path.dirname(__filename), 'middlewares', middle + '.js'));
+        let middleFile = await importFile(path.join(path.dirname(__filename), 'middlewares', middle));
+        if (!middleFile) {
+            errorLog('middleware', `can not load '${middle}' middleware`);
+            return undefined;
+        }
         let middleInit = new (middleFile['middleware']())();
 
 

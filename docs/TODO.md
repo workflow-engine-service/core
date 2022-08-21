@@ -15,6 +15,7 @@
 [ ] add `owner_id` to action request
 [ ] add _owner_ role
 [ ] add base_url to hook types (action, event)
+[ ] support state jobs
 
 # DONE Tasks
 [x] init workflow core
@@ -42,4 +43,6 @@
 [x] add api for users list
 [x] add api for get workflow schema
 [x] add pagination to apis
+[x] get user info by api
+[x] start api testing
 

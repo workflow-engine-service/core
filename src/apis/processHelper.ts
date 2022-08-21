@@ -1,10 +1,12 @@
 import { WorkflowStateEventName } from "../types";
 import { Const } from "../const";
-import { WorkflowStateAction, WorkflowStateActionResponse, WorkflowStateActionSendParameters, WorkflowStateActionSendParametersFields, WorkflowStateEvent, WorkflowStateEventSendParametersFields } from "../interfaces";
-import { WorkflowProcessChangeField } from "../models/models";
+import { WorkflowActiveJobSendParameters, WorkflowBaseWorkerSendParameters, WorkflowCreateProcessSendParameters, WorkflowProcessField, WorkflowState, WorkflowStateAction, WorkflowStateActionResponse, WorkflowStateActionSendParameters, WorkflowStateActionSendParametersFields, WorkflowStateEvent, WorkflowStateEventSendParametersFields } from "../interfaces";
+import { WorkflowProcessChangeField, WorkflowProcessModel } from "../models/models";
 import { Redis } from "../redis";
 import { errorLog, debugLog, applyAliasConfig, dbLog, makeAbsoluteUrl } from "../common";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
+import { WorkflowEvents } from "../events";
+import { WebWorkers } from "../workers";
 
 export namespace ProcessHelper {
     export async function doActionWithLocal(params: WorkflowStateActionSendParameters): Promise<WorkflowStateActionResponse> {
@@ -132,7 +134,7 @@ export namespace ProcessHelper {
     }
     /********************************** */
 
-    export async function emitStateEvent(eventName: WorkflowStateEventName, stateName: string, params: WorkflowStateActionSendParameters): Promise<boolean> {
+    export async function emitStateEvent(eventName: WorkflowStateEventName, stateName: string, params: WorkflowBaseWorkerSendParameters): Promise<boolean> {
         // =>find state
         let state = params._process.workflow.states.find(i => i.name === stateName);
         // =>find match event
@@ -151,7 +153,6 @@ export namespace ProcessHelper {
             case 'onLeave':
                 break;
             case 'onInit':
-
                 break;
         }
         dbLog({ namespace: 'event', name: 'pre_emitStateEvent', meta: { eventName, event } });
@@ -168,14 +169,14 @@ export namespace ProcessHelper {
     }
 
     /********************************** */
-    export async function collectChangedFields(params: WorkflowStateActionSendParameters, newFields: object): Promise<WorkflowProcessChangeField[]> {
+    export async function collectChangedFields(process: WorkflowProcessModel, newFields: object): Promise<WorkflowProcessChangeField[]> {
         if (!newFields) newFields = {};
         let changedFields: WorkflowProcessChangeField[] = [];
         for (const key of Object.keys(newFields)) {
             // =>find before value
             let beforeValue = undefined;
-            if (params._process.field_values.find(i => i.name === key)) {
-                beforeValue = params._process.field_values.find(i => i.name === key).value;
+            if (process.field_values.find(i => i.name === key)) {
+                beforeValue = process.field_values.find(i => i.name === key).value;
             }
             // =>Add new change field
             changedFields.push({
@@ -259,5 +260,218 @@ export namespace ProcessHelper {
             errorLog('event', e);
             return false;
         }
+    }
+    /********************************** */
+
+    export async function updateProcess(process: WorkflowProcessModel, newProcess: {
+        newState?: string;
+        userId?: number;
+        message?: string;
+        workerId: string;
+        setFields?: object;
+        params: WorkflowBaseWorkerSendParameters;
+    }) {
+        // =>validate new state
+        if (!newProcess.newState) newProcess.newState = process.current_state;
+        else {
+            if (!process.workflow.states.find(i => i.name === newProcess.newState)) {
+                return false;
+            }
+        }
+        // =>check diff states
+        let isStatesDiff = process.current_state !== newProcess.newState;
+        if (!newProcess.setFields) newProcess.setFields = {};
+        // =>call 'onLeave' event of state, if different states
+        if (process.current_state && process.current_state !== newProcess.newState) {
+            ProcessHelper.emitStateEvent('onLeave', process.current_state, newProcess.params);
+            // =>emit 'ProcessStateOnLeave$' event
+            WorkflowEvents.ProcessStateOnLeave$.next(newProcess.params._process);
+        }
+        // =>add process history
+        process.history.push({
+            before_state: process.current_state,
+            current_state: newProcess.newState,
+            created_at: new Date().getTime(),
+            user_id: newProcess.userId,
+            message: newProcess.message,
+            worker_id: newProcess.workerId,
+            changed_fields: (await ProcessHelper.collectChangedFields(process, newProcess.setFields)),
+        });
+
+        // =>update field values
+        for (const key of Object.keys(newProcess.setFields)) {
+            let index = process.field_values.findIndex(i => i.name === key);
+            if (index < 0) {
+                process.field_values.push({
+                    name: key,
+                    value: undefined,
+                });
+                index = process.field_values.length - 1;
+            }
+            process.field_values[index].value = newProcess.setFields[key];
+        }
+        // =>update current state
+        process.current_state = newProcess.newState;
+        process.updated_at = new Date().getTime();
+        // =>update process
+        await Const.DB.models.processes.findByIdAndUpdate(process._id, { $set: process }, { multi: true, upsert: true }).clone();
+        // =>call 'onInit' event of state, if different states
+        if (isStatesDiff) {
+            ProcessHelper.emitStateEvent('onInit', newProcess.newState, newProcess.params);
+            // =>emit 'ProcessStateOnInit$' event
+            WorkflowEvents.ProcessStateOnInit$.next(newProcess.params._process);
+        }
+        // =>check for end state
+        //TODO:
+
+        return true;
+    }
+
+
+    export async function executeStateAction(process: WorkflowProcessModel, state: WorkflowState, stateActionName: string, userMessage: string, fields: object, userId?: number): Promise<{ error?: string; workerId?: string; }> {
+        try {
+            let requiredFieldValues: WorkflowProcessField[] = [];
+            let optionalFieldValues: WorkflowProcessField[] = [];
+
+            // =>find selected action with name
+            let action = state.actions.find(i => i.name === stateActionName);
+            if (!action) return { error: 'not found such action' };
+            // =>normalize action
+            if (!action.required_fields) {
+                action.required_fields = [];
+            }
+            if (!action.optional_fields) {
+                action.optional_fields = [];
+            }
+            // =>check before worker added and not end for this action
+            let existWorker = await Const.DB.models.workers.find({
+                ended_at: { $exists: false },
+                type: 'state_action',
+                meta: { $exists: true },
+                "meta.process": String(process._id),
+                "meta.state": state.name,
+                "meta.action": action.name,
+
+            });
+            if (existWorker && existWorker.length > 0) {
+                dbLog({
+                    namespace: 'worker', name: 'exist_worker_on_action', meta: {
+                        worker: existWorker,
+                        action: action.name,
+                        state: state.name,
+                        process: String(process._id),
+                    }
+                });
+                return { error: `a worker running on '${action.name}' action` };
+            }
+            // =>check for message required
+            if (action.message_required && (!userMessage || String(userMessage).trim().length < 1)) {
+                return { error: 'message required' };
+            }
+            // =>check for required fields
+            if (action.required_fields) {
+                for (const field of action.required_fields) {
+                    if (fields['field.' + field] === undefined) {
+                        return { error: `must fill '${field}' field` };
+                    }
+                }
+            }
+            let needFields: object = {};
+            // =>collect required fields
+            for (const field of action.required_fields) {
+                let value = fields['field.' + field];
+                // =>validate field
+                let respValidate = await validateFieldValue(process, field, value);
+                if (!respValidate.success) {
+                    return { error: respValidate.error };
+                }
+
+                requiredFieldValues.push({
+                    name: field,
+                    value,
+                });
+                needFields[field] = value;
+            }
+            // =>collect optional fields
+            for (const field of action.optional_fields) {
+                let value = fields['field.' + field];
+                // =>validate field
+                let respValidate = await validateFieldValue(process, field, value);
+                if (!respValidate.success) {
+                    return { error: respValidate.error };
+                }
+
+                optionalFieldValues.push({
+                    name: field,
+                    value,
+                });
+                needFields[field] = value;
+            }
+
+            // =>collect send fields
+            let sendProcessFields: WorkflowProcessField[] = [];
+            if (action.send_fields) {
+                for (const fieldName of action.send_fields) {
+                    // =>find process field
+                    let field = process.field_values.find(i => i.name === fieldName);
+                    if (!field) continue;
+                    sendProcessFields.push(field);
+                }
+            }
+
+            let workerId = await WebWorkers.addActionWorker({
+                required_fields: requiredFieldValues,
+                optional_fields: optionalFieldValues,
+                process_id: process._id,
+                state_action_name: action.name,
+                send_fields: sendProcessFields,
+                state_name: state.name,
+                user_id: userId,
+                workflow_name: process.workflow_name,
+                workflow_version: process.workflow_version,
+                message: userMessage,
+                fields: needFields,
+                _action: action,
+                _process: process,
+                owner_id: process.created_by,
+            });
+            // console.log('worker id:', workerId)
+            return { workerId };
+
+        } catch (e) {
+            errorLog('err546325', e, userId);
+            return { error: 'bad request' };
+        }
+    }
+
+
+    async function validateFieldValue(process: WorkflowProcessModel, fieldName: string, fieldValue: any): Promise<{ success: boolean; error?: string; }> {
+        // =>find field by name
+        let field = process.workflow.fields.find(i => i.name === fieldName);
+        // =>check if field exist
+        if (!field) return { success: false, error: `not exist '${fieldName}' field` };
+        // =>check field value type
+        let badType = false;
+        if (field.type === 'string' && typeof fieldValue !== 'string') {
+            badType = true;
+        }
+        else if (field.type === 'number' && typeof fieldValue !== 'number') {
+            badType = true;
+        }
+        else if (field.type === 'boolean' && typeof fieldValue !== 'boolean') {
+            badType = true;
+        }
+        if (badType) {
+            return { success: false, error: `'${fieldValue}' value not match with data type '${field.type}' for '${fieldName}' field` };
+        }
+        //TODO:
+
+
+        return { success: true };
+    }
+
+    export async function findProcessById(id: string) {
+        let process = await Const.DB.models.processes.findById(id).populate('workflow');
+        return process;
     }
 }

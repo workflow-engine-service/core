@@ -6,6 +6,7 @@ const metaDataSchema = new mongoose.Schema<WorkflowProcessModel, WorkflowProcess
     current_state: String,
     field_values: Array,
     history: Array,
+    jobs: Array,
     // workflow: [{ type: mongoose.Schema.Types.ObjectId, ref: 'workflows' }],
     workflow: { type: mongoose.Schema.Types.ObjectId, ref: 'workflows' },
     created_at: Number,

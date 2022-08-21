@@ -3,6 +3,7 @@ import { Const } from "../../const";
 import { WorkflowDescriptor } from "../../interfaces";
 import { BaseApi } from "../base";
 import { Auth } from "../../auth";
+import { errorLog } from "../../common";
 
 export function classApi() {
     return AdminPostApi;
@@ -19,6 +20,7 @@ export class AdminPostApi extends BaseApi {
         // =>validate workflow code
         let validate = await this.validateWorkflowCode(code);
         if (validate[1]) {
+            errorLog('err543245', `invalid workflow deploy: ${validate[1]}`, this.request.user().id);
             return this.error400(validate[1]);
         }
         code = validate[0];

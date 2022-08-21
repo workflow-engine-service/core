@@ -7,6 +7,8 @@
         - [Schema details](./concepts/workflow/schema.md)
     - [Process](./concepts/process/process.md)
         - [Schema details](./concepts/process/schema.md)
+    - [Fields](./concepts/fields/fields.md)
+    - [Field Validations](./concepts/fields/validations.md)
     - [Access Roles](./concepts/access_roles.md)
     - [State Event](./concepts/state_event.md)
     - [State Job](./concepts/state_job.md)

@@ -1,0 +1,34 @@
+{
+    "mongo": {
+        "host": "127.0.0.1",
+        "port": 27017,
+        "name": "workflow_db_test"
+    },
+    "redis": {
+        "redis1": {
+            "host": "127.0.0.1",
+            "port": 6379
+        }
+    },
+    "server": {
+        "port": 8085,
+        "host": "localhost",
+        "logs_path": "./test-logs",
+        "debug_mode": true,
+        "swagger_disabled": true
+    },
+    "admin_users": [
+        {
+            "username": "admin",
+            "secretkey": "test1234"
+        }
+    ],
+    "auth_user": {
+        "type": "dual",
+        "lifetime": 86400,
+        "url": "http://127.0.0.1/django/api/auth-token",
+        "method": "post",
+        "param_name": "access_token",
+        "header_name": "Auth"
+    }
+}

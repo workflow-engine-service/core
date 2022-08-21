@@ -3,7 +3,7 @@ import { Const } from "./const";
 import { DeployedWorkflowModel, LogModel, SessionModel, UserModel, WorkerModel, WorkflowProcessModel } from "./models/models";
 import * as fs from 'fs';
 import * as path from 'path';
-import { debugLog, errorLog } from "./common";
+import { debugLog, errorLog, importFile } from "./common";
 import { Auth } from "./auth";
 
 export class MongoDB {
@@ -41,12 +41,12 @@ export class MongoDB {
 
     async initModels() {
         for (const name of this.modelNames) {
-            let filePath = path.join(path.dirname(__filename), 'models', name + '.js');
-            if (!fs.existsSync(filePath)) {
-                errorLog('db', `not found model '${name}'`);
+            let filePath = path.join(path.dirname(__filename), 'models', name);
+            let modelFile = await importFile(filePath);
+            if (!modelFile) {
+                errorLog('db', `not found model '${name}' in '${filePath}' path`);
                 continue;
             }
-            let modelFile = await import(filePath);
             this.models[name] = await modelFile['getSchema']();
             debugLog('db', `model '${name}' deployed`);
         }

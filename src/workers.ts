@@ -1,10 +1,12 @@
-import { dbLog, debugLog, generateString } from "./common";
-import { WorkerStruct, WorkflowStateActionResponse, WorkflowStateActionSendParameters } from "./interfaces";
+import { clone, dbLog, debugLog, errorLog, generateString } from "./common";
+import { WorkerStruct, WorkflowActiveJob, WorkflowActiveJobSendParameters, WorkflowCreateProcessSendParameters, WorkflowProcessJob, WorkflowProcessResponse, WorkflowStateActionResponse, WorkflowStateActionSendParameters, WorkflowStateJobResponse } from "./interfaces";
 import { Subject } from "rxjs";
 import { ProcessHelper } from "./apis/processHelper";
 import { Const } from "./const";
-import { WorkerModel } from "./models/models";
+import { WorkerModel, WorkflowProcessModel } from "./models/models";
 import { isMainThread, Worker } from 'worker_threads';
+import { WorkflowEvents } from "./events";
+import { LogMode } from "./types";
 
 export namespace WebWorkers {
     let workers: WorkerStruct[] = [];
@@ -13,7 +15,6 @@ export namespace WebWorkers {
     let maxWorkerRunning = 0;
     /******************************** */
     export async function addActionWorker(params: WorkflowStateActionSendParameters): Promise<string> {
-
         // =>generate worker id
         let workerId = await addWorker<WorkflowStateActionResponse>({
             type: 'state_action',
@@ -64,43 +65,15 @@ export namespace WebWorkers {
             },
             successResult: async (response) => {
                 debugLog('worker', `success to run action and go to '${response.state_name}' state...`);
-                // =>call 'onLeave' event of state
-                ProcessHelper.emitStateEvent('onLeave', params._process.current_state, params);
 
-                // =>add process history
-                params._process.history.push({
-                    before_state: params._process.current_state,
-                    current_state: response.state_name,
-                    created_at: new Date().getTime(),
-                    user_id: params.user_id,
+                await ProcessHelper.updateProcess(params._process, {
+                    newState: response.state_name,
+                    workerId,
+                    userId: params.user_id,
                     message: params.message,
-                    worker_id: workerId,
-                    changed_fields: (await ProcessHelper.collectChangedFields(params, response.fields)),
+                    setFields: response.fields,
+                    params,
                 });
-
-                // =>update current state
-                params._process.current_state = response.state_name;
-                // =>update field values
-                if (!response.fields) response.fields = {};
-                for (const key of Object.keys(response.fields)) {
-                    let index = params._process.field_values.findIndex(i => i.name === key);
-                    if (index < 0) {
-                        params._process.field_values.push({
-                            name: key,
-                            value: undefined,
-                        });
-                        index = params._process.field_values.length - 1;
-                    }
-                    params._process.field_values[index].value = response.fields[key];
-                }
-
-
-                // =>update process
-                await Const.DB.models.processes.findByIdAndUpdate(params.process_id, { $set: params._process }, { multi: true, upsert: true }).clone();
-                // =>call 'onInit' event of state
-                ProcessHelper.emitStateEvent('onInit', params._process.current_state, params);
-                // =>check for end state
-                //TODO:
 
                 return response;
             },
@@ -121,6 +94,156 @@ export namespace WebWorkers {
         });
 
 
+        return workerId;
+    }
+    /******************************** */
+    export async function addJobWorker(params: WorkflowActiveJobSendParameters): Promise<string> {
+        // =>generate worker id
+        let workerId = await addWorker<WorkflowStateJobResponse>({
+            type: 'state_job',
+            doAction: async () => {
+                let responseFromJob: WorkflowStateJobResponse = {};
+                // =>set extra fields
+                if (params.set_fields) {
+                    responseFromJob.set_fields = params.set_fields;
+                }
+                // =>if set action
+                if (params.action_name) {
+                    // =>create action worker
+                    let execAction = await ProcessHelper.executeStateAction(params._process, params._state, params.action_name, undefined, params.set_fields, 0);
+                    // =>if error
+                    if (execAction.error) {
+                        responseFromJob.error = execAction.error;
+                        return [false, responseFromJob];
+                    } else {
+                        responseFromJob.actionWorkerId = execAction.workerId;
+                    }
+                }
+                // =>if set next state
+                else if (params.state_name) {
+                    responseFromJob.next_state = params.state_name;
+                }
+
+                return [true, responseFromJob];
+            },
+            successResult: async (response) => {
+                debugLog('worker', `success to run job and go to '${response.next_state}' state...`);
+                // =>call 'onJob' event of state
+                ProcessHelper.emitStateEvent('onJob', params._process.current_state, params);
+                // let newProcess = clone(params._process);
+                // =>set fields
+                // if (params.set_fields) {
+
+                // }
+                // =>update process
+                await ProcessHelper.updateProcess(params._process, {
+                    newState: params.state_name,
+                    workerId,
+                    setFields: params.set_fields,
+                    params,
+                });
+
+
+                return response;
+            },
+            failedResult: async (response) => {
+                dbLog({
+                    namespace: 'job',
+                    mode: LogMode.ERROR,
+                    name: 'failed_job_worker',
+                    meta: { response },
+                });
+                return {
+                    // error: response.response_message,
+                    process_id: params.process_id,
+                };
+            },
+            meta: {
+                process: params.process_id,
+                state: params.state_name,
+                // action: params.state_action_name,
+            },
+            priority: 3,
+            started_by: 0,
+        });
+        return workerId;
+    }
+    /******************************** */
+    export async function addProcessWorker(params: WorkflowCreateProcessSendParameters): Promise<string> {
+        // =>generate worker id
+        let workerId = await addWorker<WorkflowProcessResponse>({
+            type: 'process',
+            doAction: async () => {
+                try {
+                    let responseFromProcess: WorkflowProcessResponse = {};
+                    // =>normalize jobs
+                    let processJobs: WorkflowProcessJob[] = [];
+                    // =>transfer process jobs
+                    for (const state of params.workflow.states) {
+                        if (!state.jobs) continue;
+                        for (const job of state.jobs) {
+                            let processJob: WorkflowProcessJob = job as any;
+                            if (!processJob._id) {
+                                job._id = generateString(12);
+                            }
+                            processJob.state_name = state.name;
+                            // =>add process job
+                            processJobs.push(processJob);
+                        }
+                    }
+                    params.jobs = processJobs;
+                    // =>create new process
+                    let res = await Const.DB.models.processes.create(params);
+                    responseFromProcess = {
+                        process: res,
+                    };
+                    params.process_id = res._id;
+                    // =>emit event
+                    WorkflowEvents.ProcessCreate$.next({
+                        process: res,
+                        worker_id: workerId
+                    });
+                    return [true, responseFromProcess];
+                } catch (e) {
+                    errorLog('err23523534', e);
+                    return [false, undefined];
+                }
+            },
+            successResult: async (response) => {
+                debugLog('worker', `success to run create process`);
+                params.process_id = response.process._id;
+                params.user_id = response.process.created_by;
+                params._process = response.process;
+                let oldProcess = clone<WorkflowProcessModel>(response.process);
+                oldProcess.current_state = null;
+                await ProcessHelper.updateProcess(oldProcess, {
+                    newState: response.process.current_state,
+                    workerId,
+                    userId: response.process.created_by,
+                    params,
+                });
+
+
+                return response;
+            },
+            failedResult: async (response) => {
+                dbLog({
+                    namespace: 'process',
+                    mode: LogMode.ERROR,
+                    name: 'failed_process_worker',
+                    meta: { response },
+                });
+                return {
+                    // error: response.response_message,
+                    process_id: params.process_id,
+                };
+            },
+            meta: {
+                workflow: params.workflow,
+            },
+            priority: 5,
+            started_by: params.created_by,
+        });
         return workerId;
     }
     /******************************** */
@@ -222,7 +345,7 @@ export namespace WebWorkers {
                 await updateWorker(worker);
                 workerRunning--;
             });
-        }, 100);
+        }, 50);
     }
 
 }

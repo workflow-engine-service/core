@@ -11,3 +11,5 @@ cli/data/docker/tmp
 docs/wes_book/book
 cli
 frontend
+coverage
+test-logs

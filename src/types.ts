@@ -63,9 +63,9 @@ export type WorkflowStateEventName = 'onInit' | 'onLeave' | 'onJob';
 export type WorkflowFieldDataType = 'string' | 'number' | 'file' | 'boolean';
 
 
-export type WorkflowNamespace = 'process' | 'workflow' | 'worker' | 'config' | 'action' | 'event' | 'other';
+export type WorkflowNamespace = 'process' | 'workflow' | 'worker' | 'config' | 'action' | 'event' | 'other' | 'job';
 
-export type WorkflowStateJobScheduleType = 'static' | 'daily' | 'weekly' | 'hourly' | 'minutely' | 'afterTime';
+// export type WorkflowStateJobScheduleType = 'static' | 'daily' | 'weekly' | 'hourly' | 'minutely' | 'afterTime';
 
 export type WorkflowStateActionType = 'hook_url' | 'redis' | 'local';
 

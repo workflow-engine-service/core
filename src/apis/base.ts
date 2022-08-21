@@ -4,6 +4,7 @@ import { HttpStatusCode, LogMode, RequestMethodType, WorkflowNamespace } from ".
 import { CoreRequest } from "./request";
 import { DeployedWorkflowModel, WorkflowProcessModel } from "../models/models";
 import { errorLog } from "../common";
+import { ProcessHelper } from "./processHelper";
 export class BaseApi {
     request: CoreRequest;
     /*************************************** */
@@ -194,8 +195,7 @@ export class BaseApi {
     }
     /*************************************** */
     async findProcessById(id: string) {
-        let process = await Const.DB.models.processes.findById(id).populate('workflow');
-        return process;
+        return ProcessHelper.findProcessById(id);
     }
     /*************************************** */
     async getProcessCurrentState(processId: string): Promise<{ state: WorkflowState, process: WorkflowProcessModel } | [string, HttpStatusCode]> {
@@ -203,6 +203,9 @@ export class BaseApi {
             // =>find process by id
             let process = await this.findProcessById(processId);
             if (!process) return this.error404('not found such process');
+            if (!process.workflow) {
+                return this.error400('bad process');
+            }
             // =>find current state info
             let stateInfo = process.workflow.states.find(i => i.name === process.current_state);
             // =>check access state

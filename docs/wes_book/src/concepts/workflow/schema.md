@@ -88,8 +88,8 @@ message_required | boolean | NO | client must send a message or not |
 
 | name | type | required | Description |
 | ----------- | ----------- |----------- |----------- |
-| type | string | **YES** | job type can be "static" or "daily" or "weekly" or "hourly" or "minutely" or "afterTime" | 
-|times | [WorkflowStateJobTime](#workflowstatejobtime-schema)[] | **YES** | set times to execute job|
+| repeat | number | NO | default is 0 that unlimited to repeat job | 
+|times | [WorkflowStateJobTime](#workflowstatejobtime-schema) | **YES** | set times to execute job|
 |set_fields | object | NO | fields that can set hardcoded|
 |action_name|string|NO| action to be go. |
 
@@ -98,12 +98,11 @@ message_required | boolean | NO | client must send a message or not |
 
 | name | type | required | Description |
 | ----------- | ----------- |----------- |----------- |
-| timestamp | number | NO | just used for 'static' type |  
-| day | number | NO | used for 'afterTime' type | 
-| weekday | number | NO | used for 'weekly' and 'static' type (range 1..7) | 
-| hour | number | NO | used for 'afterTime' and 'daily' and 'weekly' and 'static' type (range 1..24) | 
-| minute | number | NO | used for 'afterTime' and 'hourly' and 'daily' and 'weekly'  and 'static' type | 
-| second | number | NO | used for 'afterTime' and 'minutely' and 'hourly' and 'daily' and 'weekly' and 'static' type | 
+| timestamp | number | NO | - |  
+| day | number | NO | day of month | 
+| hour | number | NO | range 1..24 | 
+| minute | number | NO | range 1..60 | 
+| second | number | NO | range 1..60 | 
 
 
 -----------

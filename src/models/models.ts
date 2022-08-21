@@ -1,5 +1,5 @@
 import { LogMode } from "../types";
-import { WorkflowField, WorkflowProcessField, WorkflowState, WorkflowProcessOnInit } from "../interfaces";
+import { WorkflowField, WorkflowProcessField, WorkflowState, WorkflowProcessOnInit, WorkflowProcessJob } from "../interfaces";
 
 export interface DeployedWorkflowModel {
     name: string;
@@ -34,6 +34,7 @@ export interface WorkflowProcessModel {
     field_values?: WorkflowProcessField[];
     history: WorkflowProcessHistoryModel[];
     workflow: DeployedWorkflowModel;
+    jobs?: WorkflowProcessJob[];
     created_at: number;
     created_by: number;
     updated_at: number;
@@ -86,11 +87,11 @@ export interface SessionModel {
 
 export interface WorkerModel<R = {}> {
     _id?: string;
+    type: 'state_action' | 'state_job' | 'process';
     /**
      * more is better
      * @default 1
      */
-    type: 'state_action';
     priority?: number;
     init_at?: number;
     started_at?: number;
