@@ -3,7 +3,8 @@ import * as bcrypt from 'bcrypt';
 import { UserModel } from "./models/models";
 import { Request } from "express";
 import { UserTokenResponse } from "./apis/public/interfaces";
-import { errorLog, generateString } from "./common";
+import { dbLog, errorLog, generateString } from "./common";
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 
 export namespace Auth {
     const tokenSign = '0x%wf';
@@ -100,7 +101,49 @@ export namespace Auth {
     }
     /********************************* */
     export async function getUserByApiToken(token: string): Promise<UserModel | 'expired' | 'invalid'> {
-        //TODO:
-        return 'invalid';
+        try {
+            if (!Const.CONFIGS.auth_user.url) return 'invalid';
+            let headers = {};
+            headers[Const.CONFIGS.auth_user.api_header_name] = token;
+            // =>call api
+            let res = await axios({
+                method: Const.CONFIGS.auth_user.method,
+                url: Const.CONFIGS.auth_user.url,
+                headers,
+                timeout: Const.CONFIGS.auth_user.api_timeout,
+            });
+            // console.log('ffff', res.status, token)
+            // =>if failed
+            if (!res || res.status > 299) {
+                return 'invalid';
+            }
+            // =>if success
+            let userIdentify = res.data;
+            if (userIdentify === undefined || typeof userIdentify !== 'string') {
+                dbLog({ name: 'bad__auth_api_res', namespace: 'auth', meta: { res: res.data } });
+                return 'invalid';
+            }
+            // =>find user by name or id
+            let user: UserModel;
+            if (typeof res.data === 'number') {
+                user = await Const.DB.models.users.findOne({
+                    id: res.data
+                });
+            } else {
+                user = await Const.DB.models.users.findOne({
+                    name: String(res.data)
+                });
+            }
+
+            // =>if not found user
+            if (!user) {
+                return 'invalid';
+            }
+
+            return user;
+        } catch (e) {
+            errorLog('err211111', e);
+            return 'invalid';
+        }
     }
 }

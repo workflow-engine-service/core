@@ -73,6 +73,8 @@ export class AdminPostApi extends BaseApi {
                     break;
                 }
             }
+        } else if (typeof userInfo.id !== 'number') {
+            return this.error400('user id must be number');
         }
         // =>check for duplicate user
         if (await Const.DB.models.users.findOne({

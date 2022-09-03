@@ -33,7 +33,9 @@ export namespace SampleHookServer {
             // =>listen on response
             let sub = responses.subscribe((it) => {
                 if (!it || it.method !== method || it.path !== path) return;
-                sub.unsubscribe();
+                try {
+                    sub.unsubscribe();
+                } catch (e) { }
                 it.res(res);
             });
         });

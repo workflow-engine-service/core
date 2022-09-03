@@ -88,7 +88,7 @@ describe('Workflow hook Actions', () => {
                 return done();
             });
     });
-    it('deploy sample workflow (includes jobs)', (done) => {
+    it('deploy sample workflow', (done) => {
         request.post('/api/v1/admin/workflow/deploy').send({
             code: sampleWorkflow,
         }).set(configs.auth_user.header_name, access_token).expect(200, done);
@@ -127,6 +127,7 @@ describe('Workflow hook Actions', () => {
             if (!it || it.method !== 'post' || it.path !== '/approve') return;
             sub.unsubscribe();
             // console.log('request:', it.req.body)
+            expect(it.req.body['required_fields'].length).toEqual(1);
             expect(it.req.body['process_id']).toEqual(sampleProcessId);
             expect(it.req.body.owner_id).toEqual(sampleProcessOwnerId);
             return done();

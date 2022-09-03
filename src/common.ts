@@ -76,6 +76,15 @@ export async function loadConfigs() {
         if (!Const.CONFIGS.auth_user.header_name) {
             Const.CONFIGS.auth_user.header_name = 'Authorization';
         }
+        if (!Const.CONFIGS.auth_user.api_header_name) {
+            Const.CONFIGS.auth_user.api_header_name = 'Authorization';
+        }
+        if (!Const.CONFIGS.auth_user.method) {
+            Const.CONFIGS.auth_user.method = 'get';
+        }
+        if (!Const.CONFIGS.auth_user.api_timeout) {
+            Const.CONFIGS.auth_user.api_timeout = 2000;
+        }
         if (!Const.CONFIGS.server.wiki_base_url) {
             Const.CONFIGS.server.wiki_base_url = '/wiki';
         }
@@ -283,7 +292,7 @@ export function makeAbsoluteUrl(url: string, baseUrl?: string) {
 }
 /***************************************** */
 
-export function clone<T=any>(obj: T): T {
+export function clone<T = any>(obj: T): T {
     return JSON.parse(JSON.stringify(obj));
 }
 /***************************************** */

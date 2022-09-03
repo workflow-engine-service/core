@@ -67,24 +67,29 @@ export interface ServerConfigs {
         /**
          * seconds
          */
-        lifetime: number;
+        lifetime?: number;
         /**
          * for api_based
          */
-        url: string;
+        url?: string;
         /**
          * for api_based
+         * @default get
          */
-        method: 'post' | 'get' | 'put';
+        method?: 'post' | 'get' | 'put';
         /**
          * for api_based
-         * @default: 'access_token'
+         * @default: 'Authorization'
          */
-        param_name?: string;
+        api_header_name?: string;
         /**
-         * @default: "authentication"
+         * @default: "Authorization"
          */
         header_name?: string,
+        /**
+         * @default 2000 (ms)
+         */
+        api_timeout?: number;
 
     }
 }

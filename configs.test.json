@@ -27,7 +27,6 @@
         "type": "dual",
         "lifetime": 86400,
         "url": "http://127.0.0.1/django/api/auth-token",
-        "method": "post",
         "param_name": "access_token",
         "header_name": "Auth"
     }

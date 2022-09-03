@@ -6,7 +6,6 @@
 [ ] complete to validate deployed workflow
 [ ] add jobs on states
 [ ] run state jobs as workers
-[ ] implement authenticate methods
 [ ] manage uploaded files
 
 # Testing Tasks
@@ -45,4 +44,5 @@
 [x] add pagination to apis
 [x] get user info by api
 [x] start api testing
+[x] implement authenticate methods
 
