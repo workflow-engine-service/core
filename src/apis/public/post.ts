@@ -69,6 +69,7 @@ export class PublicPostApi extends BaseApi {
                 created_at: new Date().getTime(),
                 created_by: this.request.user().id,
                 process_id: undefined,
+                user_id: this.request.user().id,
             });
 
             return new Promise((res) => {

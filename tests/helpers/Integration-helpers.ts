@@ -1,4 +1,4 @@
-import * as express from 'express';
+// import * as express from 'express';
 import { infoLog, loadConfigs } from '../../src/common';
 import * as fs from 'fs';
 import { Const } from '../../src/const';
@@ -59,5 +59,39 @@ export default class IntegrationHelpers {
         timekeeper.travel(DATE_TO_USE);
 
         return _Date;
+    }
+
+    sampleServer(port: number) {
+        const express = require('express');
+        const app = express();
+        app.use(express.urlencoded({ extended: true, }));
+        -
+            app.use(express.json());
+        -
+            //     app.post('/api/hook', (req, res) => {
+            //         console.log('request headers:', req.headers);
+            //         console.log('request body:', req.body);
+            //         let data = {
+            //             state_name: ''
+            //         };
+            //         if (req.body['state_name'] === 'enter_info') {
+            //             data.state_name = 'process_data';
+            //         } else {
+            //             data.state_name = 'finish';
+            //         }
+            //         console.log('response after 5s...');
+            //         setTimeout(() => {
+            //             res.json(data);
+            //         }, 5000);
+            //     });
+
+            // app.put('/api/event', (req, res) => {
+            //     // console.log('request event headers:', req.headers);
+            //     console.log('request event body:', req.body);
+            // });
+
+            app.listen(port);
+
+        return app;
     }
 }

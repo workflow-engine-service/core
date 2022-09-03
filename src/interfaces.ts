@@ -242,6 +242,10 @@ export interface WorkflowStateJobTime {
      */
     timestamp?: number;
     /**
+     * field name as number type
+     */
+    timestamp_field?: string;
+    /**
      * type: afterTime (day of month)
      */
     day?: number;
@@ -299,7 +303,8 @@ export interface WorkflowProcessResponse {
 
 export interface WorkflowBaseWorkerSendParameters {
     process_id: string;
-    user_id?: number;
+    user_id: number;
+    owner_id?: number;
     _process?: WorkflowProcessModel;
 }
 
@@ -468,11 +473,13 @@ export interface WorkflowStateEventSendParametersFields {
     fields?: object;
     name: WorkflowStateEventName;
     user_id?: number;
+    owner_id: number;
 }
 
 export interface WorkflowStateActionSendParameters extends WorkflowBaseWorkerSendParameters, WorkflowStateActionSendParametersFields {
     fields?: object;
     _action?: WorkflowStateAction;
+    owner_id: number;
 }
 
 export interface WorkerStruct<R = {}> extends WorkerModel<R> {

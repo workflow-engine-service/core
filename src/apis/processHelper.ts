@@ -112,6 +112,7 @@ export namespace ProcessHelper {
                         state_name: undefined,
                         response_message: error.message,
                     };
+                    dbLog({ namespace: 'action', name: 'error_on_hook_response', 'meta': { error: error.toJSON(), code: error.code } });
                 }).finally(() => {
                     if (!actionResponse.response_message) {
                         if (actionResponse._failed) {
@@ -148,6 +149,7 @@ export namespace ProcessHelper {
             process_id: params.process_id,
             fields: (await Const.DB.models.processes.findById(params.process_id)).field_values,
             user_id: params.user_id,
+            owner_id: params.owner_id,
         };
         switch (eventName) {
             case 'onLeave':

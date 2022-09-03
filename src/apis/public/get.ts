@@ -65,7 +65,7 @@ export class PublicGetApi extends BaseApi {
                 return res;
             }
             // =>check read process access
-            if (!this.checkUserRoleHasAccess(res.process.workflow.settings.read_access_roles, { process: res.process })) {
+            if (!this.checkUserRoleHasAccess(res.process.workflow?.settings?.read_access_roles, { process: res.process })) {
                 return this.error403('no access to process info');
             }
 
