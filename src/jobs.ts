@@ -1,5 +1,5 @@
 import { ProcessHelper } from "./apis/processHelper";
-import { dbLog, errorLog } from "./common";
+import { clone, dbLog, errorLog } from "./common";
 import { Const } from "./const";
 import { WorkflowEvents } from "./events";
 import { WorkflowActiveJob, WorkflowActiveJobSendParameters, WorkflowStateJob, WorkflowStateJobTime } from "./interfaces";
@@ -19,6 +19,7 @@ export namespace WorkflowJob {
                 let activeJobs: WorkflowActiveJob[] = [];
                 // =>normalize jobs
                 for (const job of jobs) {
+                    job.__job_state_name = it.current_state;
                     job['process_id'] = String(it._id);
                     activeJobs.push(job as any);
                 }
@@ -99,7 +100,8 @@ export namespace WorkflowJob {
     }
     /****************************** */
     export async function removeActiveJobsByStateName(stateName: string) {
-        //TODO:
+        let newActiveJobs = activeJobs.filter(i => i.__job_state_name !== stateName);
+        activeJobs = clone(newActiveJobs);
     }
     /****************************** */
     async function matchJobTime(job: WorkflowStateJob, startedAt: number): Promise<boolean> {

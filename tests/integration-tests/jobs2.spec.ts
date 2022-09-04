@@ -122,7 +122,7 @@ describe('Workflow Jobs (state-based)', () => {
                 expect(worker[0].response['next_state']).toEqual('end');
                 expect(worker[0].success).toEqual(true);
                 res(true);
-            }, 300);
+            }, 400);
         });
     });
 
@@ -130,6 +130,10 @@ describe('Workflow Jobs (state-based)', () => {
         let process = await Const.DB.models.processes.findById(sampleProcessId);
         expect(process).not.toBeUndefined();
         expect(process.current_state).toEqual('end');
+    });
 
+    it("check removed 'start' state jobs", async () => {
+        let activeJobs = WorkflowJob.getActiveJobs();
+        expect(activeJobs.filter(i => i.__job_state_name === 'start').length).toEqual(0);
     });
 });

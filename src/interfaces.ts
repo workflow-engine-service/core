@@ -330,7 +330,7 @@ export interface WorkflowProcessJob extends WorkflowStateJob {
 }
 
 export interface WorkflowActiveJob extends WorkflowStateJob {
-    state_name: string;
+    __job_state_name: string;
     process_id: string;
     started_at?: number;
     current_repeat?: number;
