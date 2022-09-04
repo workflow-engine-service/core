@@ -2,7 +2,7 @@
 
 <!-- ![logo](_media/icon.svg) -->
 
-# Workflow Engine Service <small>0.8</small>
+# Workflow Engine Service <small>0.9</small>
 
 > A nice and fast engine for your workflow projects
 

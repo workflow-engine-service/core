@@ -186,7 +186,7 @@ export namespace WebWorkers {
                             if (!processJob._id) {
                                 job._id = generateString(12);
                             }
-                            processJob.state_name = state.name;
+                            processJob.__job_state_name = state.name;
                             // =>add process job
                             processJobs.push(processJob);
                         }

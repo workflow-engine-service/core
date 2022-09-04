@@ -323,7 +323,10 @@ export interface WorkflowCreateProcessSendParameters extends WorkflowBaseWorkerS
 }
 
 export interface WorkflowProcessJob extends WorkflowStateJob {
-    state_name: string;
+    /**
+     * @private
+     */
+    __job_state_name: string;
 }
 
 export interface WorkflowActiveJob extends WorkflowStateJob {

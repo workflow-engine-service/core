@@ -15,7 +15,7 @@ export namespace WorkflowJob {
             try {
                 if (!it || !it.jobs) return;
                 // =>get current state jobs
-                let jobs = it.jobs.filter(i => i.state_name === it.current_state);
+                let jobs = it.jobs.filter(i => i.__job_state_name === it.current_state);
                 let activeJobs: WorkflowActiveJob[] = [];
                 // =>normalize jobs
                 for (const job of jobs) {

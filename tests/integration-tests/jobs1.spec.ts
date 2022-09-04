@@ -10,7 +10,7 @@ import { absUrl } from '../../src/common';
 import { WorkflowJob } from '../../src/jobs';
 import { Const } from '../../src/const';
 /********************************** */
-describe('Workflow Jobs', () => {
+describe('Workflow Jobs (action-based)', () => {
     let app: IntegrationHelpers;
     let configs: ServerConfigs;
     let access_token: string;
