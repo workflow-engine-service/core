@@ -74,6 +74,11 @@ export const publicApis: ApiRoute[] = [
                             default: 1,
                             required: false,
                         },
+                        owner_id: {
+                            type: "integer",
+                            description: 'just admin users allowed to set this property',
+                            required: false,
+                        },
                     },
                 }
             },

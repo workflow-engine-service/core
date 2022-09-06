@@ -1,11 +1,11 @@
 {
     "name": "workflow-engine-service",
     "version": "1.0.0",
-    "main": "build/index.js",
+    "main": "build/src/index.js",
     "scripts": {
         "build": "tsc -b tsconfig.json",
-        "start": "tsc -b tsconfig.json; node --trace-warnings build/index.js prod",
-        "dev": "concurrently \"tsc -b -w tsconfig.json\" \"nodemon --ext 'js' --ignore 'frontend' --ignore 'cli' --trace-warnings build/index.js dev\"",
+        "start": "tsc -b tsconfig.json; node --trace-warnings build/src/index.js prod",
+        "dev": "concurrently \"tsc -b -w tsconfig.json\" \"nodemon --ext 'js' --ignore 'frontend' --ignore 'cli' --trace-warnings build/src/index.js dev\"",
         "test": "clear;jest --coverage  --force-exit --runInBand",
         "test:watch": "jest --watch --detectOpenHandles"
     },

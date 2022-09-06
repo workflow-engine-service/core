@@ -49,7 +49,15 @@ export class PublicPostApi extends BaseApi {
             let name = this.param('name');
             let version = this.paramNumber('version');
             let workflow = await this.getDeployedWorkflow(name, version);
+            let ownerId = this.paramNumber('owner_id');
 
+            let createdByUserId = this.request.user().id;
+            if (ownerId && this.isAdmin()) {
+                // =>check exist such user
+                if (await Const.DB.models.users.findOne({ id: ownerId })) {
+                    createdByUserId = ownerId;
+                }
+            }
             // =>if not found workflow
             if (!workflow) return this.error404(`not found such workflow '${name}:${version}'`);
             // =>check access create from this workflow
@@ -67,7 +75,7 @@ export class PublicPostApi extends BaseApi {
                 jobs: [],
                 workflow: workflow,
                 created_at: new Date().getTime(),
-                created_by: this.request.user().id,
+                created_by: createdByUserId,
                 process_id: undefined,
                 user_id: this.request.user().id,
             });

@@ -191,6 +191,7 @@ export namespace Swagger {
             ],
             {
                 strictNullChecks: true,
+                skipLibCheck: true
             },
         );
 

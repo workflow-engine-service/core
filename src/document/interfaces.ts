@@ -52,6 +52,7 @@ export interface SwaggerApiParameter {
             [k: string]: {
                 type?: SwaggerDataType;
                 format?: SwaggerDataTypeFormat;
+                description?: string;
                 default?: any;
                 $ref?: string;
                 required?: boolean;
