@@ -1,4 +1,5 @@
 import { ProcessHelper } from "./apis/processHelper";
+import { WorkflowCalculatorClass } from "./calculator";
 import { clone, dbLog, errorLog } from "./common";
 import { Const } from "./const";
 import { WorkflowEvents } from "./events";
@@ -93,6 +94,21 @@ export namespace WorkflowJob {
                 activeJobs.find(i => i._id === job._id).started_at = new Date().getTime();
                 continue;
             }
+            // =>parse time (as calc)
+            if (Object.keys(job.time).find(i => typeof job.time[i] === 'object')) {
+                // =>find process
+                let process = await Const.DB.models.processes.findById(job.process_id);
+                let calc = new WorkflowCalculatorClass(process);
+                // =>convert calc fields
+                for (const key of Object.keys(job.time)) {
+                    if (typeof job.time[key] === 'object') {
+                        job.time[key] = await calc.calc(job.time[key]);
+                    }
+
+                }
+
+
+            }
             // =>Add job to active
             activeJobs.push(job);
             // console.log('add job:', job)
@@ -122,23 +138,23 @@ export namespace WorkflowJob {
         if (!job.time) return jobTimeDate;
         // =>if timestamp
         if (job.time.timestamp) {
-            return new Date(job.time.timestamp);
+            return new Date(job.time.timestamp as number);
         }
         // =>if day
         if (job.time.day) {
-            jobTimeDate.setDate(jobTimeDate.getDate() + job.time.day);
+            jobTimeDate.setDate(jobTimeDate.getDate() + (job.time.day as number));
         }
         // =>if hour
         if (job.time.hour) {
-            jobTimeDate.setHours(jobTimeDate.getHours() + job.time.hour);
+            jobTimeDate.setHours(jobTimeDate.getHours() + (job.time.hour as number));
         }
         // =>if minute
         if (job.time.minute) {
-            jobTimeDate.setMinutes(jobTimeDate.getMinutes() + job.time.minute);
+            jobTimeDate.setMinutes(jobTimeDate.getMinutes() + (job.time.minute as number));
         }
         // =>if second
         if (job.time.second) {
-            jobTimeDate.setSeconds(jobTimeDate.getSeconds() + job.time.second);
+            jobTimeDate.setSeconds(jobTimeDate.getSeconds() + (job.time.second as number));
         }
 
         return jobTimeDate;

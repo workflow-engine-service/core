@@ -245,15 +245,11 @@ export interface WorkflowStateJobTime {
     /**
      * type: static
      */
-    timestamp?: number;
-    /**
-     * field name as number type
-     */
-    timestamp_field?: string;
+    timestamp?: number | WorkflowCalculator;
     /**
      * type: afterTime (day of month)
      */
-    day?: number;
+    day?: number | WorkflowCalculator;
     // /**
     //  * type: weekly|monthly
     //  */
@@ -261,15 +257,49 @@ export interface WorkflowStateJobTime {
     /**
      * daily|weekly|monthly|afterTime|static
      */
-    hour?: number;
+    hour?: number | WorkflowCalculator;
     /**
      * type: daily|weekly|hourly|afterTime|monthly|static
      */
-    minute?: number;
+    minute?: number | WorkflowCalculator;
     /**
      * type: daily|weekly|hourly|afterTime|monthly|static|minutely 
      */
-    second?: number;
+    second?: number | WorkflowCalculator;
+}
+
+/**
+ * @example if (myfield > 5) return 'state3' else 'state4'
+ * { 
+ *  $if: {
+ *      $eq: [{$field: "myfield"}, {$const: 5}]
+ * },
+ * $then: {$const: "state3"},
+ * $else: {$const: "state4"}
+ *  }
+ * }
+ * @example return myfield*2
+ * {
+ *  $mul: [{$field: "myfield"}, {$const: 2}]
+ * }
+ */
+export interface WorkflowCalculator {
+    $field?: string;
+    // $return?: WorkflowCalculator;
+    $const?: string | number | boolean;
+    /**conditions */
+    $if?: WorkflowCalculator;
+    $then?: WorkflowCalculator;
+    $else?: WorkflowCalculator;
+    $or?: WorkflowCalculator[];
+    $and?: WorkflowCalculator[];
+    $eq?: [WorkflowCalculator, WorkflowCalculator];
+    $gt?: [WorkflowCalculator, WorkflowCalculator];
+    $lt?: [WorkflowCalculator, WorkflowCalculator];
+    /**functions */
+    $add?: WorkflowCalculator[];
+    $minus?: WorkflowCalculator[];
+    $mul?: WorkflowCalculator[];
 }
 export interface WorkflowStateJob {
     _id?: string;
@@ -389,7 +419,7 @@ export interface APIResponsePagination {
 }
 
 /**
- * @edition 20220821.1
+ * @edition 20220906.1
  */
 export interface WorkflowDescriptor {
     /**

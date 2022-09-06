@@ -123,7 +123,7 @@ describe('Workflow Jobs (action-based)', () => {
                 expect(worker.length).toEqual(1);
                 expect(worker[0].success).toEqual(true);
                 res(true);
-            }, 300);
+            }, 400);
         });
     });
 

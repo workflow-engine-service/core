@@ -10,7 +10,7 @@ import { absUrl } from '../../src/common';
 import { WorkflowJob } from '../../src/jobs';
 import { Const } from '../../src/const';
 /********************************** */
-describe('Workflow Jobs (state-based)', () => {
+describe('Workflow Jobs (with calc)', () => {
     let app: IntegrationHelpers;
     let configs: ServerConfigs;
     let access_token: string;
@@ -22,21 +22,42 @@ describe('Workflow Jobs (state-based)', () => {
         version: 1,
         start_state: 'start',
         end_state: 'end',
+        fields: [
+            {
+                name: 'myfield',
+                type: 'number',
+            }
+        ],
         states: [
             {
                 name: 'start',
                 actions: [
                     {
                         name: 'approve',
+                        required_fields: ['myfield'],
                         type: 'local',
-                        next_state: 'end',
-                    }
+                        next_state: 'middle',
+                    },
                 ],
+            },
+            {
+                name: 'middle',
+                actions: [],
                 jobs: [
                     {
-                        // after 20 min to run job
                         time: {
-                            minute: 20,
+                            minute: {
+                                $if: {
+                                    $gt: [
+                                        { $field: 'myfield' },
+                                        {
+                                            $const: 10
+                                        }
+                                    ]
+                                },
+                                $then: { $field: 'myfield' },
+                                $else: { $const: 10 }
+                            },
                         },
                         state_name: 'end'
                     }
@@ -57,13 +78,7 @@ describe('Workflow Jobs (state-based)', () => {
     afterAll(async () => {
         await app.clearDatabase();
     });
-    // beforeEach(() => {
-    //     jest.useFakeTimers()
-    // });
-    // afterEach(() => {
-    //     jest.runOnlyPendingTimers()
-    //     jest.useRealTimers()
-    // });
+
     it('login as admin user', (done) => {
         request
             .post('/api/v1/token')
@@ -96,16 +111,29 @@ describe('Workflow Jobs (state-based)', () => {
         });
     });
 
-    it("check add 'start' state jobs", async () => {
+    it("execute 'approve' action of 'start' state", (done) => {
+        request.post('/api/v1/workflow/short-action').send({
+            state_action: 'approve',
+            process_id: sampleProcessId,
+            fields: {
+                myfield: 20,
+            }
+        }).set(configs.auth_user.header_name, access_token).expect(200).end((err, res) => {
+            if (err) return done(err);
+            // let data = JSON.parse(res.text)['data'];
+            // console.log(data)
+            return done();
+        });
+    });
+    it("check job time calculated value", async () => {
         return new Promise((res) => {
             setTimeout(() => {
-                let activeJobs = WorkflowJob.getActiveJobs();
-                // console.log('active jobs:', activeJobs, sampleProcessId)
-                expect(activeJobs.length).toEqual(1);
-                expect(activeJobs[0].process_id).toEqual(sampleProcessId);
-                expect(activeJobs[0].state_name).toEqual('end');
+
+                let job = WorkflowJob.getActiveJobs().find(i => i.__job_state_name === 'middle');
+                // console.log('active jobs:', WorkflowJob.getActiveJobs())
+                expect(job?.time?.minute).toEqual(20);
                 res(true);
-            }, 100);
+            }, 200);
         });
     });
     it("check execute 'approve' action after 20 minutes", async () => {
@@ -122,11 +150,12 @@ describe('Workflow Jobs (state-based)', () => {
                 expect(worker[0].response['next_state']).toEqual('end');
                 expect(worker[0].success).toEqual(true);
                 res(true);
-            }, 400);
+            }, 600);
         });
     });
 
     it("check go to 'end' state", async () => {
+
         let process = await Const.DB.models.processes.findById(sampleProcessId);
         expect(process).not.toBeUndefined();
         expect(process.current_state).toEqual('end');

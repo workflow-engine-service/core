@@ -1,4 +1,4 @@
-# Schema details (20220821.1 edition)
+# Schema details (20220906.1 edition)
 
 ## main schema
 
@@ -100,11 +100,35 @@ message_required | boolean | NO | client must send a message or not |
 
 | name | type | required | Description |
 | ----------- | ----------- |----------- |----------- |
-| timestamp | number | NO | - |  
-| day | number | NO | day of month | 
-| hour | number | NO | range 1..24 | 
-| minute | number | NO | range 1..60 | 
-| second | number | NO | range 1..60 | 
+| timestamp | number or [WorkflowCalculator](#workflowcalculator-schema) [^6] | NO | - |  
+| day | number or WorkflowCalculator [^6] | NO | day of month | 
+| hour | number or WorkflowCalculator [^6] | NO | range 1..24 | 
+| minute | number or WorkflowCalculator [^6] | NO | range 1..60 | 
+| second | number or WorkflowCalculator [^6] | NO | range 1..60 | 
+
+## WorkflowCalculator schema 
+
+created in 20220906.1 [^6]. for more information, read [here](../calculator.md)
+
+
+| name | type | required | Description |
+| ----------- | ----------- |----------- |----------- |
+| $field | string | NO | - |  
+| $const | number or string or boolean | NO | a constant value like 3 or 'hello' | 
+| $if | WorkflowCalculator  | NO | - | 
+| $then | WorkflowCalculator  | NO | comes after `$if` |
+| $else | WorkflowCalculator  | NO | comes after `$if` |
+| $or | WorkflowCalculator[]  | NO |used in `$if` |
+| $and | WorkflowCalculator[]  | NO |used in `$if` |
+| $eq | WorkflowCalculator[2] | NO | (equals) used in `$if` |
+| $gt | WorkflowCalculator[2] | NO | (greater than) used in `$if` |
+| $lt | WorkflowCalculator[2] | NO | (less than) used in `$if` |
+| $add | WorkflowCalculator[] | NO | add some number values |
+| $minus | WorkflowCalculator[] | NO | minus some number values |
+| $mul | WorkflowCalculator[] | NO | multiply some number values |
+
+
+
 
 
 ## Reference
@@ -118,4 +142,6 @@ message_required | boolean | NO | client must send a message or not |
 [^4]: added in 20220814.1
 
 [^5]: added in 20220821.1
+
+[^6]: added in 20220906.1
 

@@ -13,6 +13,7 @@
     - [State Job](/concepts/state_job.md)
     - [State Action](/concepts/state_action/state_action.md)
         - [Action Response](/concepts/state_action/action_response.md)
+    - [Calculator](/concepts/calculator.md)
 - [Command Line Tool](/cli/cli.md)
     - [new](/cli/new_command.md)
     - [install](/cli/install_command.md)
