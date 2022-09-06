@@ -4,3 +4,5 @@ build
 logs
 mongo
 Dockerfile
+jest.config.ts
+tests
