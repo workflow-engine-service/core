@@ -4,17 +4,17 @@
 [ ] check for end state
 [ ] enable multi threading for workers
 [ ] complete to validate deployed workflow
-[ ] add jobs on states
 [ ] run state jobs as workers
 [ ] manage uploaded files
+[ ] apply priority of workers
+[ ] auto start processes
+
 
 # Testing Tasks
 [ ] not create new worker for an action when exist and running
 [ ] add headers to event requests
-[ ] add `owner_id` to action request
-[ ] add _owner_ role
-[ ] add base_url to hook types (action, event)
-[ ] support state jobs
+[ ] get filtered process list
+[ ] return process history
 
 # DONE Tasks
 [x] init workflow core
@@ -45,4 +45,9 @@
 [x] get user info by api
 [x] start api testing
 [x] implement authenticate methods
+[x] support state jobs
+[x] add jobs on states
+[x] add _owner_ role
+[x] add `owner_id` to action request
+[x] add base_url to hook types (action, event)
 

@@ -78,39 +78,11 @@ export class PublicGetApi extends BaseApi {
     }
     /******************************* */
     async getProcessList() {
-        // =>get params
-        let filter_finished_processes = this.paramBoolean('filter_finished_processes', false);
-
-        try {
-            // =>iterate all processes
-            let processIds = await Const.DB.models.processes.find({}, { _id: true });
-            if (!processIds) return this.response([]);
-            let processes: WorkflowProcessModel[] = [];
-            for (const pid of processIds) {
-                let processId = pid._id;
-                let res = await this.getProcessCurrentState(processId);
-                // =>if raise error
-                if (Array.isArray(res)) {
-                    continue;
-                }
-                // =>check read process access
-                if (!this.checkUserRoleHasAccess(res.process.workflow.settings.read_access_roles, { process: res.process })) {
-                    continue;
-                }
-                // =>if filter end processes
-                if (filter_finished_processes && res.process.current_state === res.process.workflow.end_state) {
-                    continue;
-                }
-                // =>truncate data
-                processes.push(this.truncateProcessInfo(res.process));
-
-            }
-
-            return this.paginateResponse(processes);
-        } catch (e) {
-            errorLog('err32423', e);
-            return this.error400();
-        }
+        return await this.getProcessListByFilters({
+            filter_finished_processes: this.paramBoolean('filter_finished_processes', false),
+            workflows: [],
+            processes: [],
+        });
     }
 
     /******************************* */
@@ -228,14 +200,26 @@ export class PublicGetApi extends BaseApi {
         return this.response(this.request.user());
     }
     /******************************* */
-    /******************************* */
-    /******************************* */
-    truncateProcessInfo(process: WorkflowProcessModel) {
-        // =>check if admin
-        if (this.isAdmin()) return process;
-        process.workflow = undefined;
-        process.field_values = undefined;
-        process.history = undefined;
-        return process;
+    async getProcessStateHistory() {
+        try {
+            // =>get params
+            let processId = this.param
+                ('process_id');
+            // =>get process and state info
+            let res = await this.getProcessCurrentState(processId);
+            // =>if raise error
+            if (Array.isArray(res)) {
+                return res;
+            }
+
+            return this.response(res.process.history);
+        } catch (e) {
+            errorLog('err3256228', e);
+            return this.error400();
+        }
     }
+    /******************************* */
+    /******************************* */
+    /******************************* */
+
 }

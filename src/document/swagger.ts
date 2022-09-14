@@ -15,7 +15,7 @@ export namespace Swagger {
             description: 'these apis just call by admin users',
         },
         workflow: {
-            description: 'all Apis about workflow engine',
+            description: 'all Apis about workflow schema and workflow processes',
         },
         user: {
             description: 'all Apis about users (normal, admin)',

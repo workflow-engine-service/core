@@ -87,11 +87,11 @@ export const publicApis: ApiRoute[] = [
             '200': {
                 description: 'success to create new process from a workflow and return process info (includes process id)',
                 schema: {
-                    $ref: "#/definitions/WorkflowProcessModel"
+                    $ref: "#/definitions/WorkflowProcessTruncateInfo"
                 }
             }
         },
-        usedDefinitions: ['WorkflowProcessModel'],
+        usedDefinitions: ['WorkflowProcessTruncateInfo'],
     },
     {
         method: 'POST',
@@ -225,7 +225,7 @@ export const publicApis: ApiRoute[] = [
         parameters: [
             {
                 name: 'id',
-                in: 'body',
+                in: 'query',
                 required: true,
                 type: 'string',
             },
@@ -262,14 +262,14 @@ export const publicApis: ApiRoute[] = [
             '200': {
                 description: 'return process info',
                 schema: {
-                    $ref: "#/definitions/WorkflowProcessModel"
+                    $ref: "#/definitions/WorkflowProcessTruncateInfo"
                 }
             },
             '404': {
                 description: 'not found such process with this process id'
             }
         },
-        usedDefinitions: ['WorkflowProcessModel'],
+        usedDefinitions: ['WorkflowProcessTruncateInfo'],
     },
     {
         method: 'GET',
@@ -292,13 +292,12 @@ export const publicApis: ApiRoute[] = [
                 schema: {
                     type: 'array',
                     items: {
-                        $ref: "#/definitions/WorkflowProcessModel"
-
+                        $ref: "#/definitions/WorkflowProcessTruncateInfo"
                     }
                 }
             },
         },
-        usedDefinitions: ['WorkflowProcessModel'],
+        usedDefinitions: ['WorkflowProcessTruncateInfo'],
     },
     {
         method: 'GET',
@@ -410,5 +409,79 @@ export const publicApis: ApiRoute[] = [
             },
         },
         usedDefinitions: ['UserModel'],
+    },
+    {
+        method: 'POST',
+        path: 'workflow/filter',
+        functionName: 'getProcessList',
+        tags: ['workflow'],
+        des: 'get list of workflow processes by filter for this user',
+        parameters: [
+            {
+                name: 'request',
+                in: 'body',
+                schema: {
+                    type: 'object',
+                    properties: {
+                        workflows: {
+                            type: 'array',
+                            format: 'string',
+                            description: `filter by workflow names like 'workflow_sample1'`,
+                            default: []
+                        },
+                        processes: {
+                            type: 'array',
+                            format: 'string',
+                            description: `filter by process ids`,
+                            default: [],
+                        },
+                        filter_finished_processes: {
+                            type: 'boolean',
+                            default: false,
+                        },
+                    }
+                }
+            }
+
+        ],
+        responses: {
+            '200': {
+                description: 'return process list',
+                schema: {
+                    type: 'array',
+                    items: {
+                        $ref: "#/definitions/WorkflowProcessTruncateInfo"
+
+                    }
+                }
+            },
+        },
+    },
+    {
+        method: 'GET',
+        path: 'workflow/history',
+        functionName: 'getProcessStateHistory',
+        tags: ['workflow'],
+        des: 'return history of process',
+        parameters: [
+            {
+                name: 'process_id',
+                in: 'query',
+                type: 'string',
+                required: true,
+            },
+        ],
+        responses: {
+            '200': {
+                description: 'return process history',
+                schema: {
+                    type: 'array',
+                    items: {
+                        $ref: "#/definitions/WorkflowProcessHistoryModel"
+                    }
+                }
+            },
+        },
+        usedDefinitions: ['WorkflowProcessHistoryModel']
     },
 ];

@@ -547,3 +547,7 @@ export interface WorkflowDeployedInfo {
     deployed_at: number;
     deployed_by: number;
 }
+
+export interface WorkflowProcessTruncateInfo extends Omit<WorkflowProcessModel, 'workflow' | 'field_values' | 'history' | 'jobs'> {
+
+}

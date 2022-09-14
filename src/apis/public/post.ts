@@ -85,7 +85,7 @@ export class PublicPostApi extends BaseApi {
                 let processCreateEvent = WorkflowEvents.ProcessCreate$.subscribe(it => {
                     // =>if this  worker
                     if (it.worker_id !== workerId) return;
-                    res(this.response(it.process));
+                    res(this.response(this.truncateProcessInfo(it.process)));
                     processCreateEvent.unsubscribe();
                 });
             });
@@ -126,6 +126,10 @@ export class PublicPostApi extends BaseApi {
         let fields = this.allFormDataParams('both');
         // =>do action
         return await this.abstractDoAction(processId, stateActionName, userMessage, fields);
+
+    }
+    /********************************** */
+    async getProcessList() {
 
     }
     /********************************** */

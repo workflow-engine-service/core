@@ -5,6 +5,7 @@ import { CoreRequest } from "./request";
 import { DeployedWorkflowModel, WorkflowProcessModel } from "../models/models";
 import { errorLog } from "../common";
 import { ProcessHelper } from "./processHelper";
+import { FilterQuery } from "mongoose";
 export class BaseApi {
     request: CoreRequest;
     /*************************************** */
@@ -198,7 +199,7 @@ export class BaseApi {
         return ProcessHelper.findProcessById(id);
     }
     /*************************************** */
-    async getProcessCurrentState(processId: string): Promise<{ state: WorkflowState, process: WorkflowProcessModel } | [string, HttpStatusCode]> {
+    async getProcessCurrentState(processId: string, stateName?: string): Promise<{ state: WorkflowState, process: WorkflowProcessModel } | [string, HttpStatusCode]> {
         try {
             // =>find process by id
             let process = await this.findProcessById(processId);
@@ -206,8 +207,12 @@ export class BaseApi {
             if (!process.workflow) {
                 return this.error400('bad process');
             }
+            // =>check read or write access on process
+            if (!this.checkUserRoleHasAccess(process.workflow?.settings?.read_access_roles, { process }) && !this.checkUserRoleHasAccess(process.workflow?.settings?.create_access_roles, { process })) {
+                return this.error403('no access to process info');
+            }
             // =>find current state info
-            let stateInfo = process.workflow.states.find(i => i.name === process.current_state);
+            let stateInfo = process.workflow.states.find(i => i.name === stateName ? stateName : process.current_state);
             // =>check access state
             if (!this.checkUserRoleHasAccess(stateInfo.access_role)) {
                 return this.error403('no access to state info');
@@ -245,5 +250,59 @@ export class BaseApi {
         }
 
         return workflow;
+    }
+    /*************************************** */
+    async getProcessListByFilters(filters: {
+        filter_finished_processes: boolean;
+        workflows: string[];
+        processes: string[];
+    }) {
+        try {
+            let dbFilters: FilterQuery<WorkflowProcessModel> = {};
+            if (filters.processes && filters.processes.length > 0) {
+                dbFilters._id['$in'] = filters.processes;
+            }
+            if (filters.workflows && filters.workflows.length > 0) {
+                dbFilters.workflow_name['$in'] = filters.workflows;
+            }
+            // =>iterate all processes
+            let processIds = await Const.DB.models.processes.find(dbFilters, { _id: true });
+            if (!processIds) return this.response([]);
+            let processes: WorkflowProcessModel[] = [];
+            for (const pid of processIds) {
+                let processId = pid._id;
+                let res = await this.getProcessCurrentState(processId);
+                // =>if raise error
+                if (Array.isArray(res)) {
+                    continue;
+                }
+                // =>check read process access
+                if (!this.checkUserRoleHasAccess(res.process.workflow.settings.read_access_roles, { process: res.process })) {
+                    continue;
+                }
+                // =>if filter end processes
+                if (filters.filter_finished_processes && res.process.current_state === res.process.workflow.end_state) {
+                    continue;
+                }
+                // =>truncate data
+                processes.push(this.truncateProcessInfo(res.process));
+
+            }
+
+            return this.paginateResponse(processes);
+        } catch (e) {
+            errorLog('err32423', e);
+            return this.error400();
+        }
+    }
+
+    truncateProcessInfo(process: WorkflowProcessModel) {
+        // =>check if admin
+        if (this.isAdmin()) return process;
+        process.workflow = undefined;
+        process.field_values = undefined;
+        process.history = undefined;
+        process.jobs = undefined;
+        return process;
     }
 }
