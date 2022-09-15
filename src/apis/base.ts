@@ -168,10 +168,20 @@ export class BaseApi {
         return params;
     }
     /*************************************** */
+    checkProcessReadAccess(process: WorkflowProcessModel) {
+        // =>check owner access
+        if (this.checkUserRoleHasAccess([Const.RESERVED_ACCESS_ROLES.OWNER_ACCESS], { process })) return true;
+        // =>check read process access
+        if (process.workflow?.settings?.read_access_roles && this.checkUserRoleHasAccess(process.workflow?.settings?.read_access_roles, { process })) return true;
+        // =>check create process access
+        if (process.workflow?.settings?.create_access_roles && this.checkUserRoleHasAccess(process.workflow?.settings?.create_access_roles, { process })) return true;
+
+        return false;
+    }
     /*************************************** */
     /*************************************** */
     checkUserRoleHasAccess(roles: string[], options: {
-        process?: WorkflowProcessModel
+        process?: WorkflowProcessModel,
     } = {}) {
         if (!roles) {
             roles = [Const.RESERVED_ACCESS_ROLES.ALL_ACCESS];
@@ -199,7 +209,7 @@ export class BaseApi {
         return ProcessHelper.findProcessById(id);
     }
     /*************************************** */
-    async getProcessCurrentState(processId: string, stateName?: string): Promise<{ state: WorkflowState, process: WorkflowProcessModel } | [string, HttpStatusCode]> {
+    async getProcess(processId: string): Promise<{ process: WorkflowProcessModel } | [string, HttpStatusCode]> {
         try {
             // =>find process by id
             let process = await this.findProcessById(processId);
@@ -211,6 +221,21 @@ export class BaseApi {
             if (!this.checkUserRoleHasAccess(process.workflow?.settings?.read_access_roles, { process }) && !this.checkUserRoleHasAccess(process.workflow?.settings?.create_access_roles, { process })) {
                 return this.error403('no access to process info');
             }
+            return { process };
+        } catch (e) {
+            errorLog('err23523575', e);
+            return this.error400('bad process');
+        }
+    }
+    /*************************************** */
+    async getProcessCurrentState(processId: string, stateName?: string): Promise<{ state: WorkflowState, process: WorkflowProcessModel } | [string, HttpStatusCode]> {
+        try {
+            let processSt = await this.getProcess(processId);
+            // =>if error
+            if (Array.isArray(processSt)) {
+                return processSt;
+            }
+            let process = processSt.process;
             // =>find current state info
             let stateInfo = process.workflow.states.find(i => i.name === stateName ? stateName : process.current_state);
             // =>check access state
@@ -260,9 +285,11 @@ export class BaseApi {
         try {
             let dbFilters: FilterQuery<WorkflowProcessModel> = {};
             if (filters.processes && filters.processes.length > 0) {
+                dbFilters._id = {};
                 dbFilters._id['$in'] = filters.processes;
             }
             if (filters.workflows && filters.workflows.length > 0) {
+                dbFilters.workflow_name = {};
                 dbFilters.workflow_name['$in'] = filters.workflows;
             }
             // =>iterate all processes
@@ -277,7 +304,7 @@ export class BaseApi {
                     continue;
                 }
                 // =>check read process access
-                if (!this.checkUserRoleHasAccess(res.process.workflow.settings.read_access_roles, { process: res.process })) {
+                if (!this.checkUserRoleHasAccess(res.process.workflow?.settings?.read_access_roles, { process: res.process })) {
                     continue;
                 }
                 // =>if filter end processes
@@ -296,9 +323,9 @@ export class BaseApi {
         }
     }
 
-    truncateProcessInfo(process: WorkflowProcessModel) {
+    truncateProcessInfo(process: WorkflowProcessModel, fullIsAdmin = false) {
         // =>check if admin
-        if (this.isAdmin()) return process;
+        if (fullIsAdmin && this.isAdmin()) return process;
         process.workflow = undefined;
         process.field_values = undefined;
         process.history = undefined;

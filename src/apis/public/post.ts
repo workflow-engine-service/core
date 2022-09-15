@@ -130,7 +130,11 @@ export class PublicPostApi extends BaseApi {
     }
     /********************************** */
     async getProcessList() {
-
+        return await this.getProcessListByFilters({
+            filter_finished_processes: this.paramBoolean('filter_finished_processes', false),
+            workflows: this.param('workflows', [], true),
+            processes: this.param('processes', [], true),
+        });
     }
     /********************************** */
     /********************************** */

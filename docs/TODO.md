@@ -13,8 +13,8 @@
 # Testing Tasks
 [ ] not create new worker for an action when exist and running
 [ ] add headers to event requests
-[ ] get filtered process list
 [ ] return process history
+[ ] return process fields
 
 # DONE Tasks
 [x] init workflow core
@@ -50,4 +50,4 @@
 [x] add _owner_ role
 [x] add `owner_id` to action request
 [x] add base_url to hook types (action, event)
-
+[x] get filtered process list

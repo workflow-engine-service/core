@@ -460,7 +460,7 @@ export const publicApis: ApiRoute[] = [
     {
         method: 'GET',
         path: 'workflow/history',
-        functionName: 'getProcessStateHistory',
+        functionName: 'getProcessHistory',
         tags: ['workflow'],
         des: 'return history of process',
         parameters: [
@@ -483,5 +483,32 @@ export const publicApis: ApiRoute[] = [
             },
         },
         usedDefinitions: ['WorkflowProcessHistoryModel']
+    },
+    {
+        method: 'GET',
+        path: 'workflow/process-fields',
+        functionName: 'getProcessFields',
+        tags: ['workflow'],
+        des: 'return field values of process for owner or user access to the process',
+        parameters: [
+            {
+                name: 'process_id',
+                in: 'query',
+                type: 'string',
+                required: true,
+            },
+        ],
+        responses: {
+            '200': {
+                description: 'return process history',
+                schema: {
+                    type: 'array',
+                    items: {
+                        $ref: "#/definitions/WorkflowProcessField"
+                    }
+                }
+            },
+        },
+        usedDefinitions: ['WorkflowProcessField']
     },
 ];

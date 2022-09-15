@@ -200,13 +200,13 @@ export class PublicGetApi extends BaseApi {
         return this.response(this.request.user());
     }
     /******************************* */
-    async getProcessStateHistory() {
+    async getProcessHistory() {
         try {
             // =>get params
             let processId = this.param
                 ('process_id');
             // =>get process and state info
-            let res = await this.getProcessCurrentState(processId);
+            let res = await this.getProcess(processId);
             // =>if raise error
             if (Array.isArray(res)) {
                 return res;
@@ -215,6 +215,28 @@ export class PublicGetApi extends BaseApi {
             return this.response(res.process.history);
         } catch (e) {
             errorLog('err3256228', e);
+            return this.error400();
+        }
+    }
+    /******************************* */
+    async getProcessFields() {
+        try {
+            // =>get params
+            let processId = this.param
+                ('process_id');
+            // =>get process and state info
+            let res = await this.getProcess(processId);
+            // =>if raise error
+            if (Array.isArray(res)) {
+                return res;
+            }
+            // =>check access access to process
+            if (!this.checkProcessReadAccess(res.process)) {
+                return this.error403('not allowed to read process fields');
+            }
+            return this.response(res.process.field_values);
+        } catch (e) {
+            errorLog('err3252248', e);
             return this.error400();
         }
     }
