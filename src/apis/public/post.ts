@@ -80,12 +80,13 @@ export class PublicPostApi extends BaseApi {
                 user_id: this.request.user().id,
             });
 
-            return new Promise((res) => {
+            return new Promise((resolve) => {
                 // =>listen on process create event
                 let processCreateEvent = WorkflowEvents.ProcessCreate$.subscribe(it => {
                     // =>if this  worker
                     if (it.worker_id !== workerId) return;
-                    res(this.response(this.truncateProcessInfo(it.process)));
+                    let newProcess = this.truncateProcessInfo(it.process);
+                    resolve(this.response(newProcess));
                     processCreateEvent.unsubscribe();
                 });
             });

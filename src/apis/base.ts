@@ -3,7 +3,7 @@ import { APIResponse, APIResponsePagination, WorkflowState } from "../interfaces
 import { HttpStatusCode, LogMode, RequestMethodType, WorkflowNamespace } from "../types";
 import { CoreRequest } from "./request";
 import { DeployedWorkflowModel, WorkflowProcessModel } from "../models/models";
-import { errorLog } from "../common";
+import { clone, errorLog } from "../common";
 import { ProcessHelper } from "./processHelper";
 import { FilterQuery } from "mongoose";
 export class BaseApi {
@@ -324,12 +324,13 @@ export class BaseApi {
     }
 
     truncateProcessInfo(process: WorkflowProcessModel, fullIsAdmin = false) {
+        let newProcess = clone(process);
         // =>check if admin
-        if (fullIsAdmin && this.isAdmin()) return process;
-        process.workflow = undefined;
-        process.field_values = undefined;
-        process.history = undefined;
-        process.jobs = undefined;
-        return process;
+        if (fullIsAdmin && this.isAdmin()) return newProcess;
+        newProcess.workflow = undefined;
+        newProcess.field_values = undefined;
+        newProcess.history = undefined;
+        newProcess.jobs = undefined;
+        return newProcess;
     }
 }

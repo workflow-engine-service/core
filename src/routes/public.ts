@@ -459,7 +459,7 @@ export const publicApis: ApiRoute[] = [
     },
     {
         method: 'GET',
-        path: 'workflow/history',
+        path: 'workflow/process-history',
         functionName: 'getProcessHistory',
         tags: ['workflow'],
         des: 'return history of process',

@@ -14,7 +14,6 @@
 [ ] not create new worker for an action when exist and running
 [ ] add headers to event requests
 [ ] return process history
-[ ] return process fields
 
 # DONE Tasks
 [x] init workflow core
@@ -51,3 +50,4 @@
 [x] add `owner_id` to action request
 [x] add base_url to hook types (action, event)
 [x] get filtered process list
+[x] return process fields

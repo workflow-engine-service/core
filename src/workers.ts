@@ -194,6 +194,7 @@ export namespace WebWorkers {
                     params.jobs = processJobs;
                     // =>create new process
                     let res = await Const.DB.models.processes.create(params);
+                    res.workflow = params.workflow;
                     responseFromProcess = {
                         process: res,
                     };
