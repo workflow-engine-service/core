@@ -5,6 +5,7 @@ import { Request } from "express";
 import { UserTokenResponse } from "./apis/public/interfaces";
 import { dbLog, errorLog, generateString } from "./common";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
+import * as https from 'https';
 
 export namespace Auth {
     const tokenSign = '0x%wf';
@@ -107,6 +108,7 @@ export namespace Auth {
             headers[Const.CONFIGS.auth_user.api_header_name] = token;
             // =>call api
             let res = await axios({
+                httpsAgent: new https.Agent({ rejectUnauthorized: false }),
                 method: Const.CONFIGS.auth_user.method,
                 url: Const.CONFIGS.auth_user.url,
                 headers,
@@ -119,7 +121,7 @@ export namespace Auth {
             }
             // =>if success
             let userIdentify = res.data;
-            if (userIdentify === undefined || typeof userIdentify !== 'string') {
+            if (userIdentify === undefined || (typeof userIdentify !== 'string' && typeof userIdentify !== 'number')) {
                 dbLog({ name: 'bad__auth_api_res', namespace: 'auth', meta: { res: res.data } });
                 return 'invalid';
             }

@@ -1,5 +1,5 @@
 import { Const } from "../const";
-import { APIResponse, APIResponsePagination, WorkflowState } from "../interfaces";
+import { APIResponse, APIResponsePagination, WorkflowProcessField, WorkflowState } from "../interfaces";
 import { HttpStatusCode, LogMode, RequestMethodType, WorkflowNamespace } from "../types";
 import { CoreRequest } from "./request";
 import { DeployedWorkflowModel, WorkflowProcessModel } from "../models/models";
@@ -281,6 +281,7 @@ export class BaseApi {
         filter_finished_processes: boolean;
         workflows: string[];
         processes: string[];
+        with_fields?: boolean;
     }) {
         try {
             let dbFilters: FilterQuery<WorkflowProcessModel> = {};
@@ -312,7 +313,17 @@ export class BaseApi {
                     continue;
                 }
                 // =>truncate data
-                processes.push(this.truncateProcessInfo(res.process));
+                let truncateData = this.truncateProcessInfo(res.process);
+                // =>check for set fields
+                if (filters.with_fields) {
+                    let fields = await this.abstractProcessFields(res.process);
+                    // =>if raise error
+                    if (fields[0]) {
+                        res.process.field_values = fields[1] as WorkflowProcessField[];
+                    }
+                }
+
+                processes.push(truncateData);
 
             }
 
@@ -332,5 +343,13 @@ export class BaseApi {
         newProcess.history = undefined;
         newProcess.jobs = undefined;
         return newProcess;
+    }
+
+    async abstractProcessFields(process: WorkflowProcessModel) {
+        // =>check access access to process
+        if (!this.checkProcessReadAccess(process)) {
+            return [false, this.error403('not allowed to read process fields')];
+        }
+        return [true, process.field_values];
     }
 }

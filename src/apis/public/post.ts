@@ -135,6 +135,7 @@ export class PublicPostApi extends BaseApi {
             filter_finished_processes: this.paramBoolean('filter_finished_processes', false),
             workflows: this.param('workflows', [], true),
             processes: this.param('processes', [], true),
+            with_fields: this.paramBoolean('with_fields', false),
         });
     }
     /********************************** */

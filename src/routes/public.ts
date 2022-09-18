@@ -439,6 +439,11 @@ export const publicApis: ApiRoute[] = [
                             type: 'boolean',
                             default: false,
                         },
+                        with_fields: {
+                            type: 'boolean',
+                            default: false,
+                            description: 'return also fields of processes'
+                        },
                     }
                 }
             }

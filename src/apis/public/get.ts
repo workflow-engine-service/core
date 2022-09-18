@@ -230,11 +230,12 @@ export class PublicGetApi extends BaseApi {
             if (Array.isArray(res)) {
                 return res;
             }
-            // =>check access access to process
-            if (!this.checkProcessReadAccess(res.process)) {
-                return this.error403('not allowed to read process fields');
+            let fields = await this.abstractProcessFields(res.process);
+            // =>if raise error
+            if (!fields[0]) {
+                return fields[1];
             }
-            return this.response(res.process.field_values);
+            return this.response(fields[1]);
         } catch (e) {
             errorLog('err3252248', e);
             return this.error400();
