@@ -7,6 +7,7 @@ import { errorLog, debugLog, applyAliasConfig, dbLog, makeAbsoluteUrl } from "..
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { WorkflowEvents } from "../events";
 import { WebWorkers } from "../workers";
+import * as https from 'https';
 
 export namespace ProcessHelper {
     export async function doActionWithLocal(params: WorkflowStateActionSendParameters): Promise<WorkflowStateActionResponse> {
@@ -85,6 +86,7 @@ export namespace ProcessHelper {
                 headers,
                 data: await getWorkflowStateActionSendParameters(params),
                 timeout: Const.CONFIGS.server.worker_timeout * 1000,
+                httpsAgent: new https.Agent({ rejectUnauthorized: false }),
             };
             if (params._action.method === 'get') {
                 configs.params = await getWorkflowStateActionSendParameters(params);
@@ -251,6 +253,7 @@ export namespace ProcessHelper {
                 url: makeAbsoluteUrl(event.url, event.base_url),
                 headers,
                 data,
+                httpsAgent: new https.Agent({ rejectUnauthorized: false }),
             };
             if (event.method === 'get') {
                 configs.params = data;
