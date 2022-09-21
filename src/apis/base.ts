@@ -282,6 +282,7 @@ export class BaseApi {
         workflows: string[];
         processes: string[];
         with_fields?: boolean;
+        state?: string;
     }) {
         try {
             let dbFilters: FilterQuery<WorkflowProcessModel> = {};
@@ -292,6 +293,9 @@ export class BaseApi {
             if (filters.workflows && filters.workflows.length > 0) {
                 dbFilters.workflow_name = {};
                 dbFilters.workflow_name['$in'] = filters.workflows;
+            }
+            if (filters.state) {
+                dbFilters.current_state = filters.state;
             }
             // =>iterate all processes
             let processIds = await Const.DB.models.processes.find(dbFilters, { _id: true });
@@ -319,7 +323,7 @@ export class BaseApi {
                     let fields = await this.abstractProcessFields(res.process);
                     // =>if raise error
                     if (fields[0]) {
-                        res.process.field_values = fields[1] as WorkflowProcessField[];
+                        truncateData.field_values = fields[1] as WorkflowProcessField[];
                     }
                 }
 

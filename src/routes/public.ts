@@ -439,6 +439,11 @@ export const publicApis: ApiRoute[] = [
                             type: 'boolean',
                             default: false,
                         },
+                        state: {
+                            type: 'string',
+                            default: undefined,
+                            description: 'filter processes with specific state'
+                        },
                         with_fields: {
                             type: 'boolean',
                             default: false,
