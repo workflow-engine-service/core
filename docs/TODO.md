@@ -4,13 +4,13 @@
 [ ] check for end state
 [ ] enable multi threading for workers
 [ ] complete to validate deployed workflow
-[ ] run state jobs as workers
 [ ] manage uploaded files
 [ ] apply priority of workers
 [ ] auto start processes
 
 
 # Testing Tasks
+[ ] run state jobs as workers
 [ ] not create new worker for an action when exist and running
 [ ] add headers to event requests
 [ ] return process history

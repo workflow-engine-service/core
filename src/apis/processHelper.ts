@@ -400,10 +400,12 @@ export namespace ProcessHelper {
             // =>collect optional fields
             for (const field of action.optional_fields) {
                 let value = fields['field.' + field];
-                // =>validate field
-                let respValidate = await validateFieldValue(process, field, value);
-                if (!respValidate.success) {
-                    return { error: respValidate.error };
+                if (value !== undefined && value !== null) {
+                    // =>validate field
+                    let respValidate = await validateFieldValue(process, field, value);
+                    if (!respValidate.success) {
+                        return { error: respValidate.error };
+                    }
                 }
 
                 optionalFieldValues.push({
