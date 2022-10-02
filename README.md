@@ -32,7 +32,7 @@ WES (workflow engine service) is a workflow engine that can be expose some usefu
 1. install node >= 12
 2. run `export NODE_OPTIONS="--max-old-space-size=8192" # Increase to 8 GB` 
 3. run mongo service (run: `sudo docker run -p 27017:27017 --name mongo -d mongo`)
-> you can access mongo cli with `docker exec -it mongo mongosh --quiet`
+> you can access mongo cli with `sudo docker exec -it mongo mongosh --quiet`
 4. install dependencies with `npm i`
 5. copy from `configs.dev.sample.json` file and create `configs.dev.json` file
 6. run server with `npm run dev`. you can see on `http://localhost:8082`
@@ -45,6 +45,10 @@ WES (workflow engine service) is a workflow engine that can be expose some usefu
 
 > you can create a `configs.prod.json` file and set your custom configs
 
+
+## Run Integrate Tests
+
+- `npm run test tests/integration-tests/filter-processes.spec.ts` 
 ## Author
 
 developed by madkne

@@ -137,6 +137,7 @@ export class PublicPostApi extends BaseApi {
             processes: this.param('processes', [], true),
             with_fields: this.paramBoolean('with_fields', false),
             state: this.param('state'),
+            match_fields: this.param('match_fields', {}, true),
         });
     }
     /********************************** */

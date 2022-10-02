@@ -284,6 +284,7 @@ export class BaseApi {
         processes: string[];
         with_fields?: boolean;
         state?: string;
+        match_fields?: object;
     }) {
         try {
             let dbFilters: FilterQuery<WorkflowProcessModel> = {};
@@ -304,10 +305,19 @@ export class BaseApi {
             let processes: WorkflowProcessModel[] = [];
             for (const pid of processIds) {
                 let processId = pid._id;
+                let fields: WorkflowProcessField[];
                 let res = await this.getProcessCurrentState(processId);
                 // =>if raise error
                 if (Array.isArray(res)) {
                     continue;
+                }
+                // =>fetch process fields
+                if (filters.with_fields || filters.match_fields) {
+                    let tmpFields = await this.abstractProcessFields(res.process);
+                    // =>if allowed
+                    if (tmpFields[0]) {
+                        fields = tmpFields[1] as any;
+                    }
                 }
                 // =>check read process access
                 if (!this.checkUserRoleHasAccess(res.process.workflow?.settings?.read_access_roles, { process: res.process })) {
@@ -321,11 +331,18 @@ export class BaseApi {
                 let truncateData = this.truncateProcessInfo(res.process);
                 // =>check for set fields
                 if (filters.with_fields) {
-                    let fields = await this.abstractProcessFields(res.process);
-                    // =>if raise error
-                    if (fields[0]) {
-                        truncateData.field_values = fields[1] as WorkflowProcessField[];
+                    truncateData.field_values = fields;
+                }
+                // =>if match fields
+                if (filters.match_fields && Object.keys(filters.match_fields).length > 0) {
+                    let isMatch = true;
+                    for (const key of Object.keys(filters.match_fields)) {
+                        if (fields[key] !== filters.match_fields[key]) {
+                            isMatch = false;
+                            break;
+                        }
                     }
+                    if (!isMatch) continue;
                 }
 
                 processes.push(truncateData);

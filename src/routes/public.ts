@@ -444,6 +444,11 @@ export const publicApis: ApiRoute[] = [
                             default: undefined,
                             description: 'filter processes with specific state'
                         },
+                        match_fields: {
+                            type: 'object',
+                            default: {},
+                            description: 'filter processes with match specific fields'
+                        },
                         with_fields: {
                             type: 'boolean',
                             default: false,
