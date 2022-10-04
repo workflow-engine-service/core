@@ -70,3 +70,5 @@ export type WorkflowNamespace = 'process' | 'workflow' | 'worker' | 'config' | '
 export type WorkflowStateActionType = 'hook_url' | 'redis' | 'local';
 
 export type HookMethodType = 'post' | 'put' | 'get' | 'delete';
+
+export type HttpResponse = [string, HttpStatusCode, string]

@@ -1,6 +1,6 @@
 import { Const } from "../const";
 import { APIResponse, APIResponsePagination, WorkflowProcessField, WorkflowState } from "../interfaces";
-import { HttpStatusCode, LogMode, RequestMethodType, WorkflowNamespace } from "../types";
+import { HttpResponse, HttpStatusCode, LogMode, RequestMethodType, WorkflowNamespace } from "../types";
 import { CoreRequest } from "./request";
 import { DeployedWorkflowModel, WorkflowProcessModel } from "../models/models";
 import { clone, errorLog } from "../common";
@@ -83,7 +83,7 @@ export class BaseApi {
         }
     }
     /*************************************** */
-    response<T = any>(result?: T, code: HttpStatusCode = HttpStatusCode.HTTP_200_OK, message?: string, applyObjects?: object): [string, HttpStatusCode, string] {
+    response<T = any>(result?: T, code: HttpStatusCode = HttpStatusCode.HTTP_200_OK, message?: string, applyObjects?: object): HttpResponse {
         // =>if result is not set
         if (result == undefined) {
             result = '' as any;
@@ -109,7 +109,7 @@ export class BaseApi {
         return [JSON.stringify(resp), code, 'application/json'];
     }
     /*************************************** */
-    paginateResponse<T = any>(result: T[]): [string, HttpStatusCode] {
+    paginateResponse<T = any>(result: T[]): HttpResponse {
         // =>get params
         let pageSize = this.paramNumber('page_size', 10);
         let page = this.paramNumber('page', 1);
@@ -213,7 +213,7 @@ export class BaseApi {
         return ProcessHelper.findProcessById(id);
     }
     /*************************************** */
-    async getProcess(processId: string): Promise<{ process: WorkflowProcessModel } | [string, HttpStatusCode]> {
+    async getProcess(processId: string): Promise<{ process: WorkflowProcessModel } | HttpResponse> {
         try {
             // =>find process by id
             let process = await this.findProcessById(processId);
@@ -232,7 +232,7 @@ export class BaseApi {
         }
     }
     /*************************************** */
-    async getProcessCurrentState(processId: string, stateName?: string): Promise<{ state: WorkflowState, process: WorkflowProcessModel } | [string, HttpStatusCode]> {
+    async getProcessCurrentState(processId: string, stateName?: string): Promise<{ state: WorkflowState, process: WorkflowProcessModel } | HttpResponse> {
         try {
             let processSt = await this.getProcess(processId);
             // =>if error

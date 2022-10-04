@@ -559,3 +559,4 @@ export interface WorkflowDeployedInfo {
 export interface WorkflowProcessTruncateInfo extends Omit<WorkflowProcessModel, 'workflow' | 'history' | 'jobs'> {
 
 }
+
