@@ -83,7 +83,7 @@ export class BaseApi {
         }
     }
     /*************************************** */
-    response<T = any>(result?: T, code: HttpStatusCode = HttpStatusCode.HTTP_200_OK, message?: string, applyObjects?: object): [string, HttpStatusCode] {
+    response<T = any>(result?: T, code: HttpStatusCode = HttpStatusCode.HTTP_200_OK, message?: string, applyObjects?: object): [string, HttpStatusCode, string] {
         // =>if result is not set
         if (result == undefined) {
             result = '' as any;
@@ -106,7 +106,7 @@ export class BaseApi {
             resp.message = message;
         }
 
-        return [JSON.stringify(resp), code];
+        return [JSON.stringify(resp), code, 'application/json'];
     }
     /*************************************** */
     paginateResponse<T = any>(result: T[]): [string, HttpStatusCode] {

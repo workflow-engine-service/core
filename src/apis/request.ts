@@ -40,8 +40,10 @@ export class CoreRequest {
    response(body: any, statusCode: HttpStatusCode = HttpStatusCode.HTTP_200_OK) {
       // =>if before send data, ignore
       if (this.res.writableEnded) return;
-      // console.log('response:', this.res.statusCode, this.res.writableEnded);
-      this.res.status(statusCode).send(body);
+      // =>if json response type
+      if ()
+         // console.log('response:', this.res.statusCode, this.res.writableEnded);
+         this.res.status(statusCode).send(body);
       // debugLog('response', `[${statusCode}] ${this.requestType}:${this.req.path}`);
    }
    /************************************* */

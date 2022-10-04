@@ -46,26 +46,38 @@ export namespace WebServer {
                 }
             }
             // =>run http server
-            app.listen(Const.CONFIGS.server.port, async () => afterWebserverInit);
+            app.listen(Const.CONFIGS.server.port, async () => {
+                console.log(`WorkFlow Engine Service listening on port ${Const.CONFIGS.server.port}!`);
+                // =>init swagger, if allowed
+                if (!Const.CONFIGS.server.swagger_disabled) {
+                    await Swagger.init(app);
+                }
+
+                // =>init wiki, if allowed
+                if (!Const.CONFIGS.server.wiki_disabled) {
+                    await Wiki.init(app);
+                }
+                res(true);
+            });
 
 
         });
 
     }
 
-    async function afterWebserverInit(res: (boolean) => any) {
-        console.log(`WorkFlow Engine Service listening on port ${Const.CONFIGS.server.port}!`);
-        // =>init swagger, if allowed
-        if (!Const.CONFIGS.server.swagger_disabled) {
-            await Swagger.init(app);
-        }
+    // async function afterWebserverInit(res: (boolean) => any) {
+    //     console.log(`WorkFlow Engine Service listening on port ${Const.CONFIGS.server.port}!`);
+    //     // =>init swagger, if allowed
+    //     if (!Const.CONFIGS.server.swagger_disabled) {
+    //         await Swagger.init(app);
+    //     }
 
-        // =>init wiki, if allowed
-        if (!Const.CONFIGS.server.wiki_disabled) {
-            await Wiki.init(app);
-        }
-        res(true);
-    }
+    //     // =>init wiki, if allowed
+    //     if (!Const.CONFIGS.server.wiki_disabled) {
+    //         await Wiki.init(app);
+    //     }
+    //     res(true);
+    // }
 
     async function loadMiddlewares() {
         for (const middle of Const.MIDDLEWARES) {

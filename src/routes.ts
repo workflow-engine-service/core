@@ -36,9 +36,16 @@ export namespace WebRoutes {
                 // console.log('req:', api.functionName, apiClassInstance['request'], classFilePath);
                 // =>call api function
                 let resP = await apiClassInstance[api.functionName]();
-                let response: string, status: HttpStatusCode;
+                let response: string, status: HttpStatusCode, contentType: string;
                 if (Array.isArray(resP)) {
                     [response, status] = resP;
+                    if (resP.length > 2) {
+                        contentType = resP[2];
+                    }
+                }
+                // =>if has content type
+                if (contentType) {
+                    res.setHeader('Content-Type', contentType);
                 }
                 // =>response 
                 coreRequest.response(response, status);
