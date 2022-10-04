@@ -12,6 +12,7 @@ const metaDataSchema = new mongoose.Schema<UserModel, UserModel>({
     },
     secret_key: String,
     created_at: Number,
+    updated_at: Number,
 });
 
 export async function getSchema() {

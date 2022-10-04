@@ -62,6 +62,7 @@ export interface UserModel {
     is_admin?: boolean;
     info?: {};
     created_at?: number;
+    updated_at?: number;
 }
 export interface LogModel {
     namespace: string;

@@ -63,6 +63,39 @@ export const adminApis: ApiRoute[] = [
         usedDefinitions: ['UserModel']
     },
     {
+        method: 'POST',
+        path: 'user/edit',
+        functionName: 'userEdit',
+        tags: ['admin'],
+        des: 'edit a user in workflow',
+        responses: {
+            '200': {
+                description: 'successful operation',
+                schema: {
+                    $ref: "#/definitions/UserModel"
+                }
+            },
+        },
+        parameters: [
+            {
+                name: 'request',
+                in: 'body',
+                required: true,
+                type: 'object',
+                description: 'you MUST set user id',
+                schema: {
+                    type: "object",
+                    properties: {
+                        user: {
+                            $ref: "#/definitions/UserModel"
+                        },
+                    },
+                }
+            },
+        ],
+        usedDefinitions: ['UserModel']
+    },
+    {
         method: 'GET',
         path: 'user/list',
         functionName: 'usersList',

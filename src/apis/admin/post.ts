@@ -105,6 +105,40 @@ export class AdminPostApi extends BaseApi {
         return this.response(addedUser);
     }
     /************************************** */
+    async userEdit() {
+        // =>check admin access
+        if (!this.isAdmin()) {
+            return this.error403('just admin allowed');
+        }
+
+        let userInfo = this.param<UserModel>('user');
+        if (!userInfo || !userInfo.id) return this.error400('you must set specific user id');
+
+        // =>find user by id
+        let user = await Const.DB.models.users.findOne({ id: userInfo.id });
+        if (!user) {
+            return this.error404('user not exist');
+        }
+        // =>check for not set reserved access roles
+        if (!userInfo.roles) userInfo.roles = [];
+        for (const role of userInfo.roles) {
+            if (role === Const.RESERVED_ACCESS_ROLES.ALL_ACCESS || role === Const.RESERVED_ACCESS_ROLES.OWNER_ACCESS) {
+                return this.error400('user can not have a reserved access role!');
+            }
+        }
+        // console.log('user:', userInfo);
+        // =>if set secret key, encrypt it
+        if (userInfo.secret_key) {
+            userInfo.secret_key = await Auth.encryptPassword(userInfo.secret_key);
+        }
+
+        userInfo.updated_at = new Date().getTime();
+        // =>update user
+        await await Const.DB.models.users.findOneAndUpdate({ id: userInfo.id }, userInfo);
+
+        return this.response(userInfo);
+    }
+    /************************************** */
     /************************************** */
 
     /************************************** */

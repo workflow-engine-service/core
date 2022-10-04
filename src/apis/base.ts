@@ -183,7 +183,7 @@ export class BaseApi {
     checkUserRoleHasAccess(roles: string[], options: {
         process?: WorkflowProcessModel,
     } = {}) {
-        if (!roles) {
+        if (!roles || !Array.isArray(roles) || roles.length === 0) {
             roles = [Const.RESERVED_ACCESS_ROLES.ALL_ACCESS];
         }
         // =>if all access
@@ -193,6 +193,10 @@ export class BaseApi {
         // =>if owner access
         if (roles.includes(Const.RESERVED_ACCESS_ROLES.OWNER_ACCESS) && options.process) {
             if (options.process.created_by === this.request.user().id) return true;
+        }
+        // =>if is admin
+        if (this.isAdmin()) {
+            return true;
         }
         if (!this.request.user().roles) {
             this.request.user().roles = [];
