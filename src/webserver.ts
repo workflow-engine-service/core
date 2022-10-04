@@ -31,23 +31,22 @@ export namespace WebServer {
             // =>run https server
             if (Const.CONFIGS.server.ssl) {
                 try {
+                    if (!Const.CONFIGS.server.ssl.port) Const.CONFIGS.server.ssl.port = 443;
                     var privateKey = fs.readFileSync(Const.CONFIGS.server.ssl.privateKeyPath);
                     var certificate = fs.readFileSync(Const.CONFIGS.server.ssl.certificatePath);
 
                     var credentials = { key: privateKey, cert: certificate };
 
                     https.createServer(credentials, app)
-                        .listen(Const.CONFIGS.server.port, async () => afterWebserverInit);
+                        .listen(Const.CONFIGS.server.ssl.port);
                 } catch (e) {
-                    Const.CONFIGS.server.ssl = undefined;
+                    // Const.CONFIGS.server.ssl = undefined;
                     errorLog('ssl', `can not set ssl and init https server`);
                     errorLog('ssl', e);
                 }
             }
             // =>run http server
-            if (!Const.CONFIGS.server.ssl) {
-                app.listen(Const.CONFIGS.server.port, async () => afterWebserverInit);
-            }
+            app.listen(Const.CONFIGS.server.port, async () => afterWebserverInit);
 
 
         });

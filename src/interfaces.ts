@@ -26,6 +26,10 @@ export interface ServerConfigs {
         ssl?: {
             privateKeyPath: string;
             certificatePath: string;
+            /**
+             * @default 443
+             */
+            port?: number;
         };
         /**
          * @deprecated
