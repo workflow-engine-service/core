@@ -150,6 +150,10 @@ export class PublicPostApi extends BaseApi {
             if (Array.isArray(res)) {
                 return res;
             } else {
+                // =>check access action
+                if (!this.checkUserRoleHasAccess(res.state.actions.find(i => i.name === stateActionName)?.access_role, { process: res.process })) {
+                    return this.error403('no access to action info');
+                }
                 // =>execute action
                 let execAction = await ProcessHelper.executeStateAction(res.process, res.state, stateActionName, userMessage, fields, this.request.user().id);
                 // =>if error

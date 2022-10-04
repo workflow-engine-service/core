@@ -337,7 +337,7 @@ export class BaseApi {
                 if (filters.match_fields && Object.keys(filters.match_fields).length > 0) {
                     let isMatch = true;
                     for (const key of Object.keys(filters.match_fields)) {
-                        if (fields[key] !== filters.match_fields[key]) {
+                        if (!fields.find(i => i.name === key) || fields.find(i => i.name === key).value !== filters.match_fields[key]) {
                             isMatch = false;
                             break;
                         }
