@@ -37,13 +37,16 @@ export class CoreRequest {
       return diff;
    }
    /************************************* */
-   response(body: any, statusCode: HttpStatusCode = HttpStatusCode.HTTP_200_OK) {
+   response(body: any, statusCode: HttpStatusCode = HttpStatusCode.HTTP_200_OK, contentType?: string) {
       // =>if before send data, ignore
       if (this.res.writableEnded) return;
       // =>if json response type
-      if ()
-         // console.log('response:', this.res.statusCode, this.res.writableEnded);
-         this.res.status(statusCode).send(body);
+      // =>if has content type
+      if (contentType) {
+         this.res.setHeader('Content-Type', contentType);
+      }
+      // console.log('response:', this.res.statusCode, this.res.writableEnded);
+      this.res.status(statusCode).send(body);
       // debugLog('response', `[${statusCode}] ${this.requestType}:${this.req.path}`);
    }
    /************************************* */

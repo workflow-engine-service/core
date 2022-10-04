@@ -43,12 +43,8 @@ export namespace WebRoutes {
                         contentType = resP[2];
                     }
                 }
-                // =>if has content type
-                if (contentType) {
-                    res.setHeader('Content-Type', contentType);
-                }
                 // =>response 
-                coreRequest.response(response, status);
+                coreRequest.response(response, status, contentType);
             });
         }
         // =>serve wiki
