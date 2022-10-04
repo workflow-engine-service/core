@@ -9,13 +9,13 @@ import { Wiki } from './document/wiki';
 import { MiddlewareName } from './types';
 import { WebWorkers } from './workers';
 import { WorkflowJob } from './jobs';
+import * as https from 'https';
 // import * as cors from 'cors';
 
 export namespace WebServer {
     export let app: Express;
     export async function initWebServer() {
         return new Promise(async (res) => {
-
             app = express();
             app.use(express.json({ limit: '400kb', strict: false }));
             // =>enable cors policy
@@ -28,23 +28,44 @@ export namespace WebServer {
             // =>start workflow job service
             WorkflowJob.start();
 
+            // =>run https server
+            if (Const.CONFIGS.server.ssl) {
+                try {
+                    var privateKey = fs.readFileSync(Const.CONFIGS.server.ssl.privateKeyPath);
+                    var certificate = fs.readFileSync(Const.CONFIGS.server.ssl.certificatePath);
 
+                    var credentials = { key: privateKey, cert: certificate };
 
-            app.listen(Const.CONFIGS.server.port, async () => {
-                console.log(`WorkFlow Engine Service listening on port ${Const.CONFIGS.server.port}!`);
-                // =>init swagger, if allowed
-                if (!Const.CONFIGS.server.swagger_disabled) {
-                    await Swagger.init(app);
+                    https.createServer(credentials, app)
+                        .listen(Const.CONFIGS.server.port, async () => afterWebserverInit);
+                } catch (e) {
+                    Const.CONFIGS.server.ssl = undefined;
+                    errorLog('ssl', `can not set ssl and init https server`);
+                    errorLog('ssl', e);
                 }
+            }
+            // =>run http server
+            if (!Const.CONFIGS.server.ssl) {
+                app.listen(Const.CONFIGS.server.port, async () => afterWebserverInit);
+            }
 
-                // =>init wiki, if allowed
-                if (!Const.CONFIGS.server.wiki_disabled) {
-                    await Wiki.init(app);
-                }
-                res(true);
-            });
+
         });
 
+    }
+
+    async function afterWebserverInit(res: (boolean) => any) {
+        console.log(`WorkFlow Engine Service listening on port ${Const.CONFIGS.server.port}!`);
+        // =>init swagger, if allowed
+        if (!Const.CONFIGS.server.swagger_disabled) {
+            await Swagger.init(app);
+        }
+
+        // =>init wiki, if allowed
+        if (!Const.CONFIGS.server.wiki_disabled) {
+            await Wiki.init(app);
+        }
+        res(true);
     }
 
     async function loadMiddlewares() {

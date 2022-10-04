@@ -34,5 +34,11 @@ sample code:
 | frontend_path | string| NO | frontend file resources path for serve (if not, means that this service is disabled!)|
 | frontend_assets_path | string| NO | frontend assets resources path for serve (if not, set `/assets`)|
 | frontend_url | string| NO | frontend url (default: `/frontend`) |
+| ssl | [ssl](#SSL-schema)| NO | ssl enabled for server |
 
+## SSL schema
 
+| name | type | required | Description |
+| ----------- | ----------- |----------- |----------- |
+| privateKeyPath | string | **YES** | certificate private key file path (like `/server.key`) | 
+|certificatePath | any | **YES** | certificate file path (like `/server.crt`) |

@@ -23,6 +23,10 @@ export interface ServerConfigs {
         uploads_path?: string;
         debug_mode?: boolean;
         tmp_path?: string;
+        ssl?: {
+            privateKeyPath: string;
+            certificatePath: string;
+        };
         /**
          * @deprecated
          */
