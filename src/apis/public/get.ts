@@ -6,6 +6,7 @@ import { HttpStatusCode } from "../../types";
 import { BaseApi } from "../base";
 import { UserTokenResponse } from "./interfaces";
 import { WorkflowDeployedInfo } from "src/interfaces";
+import { FilterQuery } from "mongoose";
 
 export function classApi() {
     return PublicGetApi;
@@ -134,23 +135,36 @@ export class PublicGetApi extends BaseApi {
         let filter_finished_workers = this.paramBoolean('filter_finished_workers', false);
 
         try {
-            let workers: WorkerModel[] = [];
+            let filters: FilterQuery<WorkerModel> = {};
             if (filter_finished_workers) {
-                workers = await Const.DB.models.workers.find({ ended_at: { $exist: false } });
-            } else {
-                workers = await Const.DB.models.workers.find({});
+                filters = { ended_at: { $exist: false } };
             }
-            if (!workers) return this.response([]);
-            // =>iterate all workers
-            for (const worker of workers) {
-                // =>check access of worker
-                if (!this.isAdmin() && worker.started_by !== this.request.user().id) {
-                    continue;
-                }
-
+            // =>if not admin
+            if (!this.isAdmin()) {
+                filters.started_by = { '$eq': this.request.user().id };
             }
 
-            return this.paginateResponse(workers);
+
+            return await this.paginateResponse(Const.DB.models.workers, {
+                filters,
+            });
+            // let workers: WorkerModel[] = [];
+            // if (filter_finished_workers) {
+            //     workers = await Const.DB.models.workers.find({ ended_at: { $exist: false } });
+            // } else {
+            //     workers = await Const.DB.models.workers.find({});
+            // }
+            // if (!workers) return this.response([]);
+            // // =>iterate all workers
+            // for (const worker of workers) {
+            //     // =>check access of worker
+            //     if (!this.isAdmin() && worker.started_by !== this.request.user().id) {
+            //         continue;
+            //     }
+
+            // }
+
+            // return this.paginateResponseOld(workers);
         } catch (e) {
             errorLog('err324223', e);
             return this.error400();
@@ -189,7 +203,7 @@ export class PublicGetApi extends BaseApi {
                 });
             }
 
-            return this.paginateResponse(list);
+            return this.paginateResponseOld(list);
         } catch (e) {
             errorLog('err456232', e);
             return this.error400();

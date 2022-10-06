@@ -38,7 +38,9 @@ export namespace WebServer {
                     var credentials = { key: privateKey, cert: certificate };
 
                     https.createServer(credentials, app)
-                        .listen(Const.CONFIGS.server.ssl.port);
+                        .listen(Const.CONFIGS.server.ssl.port, () => {
+                            console.log(`(https) WorkFlow Engine Service listening on port ${Const.CONFIGS.server.ssl.port}!`);
+                        });
                 } catch (e) {
                     // Const.CONFIGS.server.ssl = undefined;
                     errorLog('ssl', `can not set ssl and init https server`);
@@ -47,7 +49,7 @@ export namespace WebServer {
             }
             // =>run http server
             app.listen(Const.CONFIGS.server.port, async () => {
-                console.log(`WorkFlow Engine Service listening on port ${Const.CONFIGS.server.port}!`);
+                console.log(`(http) WorkFlow Engine Service listening on port ${Const.CONFIGS.server.port}!`);
                 // =>init swagger, if allowed
                 if (!Const.CONFIGS.server.swagger_disabled) {
                     await Swagger.init(app);
