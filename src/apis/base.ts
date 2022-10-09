@@ -358,7 +358,7 @@ export class BaseApi {
             //     }
             // });
             // =>iterate all processes
-            let processDocs = await Const.DB.models.processes.find(dbFilters);
+            let processDocs = await Const.DB.models.processes.find(dbFilters).populate('workflow');
             if (!processDocs) return this.response([]);
             let processes: WorkflowProcessModel[] = [];
             for (const pDoc of processDocs) {
