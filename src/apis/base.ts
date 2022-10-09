@@ -246,28 +246,31 @@ export class BaseApi {
         return ProcessHelper.findProcessById(id);
     }
     /*************************************** */
-    async getProcess(processId: string): Promise<{ process: WorkflowProcessModel } | HttpResponse> {
+    async getProcess(processId: string, processDoc?: WorkflowProcessModel): Promise<{ process: WorkflowProcessModel } | HttpResponse> {
         try {
-            // =>find process by id
-            let process = await this.findProcessById(processId);
-            if (!process) return this.error404('not found such process');
-            if (!process.workflow) {
+            if (!processDoc) {
+                // =>find process by id
+                processDoc = await this.findProcessById(processId);
+
+            }
+            if (!processDoc) return this.error404('not found such process');
+            if (!processDoc.workflow) {
                 return this.error400('bad process');
             }
             // =>check read or write access on process
-            if (!this.checkUserRoleHasAccess(process.workflow?.settings?.read_access_roles, { process }) && !this.checkUserRoleHasAccess(process.workflow?.settings?.create_access_roles, { process })) {
+            if (!this.checkUserRoleHasAccess(processDoc.workflow?.settings?.read_access_roles, { process: processDoc }) && !this.checkUserRoleHasAccess(processDoc.workflow?.settings?.create_access_roles, { process: processDoc })) {
                 return this.error403('no access to process info');
             }
-            return { process };
+            return { process: processDoc };
         } catch (e) {
             errorLog('err23523575', e);
             return this.error400('bad process');
         }
     }
     /*************************************** */
-    async getProcessCurrentState(processId: string, stateName?: string): Promise<{ state: WorkflowState, process: WorkflowProcessModel } | HttpResponse> {
+    async getProcessCurrentState(processId: string, stateName?: string, processDoc?: WorkflowProcessModel): Promise<{ state: WorkflowState, process: WorkflowProcessModel } | HttpResponse> {
         try {
-            let processSt = await this.getProcess(processId);
+            let processSt = await this.getProcess(processId, processDoc);
             // =>if error
             if (Array.isArray(processSt)) {
                 return processSt;
@@ -336,14 +339,32 @@ export class BaseApi {
             if (filters.state) {
                 dbFilters.current_state = filters.state;
             }
+
+
+
+            // return await this.paginateResponse<WorkflowProcessModel>(Const.DB.models.processes, {
+            //     filters: dbFilters,
+            //     mapCallback: (row) => {
+            //         // =>check process access
+            //         if (!this.checkProcessReadAccess(row)) {
+            //             return { _id: row._id } as any;
+            //         }
+            //         // =>truncate data
+            //         let truncateData = this.truncateProcessInfo(row);
+            //         if (filters.with_fields) {
+
+            //         }
+            //         return truncateData;
+            //     }
+            // });
             // =>iterate all processes
-            let processIds = await Const.DB.models.processes.find(dbFilters, { _id: true });
-            if (!processIds) return this.response([]);
+            let processDocs = await Const.DB.models.processes.find(dbFilters);
+            if (!processDocs) return this.response([]);
             let processes: WorkflowProcessModel[] = [];
-            for (const pid of processIds) {
-                let processId = pid._id;
+            for (const pDoc of processDocs) {
+                let processId = pDoc._id;
                 let fields: WorkflowProcessField[];
-                let res = await this.getProcessCurrentState(processId);
+                let res = await this.getProcessCurrentState(processId, undefined, pDoc);
                 // =>if raise error
                 if (Array.isArray(res)) {
                     continue;
