@@ -526,4 +526,24 @@ export const publicApis: ApiRoute[] = [
         },
         usedDefinitions: ['WorkflowProcessField']
     },
+    {
+        method: 'DELETE',
+        path: 'workflow/delete',
+        functionName: 'deleteProcess',
+        tags: ['workflow'],
+        des: 'delete a process from a workflow by process id',
+        parameters: [
+            {
+                name: 'id',
+                in: 'path',
+                required: true,
+                type: 'string',
+            },
+        ],
+        responses: {
+            '200': {
+                description: 'success to delete the process from a workflow',
+            }
+        },
+    },
 ];
