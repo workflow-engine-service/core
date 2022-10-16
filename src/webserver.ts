@@ -19,8 +19,13 @@ export namespace WebServer {
             app = express();
             app.use(express.json({ limit: '400kb', strict: false }));
             // =>enable cors policy
+            const corsOptions = {
+                origin: '*',
+                credentials: true,            //access-control-allow-credentials:true
+                optionSuccessStatus: 200,
+            }
             var cors = require('cors');
-            app.use(cors());
+            app.use(cors(corsOptions));
             await loadMiddlewares();
             WebRoutes.routes(app);
             // =>start workers service
