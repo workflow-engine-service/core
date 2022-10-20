@@ -439,6 +439,10 @@ export const publicApis: ApiRoute[] = [
                             type: 'boolean',
                             default: false,
                         },
+                        owner_id: {
+                            type: 'integer',
+                            format: 'int32',
+                        },
                         state: {
                             type: 'string',
                             default: undefined,

@@ -325,6 +325,7 @@ export class BaseApi {
         with_fields?: boolean;
         state?: string;
         match_fields?: object;
+        owner_id?: number;
     }) {
         try {
             let dbFilters: FilterQuery<WorkflowProcessModel> = {};
@@ -339,7 +340,9 @@ export class BaseApi {
             if (filters.state) {
                 dbFilters.current_state = filters.state;
             }
-
+            if (filters.owner_id) {
+                dbFilters.created_by = filters.owner_id;
+            }
 
 
             // return await this.paginateResponse<WorkflowProcessModel>(Const.DB.models.processes, {
