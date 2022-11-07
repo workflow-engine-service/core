@@ -19,7 +19,7 @@ export class PublicDeleteApi extends BaseApi {
     async deleteProcess() {
         try {
             // =>get params
-            let processId = this.request.req.url.split('/').filter(i => i.trim() !== '').pop();
+            let processId = this.param('id');
             // =>find process by id
             let res = await this.getProcess(processId);
             if (Array.isArray(res)) return res;
@@ -32,7 +32,7 @@ export class PublicDeleteApi extends BaseApi {
                 user: this.request.user().id,
                 process_id: processId,
             });
-            return this.response();
+            return this.response(true);
         } catch (e) {
             errorLog('delete_process', e);
             return this.error400();

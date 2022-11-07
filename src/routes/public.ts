@@ -539,7 +539,7 @@ export const publicApis: ApiRoute[] = [
         parameters: [
             {
                 name: 'id',
-                in: 'path',
+                in: 'query',
                 required: true,
                 type: 'string',
             },

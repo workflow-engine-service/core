@@ -64,7 +64,10 @@ export namespace WorkflowJob {
                         name: 'run_job_worker',
                         namespace: 'job',
                         mode: LogMode.INFO,
-                        meta: { workerId, job },
+                        meta: {
+                            workerId,
+                            job,
+                        },
                     });
                     // =>update job started_at
                     job.started_at = new Date().getTime();
@@ -99,13 +102,23 @@ export namespace WorkflowJob {
                 // =>find process
                 let process = await Const.DB.models.processes.findById(job.process_id);
                 let calc = new WorkflowCalculatorClass(process);
+                const rawTime = clone(job.time);
                 // =>convert calc fields
                 for (const key of Object.keys(job.time)) {
                     if (typeof job.time[key] === 'object') {
                         job.time[key] = await calc.calc(job.time[key]);
                     }
-
                 }
+                dbLog({
+                    name: 'parse_job_time',
+                    namespace: 'job',
+                    mode: LogMode.INFO,
+                    meta: {
+                        job,
+                        raw_time: rawTime,
+                        parsed_time: job.time,
+                    },
+                });
 
 
             }

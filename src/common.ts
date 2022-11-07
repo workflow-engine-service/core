@@ -110,6 +110,10 @@ export async function loadConfigs() {
             Const.CONFIGS.alias = {};
         }
 
+        if (!Const.CONFIGS.server.swagger_base_url) {
+            Const.CONFIGS.server.swagger_base_url = `${Const.CONFIGS.server.host}:${Const.CONFIGS.server.port}`;
+        }
+
         // =>if 'prod' server mode
         if (Const.SERVER_MODE === 'prod') {
             if (Const.CONFIGS.server.host === 'localhost' || Const.CONFIGS.server.host === '127.0.0.1') {

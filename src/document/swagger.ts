@@ -57,7 +57,7 @@ export namespace Swagger {
             //         },
             //     },
             // ],
-            host: `${Const.CONFIGS.server.host}:${Const.CONFIGS.server.port}`,
+            host: Const.CONFIGS.server.swagger_hostname,
             basePath: '/api/v1/',
             tags: [],
             paths: {},

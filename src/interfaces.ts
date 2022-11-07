@@ -41,6 +41,10 @@ export interface ServerConfigs {
         wiki_disabled?: boolean;
         swagger_disabled?: boolean;
         swagger_base_url?: string;
+        /**
+         * @default host:port
+         */
+        swagger_hostname?: string;
         frontend_path?: string;
 
         /**
