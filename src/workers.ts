@@ -50,12 +50,15 @@ export namespace WebWorkers {
                 }
                 if (params.fields) {
                     for (const key of Object.keys(params.fields)) {
+                        if (params.fields[key] === undefined || params.fields[key] === null) continue;
                         responseFromActionType.fields[key] = params.fields[key];
                     }
                 }
                 // =>set extra fields
                 if (params._action.set_fields) {
                     for (const key of Object.keys(params._action.set_fields)) {
+                        if (params._action.set_fields[key] === undefined) continue;
+
                         responseFromActionType.fields[key] = params._action.set_fields[key];
                     }
                 }
