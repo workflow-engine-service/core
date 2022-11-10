@@ -333,11 +333,11 @@ export namespace ProcessHelper {
     }
 
 
-    export async function executeStateAction(process: WorkflowProcessModel, state: WorkflowState, stateActionName: string, userMessage: string, fields: object, userId?: number): Promise<{ error?: string; workerId?: string; }> {
+    export async function executeStateAction(process: WorkflowProcessModel, state: WorkflowState, stateActionName: string, userMessage: string, fields?: object, userId?: number): Promise<{ error?: string; workerId?: string; }> {
         try {
             let requiredFieldValues: WorkflowProcessField[] = [];
             let optionalFieldValues: WorkflowProcessField[] = [];
-
+            if (!fields) fields = {};
             // =>find selected action with name
             let action = state.actions.find(i => i.name === stateActionName);
             if (!action) return { error: 'not found such action' };
@@ -446,7 +446,7 @@ export namespace ProcessHelper {
             return { workerId };
 
         } catch (e) {
-            errorLog('err546325', e, userId);
+            errorLog('err5463257', e, userId);
             return { error: 'bad request' };
         }
     }
