@@ -163,9 +163,9 @@ export class AdminPostApi extends BaseApi {
                 let fieldIndex = res.process.field_values.findIndex(i => i.name === key);
                 // =>set field
                 if (fieldIndex > -1) {
-                    res.process.field_values[fieldIndex] = fields[key];
+                    res.process.field_values[fieldIndex] = { name: key, value: fields[key] };
                 } else {
-                    res.process.field_values.push(fields[key]);
+                    res.process.field_values.push({ name: key, value: fields[key] });
                 }
             }
             // =>update process
