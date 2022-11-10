@@ -37,6 +37,10 @@ export namespace Swagger {
     let swaggerFileName = 'swagger.json';
     /********************** */
     async function generate() {
+        let swaggerSchemes = ['http'];
+        if (Const.CONFIGS.server?.swagger_hostname?.startsWith('https://')) {
+            swaggerSchemes.unshift('https');
+        }
         let swagger = {
             // openapi: "3.0",
             swagger: "2.0",
@@ -61,9 +65,7 @@ export namespace Swagger {
             basePath: '/api/v1/',
             tags: [],
             paths: {},
-            schemes: [
-                "http"
-            ],
+            schemes: swaggerSchemes,
             consumes: [
                 "application/json"
             ],

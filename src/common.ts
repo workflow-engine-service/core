@@ -209,7 +209,9 @@ export function errorLog(name: string, error: any, uid?: number) {
     log(error, name, 'error');
     let jsonError = {};
     if (typeof error == 'object') {
-        jsonError = JSON.stringify(error);
+        try {
+            jsonError = JSON.stringify(error);
+        } catch (e) { jsonError = String(error); }
     }
     // =>add error on db
     try {
