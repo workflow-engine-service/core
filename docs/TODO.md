@@ -10,10 +10,10 @@
 
 
 # Testing Tasks
-[ ] run state jobs as workers
 [ ] not create new worker for an action when exist and running
 [ ] add headers to event requests
 [ ] return process history
+[] admin can force change process fields
 
 # DONE Tasks
 [x] init workflow core
@@ -51,3 +51,4 @@
 [x] add base_url to hook types (action, event)
 [x] get filtered process list
 [x] return process fields
+[x] run state jobs as workers

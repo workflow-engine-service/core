@@ -452,7 +452,7 @@ export namespace ProcessHelper {
     }
 
 
-    async function validateFieldValue(process: WorkflowProcessModel, fieldName: string, fieldValue: any): Promise<{ success: boolean; error?: string; }> {
+    export async function validateFieldValue(process: WorkflowProcessModel, fieldName: string, fieldValue: any): Promise<{ success: boolean; error?: string; }> {
         // =>find field by name
         let field = process.workflow.fields.find(i => i.name === fieldName);
         // =>check if field exist

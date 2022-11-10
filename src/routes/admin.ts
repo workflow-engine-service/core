@@ -164,5 +164,44 @@ export const adminApis: ApiRoute[] = [
             },
         ],
     },
+    {
+        method: 'POST',
+        path: 'workflow/set-fields',
+        functionName: 'processSetFields',
+        tags: ['admin', 'workflow'],
+        des: 'get list of fields as key-value and overwrite them on specific process',
+        responses: {
+            '200': {
+                description: 'successful operation',
+                schema: {
+                    type: 'object',
+                    items: {
+                        $ref: "#/definitions/WorkflowProcessModel"
+                    },
+                },
+            },
+        },
+        parameters: [
+            {
+                name: 'request',
+                in: 'body',
+                required: true,
+                type: 'object',
+                schema: {
+                    type: "object",
+                    properties: {
+                        process_id: {
+                            type: 'string',
+                        },
+                        fields: {
+                            type: 'object',
+                        }
+                    },
+                }
+            },
+        ],
+        usedDefinitions: ["WorkflowProcessModel"],
+    },
+
 
 ];

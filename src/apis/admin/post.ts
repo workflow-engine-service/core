@@ -4,6 +4,7 @@ import { WorkflowDescriptor } from "../../interfaces";
 import { BaseApi } from "../base";
 import { Auth } from "../../auth";
 import { errorLog } from "../../common";
+import { ProcessHelper } from "../processHelper";
 
 export function classApi() {
     return AdminPostApi;
@@ -139,8 +140,52 @@ export class AdminPostApi extends BaseApi {
         return this.response(userInfo);
     }
     /************************************** */
-    /************************************** */
+    async processSetFields() {
+        try {
+            // =>check admin access
+            if (!this.isAdmin()) {
+                return this.error403('just admin allowed');
+            }
+            // =>get params
+            let processId = this.param('process_id');
+            let fields = this.param('fields', {}, true);
+            // =>find process by id
+            let res = await this.getProcess(processId);
+            if (Array.isArray(res)) return res;
+            // =>iterate fields
+            for (const key of Object.keys(fields)) {
+                // =>validate field
+                let respValidate = await ProcessHelper.validateFieldValue(res.process, key, fields[key]);
+                if (!respValidate.success) {
+                    return this.error400(respValidate.error);
+                }
+                // =>find field
+                let fieldIndex = res.process.field_values.findIndex(i => i.name === key);
+                // =>set field
+                if (fieldIndex > -1) {
+                    res.process.field_values[fieldIndex] = fields[key];
+                } else {
+                    res.process.field_values.push(fields[key]);
+                }
+            }
+            // =>update process
+            res.process.updated_at = new Date().getTime();
+            await Const.DB.models.processes.updateOne({
+                _id: res.process._id,
+            }, {
+                $set: {
+                    field_values: res.process.field_values,
+                },
+            }, { multi: true, upsert: true }).clone();
 
+            return this.response(res.process);
+        } catch (e) {
+            errorLog('process_set_fields', e);
+            return this.error400();
+        }
+    }
+    /************************************** */
+    /************************************** */
     /************************************** */
     async validateWorkflowCode(code: WorkflowDescriptor): Promise<[WorkflowDescriptor, string]> {
         if (!code) return [code, 'undefined code'];
