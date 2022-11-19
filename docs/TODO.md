@@ -13,7 +13,8 @@
 [ ] not create new worker for an action when exist and running
 [ ] add headers to event requests
 [ ] return process history
-[] admin can force change process fields
+[ ] admin can force change process fields
+[ ] define '*' in send_fields to state action
 
 # DONE Tasks
 [x] init workflow core

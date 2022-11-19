@@ -419,6 +419,11 @@ export namespace ProcessHelper {
             let sendProcessFields: WorkflowProcessField[] = [];
             if (action.send_fields) {
                 for (const fieldName of action.send_fields) {
+                    // =>if '*'
+                    if (fieldName === '*') {
+                        sendProcessFields = process.field_values.filter(i => i.value !== undefined);
+                        break;
+                    }
                     // =>find process field
                     let field = process.field_values.find(i => i.name === fieldName);
                     if (!field) continue;

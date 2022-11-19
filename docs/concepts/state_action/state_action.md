@@ -6,6 +6,8 @@ every action can be one of these types for execute:
 
 > you can use, `alias` for `hook_url`, `redis` types by `alias_name` property.
 
+> Also, if you want to to send all fields of process to api endpoint, or redis channel, you can use `send_fields: ["*"]`
+
 #### hook_url
 
 when your server must be determine that next state is which or you can manage action execute by your self app server.
