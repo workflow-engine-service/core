@@ -48,6 +48,7 @@ export async function getConfig<T = string>(name: ConfigName, def?: T): Promise<
     // =>find by name
     const conf = await Const.DB?.models?.configs.findOne({ name });
     if (conf) {
+        if (conf.type === 'json' && typeof conf.value === 'string') conf.value = JSON.parse(conf.value);
         return conf.value as any;
     }
 

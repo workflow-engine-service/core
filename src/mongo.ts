@@ -35,6 +35,7 @@ export class MongoDB {
             });
         this.db = monogo.connection;
         this.db.on("error", console.error.bind(console, "connection error: "));
+        mongoose.set('strictQuery', false);
         this.db.once("open", function () {
             console.log("Connected successfully");
         });
