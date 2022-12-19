@@ -1,4 +1,4 @@
-import { LogMode } from "../types";
+import { ConfigName, LogMode } from "../types";
 import { WorkflowField, WorkflowProcessField, WorkflowState, WorkflowProcessOnInit, WorkflowProcessJob } from "../interfaces";
 
 export interface DeployedWorkflowModel {
@@ -101,4 +101,13 @@ export interface WorkerModel<R = {}> {
     success?: boolean;
     meta?: object;
     response?: R;
+}
+
+
+export interface ConfigModel {
+    _id?: string;
+    name: ConfigName;
+    value?: string | number | object;
+    type?: 'string' | 'number' | 'json';
+    updated_at?: number;
 }

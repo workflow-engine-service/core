@@ -71,4 +71,6 @@ export type WorkflowStateActionType = 'hook_url' | 'redis' | 'local';
 
 export type HookMethodType = 'post' | 'put' | 'get' | 'delete';
 
-export type HttpResponse = [string, HttpStatusCode, string]
+export type HttpResponse = [string, HttpStatusCode, string];
+
+export type ConfigName = 'active_jobs';

@@ -1,9 +1,10 @@
 import { ProcessHelper } from "./apis/processHelper";
 import { WorkflowCalculatorClass } from "./calculator";
-import { clone, dbLog, errorLog } from "./common";
+import { clone, dbLog, errorLog, infoLog } from "./common";
 import { Const } from "./const";
 import { WorkflowEvents } from "./events";
-import { WorkflowActiveJob, WorkflowActiveJobSendParameters, WorkflowStateJob, WorkflowStateJobTime } from "./interfaces";
+import { WorkflowActiveJob, WorkflowActiveJobSendParameters, WorkflowStateJob } from "./interfaces";
+import { getConfig, setConfig } from "./models/configs";
 import { LogMode } from "./types";
 import { WebWorkers } from "./workers";
 
@@ -11,6 +12,19 @@ export namespace WorkflowJob {
     let runningActiveJobsCycle = false;
     let activeJobs: WorkflowActiveJob[] = [];
     export async function start() {
+        // =>if active job empty, restore it
+        if (activeJobs.length === 0) {
+            activeJobs = await getConfig<WorkflowActiveJob[]>('active_jobs', []);
+            infoLog('job', `restored '${activeJobs.length}' active jobs`);
+            dbLog({
+                name: 'restore_active_jobs',
+                namespace: 'job',
+                mode: LogMode.INFO,
+                meta: {
+                    jobs_length: activeJobs.length,
+                },
+            });
+        }
         // =>listen on every process state onInit
         WorkflowEvents.ProcessStateOnInit$.subscribe(async it => {
             try {
@@ -126,11 +140,15 @@ export namespace WorkflowJob {
             activeJobs.push(job);
             // console.log('add job:', job)
         }
+        // =>save active jobs on db
+        setConfig<WorkflowActiveJob[]>('active_jobs', activeJobs);
     }
     /****************************** */
     export async function removeActiveJobsByStateName(stateName: string) {
         let newActiveJobs = activeJobs.filter(i => i.__job_state_name !== stateName);
         activeJobs = clone(newActiveJobs);
+        // =>save active jobs on db
+        setConfig<WorkflowActiveJob[]>('active_jobs', activeJobs);
     }
     /****************************** */
     async function matchJobTime(job: WorkflowStateJob, startedAt: number): Promise<boolean> {
