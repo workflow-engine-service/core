@@ -4,8 +4,8 @@ import { ConfigName } from "../types";
 import { ConfigModel } from './models';
 const metaDataSchema = new mongoose.Schema<ConfigModel, ConfigModel>({
     name: String,
-    value: String,
-    type: Object,
+    value: mongoose.SchemaTypes.Mixed,
+    type: String,
     updated_at: {
         type: Number,
     },
