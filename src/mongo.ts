@@ -22,18 +22,23 @@ export class MongoDB {
 
     }
     async connect() {
-        let uri = `mongodb://${Const.CONFIGS.mongo.host}:${Const.CONFIGS.mongo.port}/${Const.CONFIGS.mongo.name}`;
+        let uri = `mongodb://${Const.CONFIGS.mongo.host}:${Const.CONFIGS.mongo.port}/${Const.CONFIGS.mongo.name}?authSource=admin`;
+        let options: mongoose.ConnectOptions = {
+            authSource: 'admin',
+        };
         // =>if has username, password
         if (Const.CONFIGS.mongo.username && Const.CONFIGS.mongo.password) {
-            uri = `mongodb://${encodeURIComponent(Const.CONFIGS.mongo.username)}:${encodeURIComponent(Const.CONFIGS.mongo.password)}@${Const.CONFIGS.mongo.host}:${Const.CONFIGS.mongo.port}/${Const.CONFIGS.mongo.name}?authSource=admin`;
+            // uri = `mongodb://${Const.CONFIGS.mongo.username}:${encodeURIComponent(Const.CONFIGS.mongo.password)}@${Const.CONFIGS.mongo.host}:${Const.CONFIGS.mongo.port}/${Const.CONFIGS.mongo.name}?authSource=admin`;
+            options.auth = {
+                username: Const.CONFIGS.mongo.username,
+                password: Const.CONFIGS.mongo.password,
+            };
+            // options['useNewUrlParser'] = true
         }
-        // console.log('uri:', uri);
-        let monogo = await mongoose.connect(
-            uri,
-            {
-                authSource: 'admin',
-            });
-        this.db = monogo.connection;
+        // console.log('uri:', uri, options);
+        let mongo = await mongoose.connect(
+            uri, options);
+        this.db = mongo.connection;
         this.db.on("error", console.error.bind(console, "connection error: "));
         mongoose.set('strictQuery', false);
         this.db.once("open", function () {

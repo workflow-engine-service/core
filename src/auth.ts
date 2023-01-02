@@ -8,7 +8,7 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import * as https from 'https';
 
 export namespace Auth {
-    const tokenSign = '0x%wf';
+    const tokenSign = '0x_wfsrv';
     /********************************* */
     export async function authenticate(username: string, secret_key: string) {
         if (!username || !secret_key) return undefined;
