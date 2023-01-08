@@ -281,6 +281,11 @@ export class BaseApi {
             let stateInfo = process.workflow.states.find(i => i.name === stateName);
             // =>check access state
             if (!this.checkUserRoleHasAccess(stateInfo.access_role, { process })) {
+                this.errorLog('process', 'no_access_state', {
+                    state_access_role: stateInfo.access_role,
+                    process_id: process._id,
+                    state_name: stateName,
+                });
                 return this.error403('no access to state info');
             }
             return { state: stateInfo, process };
