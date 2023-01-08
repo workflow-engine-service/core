@@ -385,7 +385,7 @@ export class BaseApi {
                     continue;
                 }
                 // =>if filter end processes
-                if (filters.filter_finished_processes && res.process.current_state === res.process.workflow.end_state) {
+                if (filters.filter_finished_processes && res.process.workflow.end_state.includes(res.process.current_state)) {
                     continue;
                 }
                 // =>truncate data

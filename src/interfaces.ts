@@ -472,9 +472,9 @@ export interface WorkflowDescriptor {
      */
     start_state: string;
     /**
-     * end state of process
+     * end states of process
      */
-    end_state: string;
+    end_state: string | string[];
     fields?: WorkflowField[];
     states: WorkflowState[];
 }

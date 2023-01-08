@@ -5,7 +5,7 @@ export interface DeployedWorkflowModel {
     name: string;
     version?: number;
     start_state: string;
-    end_state: string;
+    end_state: string[];
     settings: {
         auto_delete_after_end?: boolean;
         create_access_roles?: string[];

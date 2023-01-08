@@ -4,7 +4,7 @@ const metaDataSchema = new mongoose.Schema<DeployedWorkflowModel, DeployedWorkfl
     name: String,
     version: Number,
     start_state: String,
-    end_state: String,
+    end_state: Array,
     settings: Object,
     fields: Array,
     states: Array,

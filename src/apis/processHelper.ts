@@ -12,7 +12,7 @@ import * as https from 'https';
 export namespace ProcessHelper {
     export async function doActionWithLocal(params: WorkflowStateActionSendParameters): Promise<WorkflowStateActionResponse> {
 
-        let nextState = params._action.next_state || params._process.workflow.end_state;
+        let nextState = params._action.next_state || params._process.workflow.end_state[0];
         return {
             state_name: nextState,
             response_message: `[workflow] process go to ${nextState} locally`,

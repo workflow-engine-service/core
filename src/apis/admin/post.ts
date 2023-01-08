@@ -36,7 +36,7 @@ export class AdminPostApi extends BaseApi {
             name: code.workflow_name,
             version: code.version,
             start_state: code.start_state,
-            end_state: code.end_state,
+            end_state: code.end_state as string[],
             settings: {
                 auto_delete_after_end: code.auto_delete_after_end,
             },
@@ -198,7 +198,11 @@ export class AdminPostApi extends BaseApi {
         // =>check has start state
         if (!code.start_state || typeof code.start_state !== 'string') return [code, 'bad start state'];
         // =>check has end state
-        if (!code.end_state || typeof code.end_state !== 'string') return [code, 'bad end state'];
+        if (!code.end_state) return [code, 'bad end state'];
+        // =>convert end state to array
+        if (typeof code.end_state === 'string') {
+            code.end_state = [code.end_state as any];
+        }
         // =>check for at least one state
         if (!code.states || !Array.isArray(code.states) || code.states.length < 1) {
             return [code, 'bad define states'];
@@ -207,13 +211,15 @@ export class AdminPostApi extends BaseApi {
         if (!code.states.find(i => i.name === code.start_state)) {
             return [code, 'not found start state at states array'];
         }
-        // =>check for exist end state
-        if (!code.states.find(i => i.name === code.end_state)) {
-            return [code, 'not found end state at states array'];
-        }
-        // =>check start, end states not same
-        if (code.start_state === code.end_state) {
-            return [code, 'start state, end state can not be same'];
+        for (const end of code.end_state) {
+            // =>check for exist end state
+            if (!code.states.find(i => i.name === end)) {
+                return [code, 'not found end state at states array'];
+            }
+            // =>check start, end states not same
+            if (code.start_state === end) {
+                return [code, 'start state, end state can not be same'];
+            }
         }
         //TODO:
         return [code, undefined];

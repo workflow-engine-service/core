@@ -11,7 +11,7 @@
 |process_init_check| [WorkflowProcessOnInit](#workflowprocessoninit-schema) | NO | check when a process wants to start
 |auto_delete_after_end| boolean | NO | delete process after enter to end state
 |start_state| string | **YES** | start state of process
-|end_state| string | **YES** | end state of process
+|end_state| string or string[] | **YES** | end state(s) of process
 |fields| [WorkflowField](#workflowfield-schema) | NO | workflow fields
 |states| [WorkflowState](#workflowstate-schema) | **YES** | workflow states
 
