@@ -276,8 +276,8 @@ export async function dbLog(options: { namespace: WorkflowNamespace, name: strin
             created_at: new Date().getTime(),
         });
     } catch (e) {
-        // console.trace();
-        errorLog('err66553', e);
+        console.trace();
+        // errorLog('err66553', e);
         console.log(e);
     }
 }
