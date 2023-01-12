@@ -280,7 +280,8 @@ export async function dbLog(options: { namespace: WorkflowNamespace, name: strin
     } catch (e) {
         console.trace();
         // errorLog('err66553', e);
-        console.log(e);
+        console.log('err66553', options.name, e);
+        console.log(options);
     }
 }
 /***************************************** */

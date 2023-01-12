@@ -16,14 +16,14 @@ export namespace WorkflowJob {
         if (activeJobs.length === 0) {
             activeJobs = await getConfig<WorkflowActiveJob[]>('active_jobs', []);
             infoLog('job', `restored '${activeJobs.length}' active jobs`);
-            // dbLog({
-            //     name: 'restore_active_jobs',
-            //     namespace: 'job',
-            //     mode: LogMode.INFO,
-            //     meta: {
-            //         jobs_length: activeJobs.length,
-            //     },
-            // });
+            dbLog({
+                name: 'restore_active_jobs',
+                namespace: 'job',
+                mode: LogMode.INFO,
+                meta: {
+                    jobs_length: activeJobs.length,
+                },
+            });
         }
         // =>listen on every process state onInit
         WorkflowEvents.ProcessStateOnInit$.subscribe(async it => {
