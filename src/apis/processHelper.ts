@@ -122,7 +122,13 @@ export namespace ProcessHelper {
                         state_name: undefined,
                         response_message: error.message,
                     };
-                    dbLog({ namespace: 'action', name: 'error_on_hook_response', 'meta': { error: error.toJSON(), code: error.code } });
+                    dbLog({
+                        namespace: 'action', name: 'error_on_hook_response', 'meta': {
+                            msg: error.message,
+                            res_data: String(error.response.data),
+                            code: error.code,
+                        }
+                    });
                 }).finally(() => {
                     if (!actionResponse.response_message) {
                         if (actionResponse._failed) {
