@@ -23,6 +23,7 @@ sample code:
 | api_header_name | string | NO | header name for send access token for API url for api_based type (default: Authorization) |
 | api_timeout | number | NO | timeout for call api endpoint for api_based type (default: 2000 ms) |
 | header_name | string | NO | for authenticate user request (default: Authorization) |
+| api_cache_time | number | NO | cache period authentication user in ms (default: 100) |
 
 ## `api_based` type
 

@@ -79,6 +79,9 @@ export async function loadConfigs() {
         if (!Const.CONFIGS.auth_user.api_header_name) {
             Const.CONFIGS.auth_user.api_header_name = 'Authorization';
         }
+        if (!Const.CONFIGS.auth_user.api_cache_time) {
+            Const.CONFIGS.auth_user.api_cache_time = 100;
+        }
         if (!Const.CONFIGS.auth_user.method) {
             Const.CONFIGS.auth_user.method = 'get';
         }

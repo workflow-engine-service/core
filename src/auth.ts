@@ -3,12 +3,19 @@ import * as bcrypt from 'bcrypt';
 import { UserModel } from "./models/models";
 import { Request } from "express";
 import { UserTokenResponse } from "./apis/public/interfaces";
-import { dbLog, errorLog, generateString } from "./common";
+import { dbLog, errorLog, generateString, infoLog } from "./common";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import * as https from 'https';
 
 export namespace Auth {
     const tokenSign = '0x_wfsrv';
+    const cachingAuth: {
+        [k: string]: {
+            expiredAt?: number;
+            userId?: number;
+            userName?: string;
+        }
+    } = {};
     /********************************* */
     export async function authenticate(username: string, secret_key: string) {
         if (!username || !secret_key) return undefined;
@@ -106,37 +113,73 @@ export namespace Auth {
             if (!Const.CONFIGS.auth_user.url) return 'invalid';
             let headers = {};
             headers[Const.CONFIGS.auth_user.api_header_name] = token;
-            // =>call api
-            let res = await axios({
-                httpsAgent: new https.Agent({ rejectUnauthorized: false }),
-                method: Const.CONFIGS.auth_user.method,
-                url: Const.CONFIGS.auth_user.url,
-                headers,
-                timeout: Const.CONFIGS.auth_user.api_timeout,
-            });
-            // console.log('ffff', res.status, token)
-            // =>if failed
-            if (!res || res.status > 299) {
-                return 'invalid';
+            let apiUserIdOrName: number | string;
+            // =>remove all expired caches
+            let now = new Date().getTime();
+            while (true) {
+                let isExistExpired = false;
+                for (const key of Object.keys(cachingAuth)) {
+                    if (cachingAuth[key].expiredAt < now) {
+                        delete cachingAuth[key];
+                        break;
+                    }
+                }
+                if (!isExistExpired) break;
             }
-            // =>if success
-            let userIdentify = res.data;
-            if (userIdentify === undefined || (typeof userIdentify !== 'string' && typeof userIdentify !== 'number')) {
-                dbLog({ name: 'bad__auth_api_res', namespace: 'auth', meta: { res: res.data } });
-                return 'invalid';
+            // =>check from cache
+            if (cachingAuth[token]) {
+                if (cachingAuth[token].userId) {
+                    apiUserIdOrName = cachingAuth[token].userId;
+                } else if (cachingAuth[token].userName) {
+                    apiUserIdOrName = cachingAuth[token].userName;
+                }
+                infoLog('api_auth', `using cache for auth user '${apiUserIdOrName}'`);
+            }
+            // =>call api
+            else {
+                let res = await axios({
+                    httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+                    method: Const.CONFIGS.auth_user.method,
+                    url: Const.CONFIGS.auth_user.url,
+                    headers,
+                    timeout: Const.CONFIGS.auth_user.api_timeout,
+                });
+                // console.log('ffff', res.status, token)
+                // =>if failed
+                if (!res || res.status > 299) {
+                    return 'invalid';
+                }
+                // =>if success
+                let userIdentify = res.data;
+                if (userIdentify === undefined || (typeof userIdentify !== 'string' && typeof userIdentify !== 'number')) {
+                    dbLog({ name: 'bad__auth_api_res', namespace: 'auth', meta: { res: res.data } });
+                    return 'invalid';
+                }
+
+                // =>set user id or name
+                if (typeof res.data === 'number') {
+                    apiUserIdOrName = res.data;
+                } else {
+                    apiUserIdOrName = String(res.data);
+                }
             }
             // =>find user by name or id
             let user: UserModel;
-            if (typeof res.data === 'number') {
+            if (typeof apiUserIdOrName === 'number') {
                 user = await Const.DB.models.users.findOne({
-                    id: res.data
+                    id: apiUserIdOrName,
                 });
             } else {
                 user = await Const.DB.models.users.findOne({
-                    name: String(res.data)
+                    name: String(apiUserIdOrName)
                 });
             }
-
+            // =>cache user
+            cachingAuth[token] = {
+                expiredAt: now + Const.CONFIGS.auth_user.api_cache_time,
+                userId: typeof apiUserIdOrName === 'number' ? apiUserIdOrName : undefined,
+                userName: typeof apiUserIdOrName === 'string' ? apiUserIdOrName : undefined,
+            };
             // =>if not found user
             if (!user) {
                 return 'invalid';

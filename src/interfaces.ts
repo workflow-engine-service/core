@@ -102,7 +102,11 @@ export interface ServerConfigs {
          * @default 2000 (ms)
          */
         api_timeout?: number;
-
+        /**
+         * for api_based (in ms)
+         * @default: 100
+         */
+        api_cache_time?: number;
     }
 }
 
