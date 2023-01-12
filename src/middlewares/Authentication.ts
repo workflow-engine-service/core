@@ -55,7 +55,7 @@ export class Authentication extends Middleware {
       }
       // =>if no have auth
       if (!req.body[Const.AuthenticateUserKey]) {
-         errorLog('no_auth_api', JSON.stringify([req.path, req.method]));
+         errorLog('no_auth_api', JSON.stringify([req.path, req.method]), true);
          // =>return 401 response
          return this.responseError(req, HttpStatusCode.HTTP_401_UNAUTHORIZED, `auth need, set '${Const.CONFIGS.auth_user.header_name}' header on request`);
       }

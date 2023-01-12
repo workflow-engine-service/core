@@ -146,7 +146,7 @@ export function applyAliasConfig<T = object>(obj: T): T {
         obj[key] = aliasObject[key];
     }
     if (!aliasObject) return obj;
-    dbLog({ namespace: 'config', name: 'detect_alias', meta: { alias: aliasObject } });
+    // dbLog({ namespace: 'config', name: 'detect_alias', meta: { alias: aliasObject } });
 
 
     return obj;
@@ -202,7 +202,7 @@ export function debugLog(name: string, message: string) {
     }
 }
 /***************************************** */
-export function errorLog(name: string, error: any, uid?: number) {
+export function errorLog(name: string, error: any, uid?: number, noDBLog = false) {
     if (Const.CONFIGS && Const.CONFIGS.server.debug_mode && typeof error !== 'string') {
         console.error(error);
     }
@@ -214,9 +214,11 @@ export function errorLog(name: string, error: any, uid?: number) {
         } catch (e) { jsonError = String(error); }
     }
     // =>add error on db
-    try {
-        dbLog({ namespace: 'other', name, mode: LogMode.ERROR, user_id: uid, meta: { error, jsonError } });
-    } catch (e) { }
+    if (!noDBLog) {
+        try {
+            dbLog({ namespace: 'other', name, mode: LogMode.ERROR, user_id: uid, meta: { error, jsonError } });
+        } catch (e) { }
+    }
 
     writeLogOnFile('errors', `${name} ${uid ? uid : ''}::${error}`);
 }
