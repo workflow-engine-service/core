@@ -137,13 +137,18 @@ export namespace Auth {
             }
             // =>call api
             else {
-                let res = await axios({
-                    httpsAgent: new https.Agent({ rejectUnauthorized: false }),
-                    method: Const.CONFIGS.auth_user.method,
-                    url: Const.CONFIGS.auth_user.url,
-                    headers,
-                    timeout: Const.CONFIGS.auth_user.api_timeout,
-                });
+                let res: AxiosResponse;
+                try {
+                    res = await axios({
+                        httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+                        method: Const.CONFIGS.auth_user.method,
+                        url: Const.CONFIGS.auth_user.url,
+                        headers,
+                        timeout: Const.CONFIGS.auth_user.api_timeout,
+                    });
+                } catch (e) {
+                    errorLog('err123432', e, 0, true);
+                }
                 // console.log('ffff', res.status, token)
                 // =>if failed
                 if (!res || res.status > 299) {
