@@ -22,7 +22,7 @@ export class MongoDB {
 
     }
     async connect() {
-        let uri = `mongodb+srv://${Const.CONFIGS.mongo.host}:${Const.CONFIGS.mongo.port}/${Const.CONFIGS.mongo.name}`;
+        let uri = `mongodb://${Const.CONFIGS.mongo.host}:${Const.CONFIGS.mongo.port}/${Const.CONFIGS.mongo.name}`;
         let options: mongoose.ConnectOptions = {
             authSource: 'admin',
             retryWrites: true,
