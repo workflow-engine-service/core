@@ -91,7 +91,15 @@ export namespace ProcessHelper {
             if (params._action.method === 'get') {
                 configs.params = await getWorkflowStateActionSendParameters(params);
             }
-            dbLog({ namespace: 'action', name: 'pre_doActionWithHookUrl', meta: { configs } });
+            dbLog({
+                namespace: 'action', name: 'pre_doActionWithHookUrl', meta: {
+                    url: configs.url,
+                    method: configs.method,
+                    params: configs.params,
+                    body: configs.data,
+                    headers: configs.headers,
+                }
+            });
             debugLog('hook', `do action with hook url [${configs.method}] '${configs.url}'`);
             // =>send request
             return new Promise((resolve) => {
