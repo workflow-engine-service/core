@@ -74,15 +74,15 @@ export namespace WorkflowJob {
                     sendParams._state = sendParams._process.workflow.states.find(i => i.name === sendParams._process.current_state);
                     // =>create new worker
                     let workerId = await WebWorkers.addJobWorker(sendParams);
-                    dbLog({
-                        name: 'run_job_worker',
-                        namespace: 'job',
-                        mode: LogMode.INFO,
-                        meta: {
-                            workerId,
-                            job,
-                        },
-                    });
+                    // dbLog({
+                    //     name: 'run_job_worker',
+                    //     namespace: 'job',
+                    //     mode: LogMode.INFO,
+                    //     meta: {
+                    //         workerId,
+                    //         job,
+                    //     },
+                    // });
                     // =>update job started_at
                     job.started_at = new Date().getTime();
                 }
