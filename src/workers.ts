@@ -260,7 +260,7 @@ export namespace WebWorkers {
         let worker = await Const.DB.models.workers.create(struct);
         struct._id = worker._id;
         debugLog('worker', `added a new worker by id '${struct._id}' by type '${struct.type}'`);
-        dbLog({ namespace: 'worker', name: 'add_worker', meta: { struct }, user_id: struct.started_by });
+        // dbLog({ namespace: 'worker', name: 'add_worker', meta: { struct }, user_id: struct.started_by });
         workers.push(struct);
         return struct._id;
     }
