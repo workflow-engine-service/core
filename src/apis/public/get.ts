@@ -118,6 +118,7 @@ export class PublicGetApi extends BaseApi {
         try {
             // =>get worker id
             let workerId = this.param('id');
+            if (!workerId || typeof workerId !== 'string') return this.error400('bad worker id');
             // =>find worker by id
             let worker = await Const.DB.models.workers.findById(workerId);
             if (!worker) return this.error404();

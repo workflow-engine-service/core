@@ -131,7 +131,7 @@ export async function loadConfigs() {
         }
         return true;
     } catch (e) {
-        console.error(e);
+        errorLog('err4574332', e, 0, true)
         return false;
     }
 }
@@ -164,7 +164,7 @@ function log(text: string, label?: string, type: 'info' | 'error' | 'normal' | '
         message = `[${date}-${time}:${dateTime.getMilliseconds()}] ${label} : ${text}`;
     }
     if (type === 'error') {
-        console.error("\x1b[31m\x1b[1m" + message);
+        console.warn("\x1b[31m\x1b[1m" + message);
     } else if (type === 'info') {
         console.log("\x1b[34m\x1b[1m" + message);
     } else if (type === 'debug') {
@@ -207,7 +207,7 @@ export function debugLog(name: string, message: string) {
 /***************************************** */
 export function errorLog(name: string, error: any, uid?: number, noDBLog = false) {
     if (Const.CONFIGS && Const.CONFIGS.server.debug_mode && typeof error !== 'string') {
-        console.error(error);
+        console.warn(error);
     }
     log(error, name, 'error');
     let jsonError = {};
