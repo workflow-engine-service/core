@@ -33,13 +33,16 @@ export default class IntegrationHelpers {
         console.log('clear the database');
     }
 
-    public static timeTraveling(options: { addHours?: number; addMinutes?: number; }) {
+    public static timeTraveling(options: { addHours?: number; addMinutes?: number; addSeconds?: number;}) {
         const DATE_TO_USE = new Date();
         if (options.addHours) {
             DATE_TO_USE.setHours(DATE_TO_USE.getHours() + options.addHours);
         }
         if (options.addMinutes) {
             DATE_TO_USE.setMinutes(DATE_TO_USE.getMinutes() + options.addMinutes);
+        }
+        if (options.addSeconds) {
+            DATE_TO_USE.setSeconds(DATE_TO_USE.getSeconds() + options.addSeconds);
         }
         const _Date = Date;
         // const gg = new Date(DATE_TO_USE.getTime());

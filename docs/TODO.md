@@ -15,6 +15,7 @@
 [ ] return process history
 [ ] admin can force change process fields
 [ ] define '*' in send_fields to state action
+[ ] delete process, workers, if auto delete enabled
 
 # DONE Tasks
 [x] init workflow core

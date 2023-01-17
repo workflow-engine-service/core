@@ -3,7 +3,7 @@ import { Const } from "../const";
 import { WorkflowActiveJobSendParameters, WorkflowBaseWorkerSendParameters, WorkflowCreateProcessSendParameters, WorkflowProcessField, WorkflowState, WorkflowStateAction, WorkflowStateActionResponse, WorkflowStateActionSendParameters, WorkflowStateActionSendParametersFields, WorkflowStateEvent, WorkflowStateEventSendParametersFields } from "../interfaces";
 import { WorkflowProcessChangeField, WorkflowProcessModel } from "../models/models";
 import { Redis } from "../redis";
-import { errorLog, debugLog, applyAliasConfig, dbLog, makeAbsoluteUrl } from "../common";
+import { errorLog, debugLog, applyAliasConfig, dbLog, makeAbsoluteUrl, infoLog } from "../common";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { WorkflowEvents } from "../events";
 import { WebWorkers } from "../workers";
@@ -340,8 +340,24 @@ export namespace ProcessHelper {
             // =>emit 'ProcessStateOnInit$' event
             WorkflowEvents.ProcessStateOnInit$.next(newProcess.params._process);
         }
+        // =>set workflow, if not set
+        if (!process.workflow) {
+            process.workflow = await Const.DB.models.workflows.findOne({ name: process.workflow_name, version: process.workflow_version });
+        }
         // =>check for end state
-        //TODO:
+        if (process.workflow.end_state?.includes(process.current_state)) {
+            // =>remove related workers on process
+            let res = await Const.DB.models.workers.deleteMany({
+                ended_at: { $ne: null },
+                meta: { process: process._id },
+            });
+            infoLog('auto_delete_process', `auto delete process workers of ${process.workflow_name}: ${res.deletedCount} done workers`);
+            // =>remove process, after time 2s
+            setTimeout(() => {
+                Const.DB.models.processes.findByIdAndDelete(process._id);
+                infoLog('auto_delete_process', `auto delete process of ${process.workflow_name} with id ${process._id}`);
+            }, 2 * 1000);
+        }
 
         return true;
     }

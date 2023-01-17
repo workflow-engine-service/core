@@ -97,7 +97,7 @@ export interface ServerConfigs {
         /**
          * @default: "Authorization"
          */
-        header_name?: string,
+        header_name: string,
         /**
          * @default 2000 (ms)
          */
@@ -287,35 +287,35 @@ export interface WorkflowStateJobTime {
 /**
  * @example if (myfield > 5) return 'state3' else 'state4'
  * { 
- *  $if: {
- *      $eq: [{$field: "myfield"}, {$const: 5}]
+ *  __if: {
+ *      __eq: [{__field: "myfield"}, {__const: 5}]
  * },
- * $then: {$const: "state3"},
- * $else: {$const: "state4"}
+ * __then: {__const: "state3"},
+ * __else: {__const: "state4"}
  *  }
  * }
  * @example return myfield*2
  * {
- *  $mul: [{$field: "myfield"}, {$const: 2}]
+ *  __mul: [{__field: "myfield"}, {__const: 2}]
  * }
  */
 export interface WorkflowCalculator {
-    $field?: string;
-    // $return?: WorkflowCalculator;
-    $const?: string | number | boolean;
+    __field?: string;
+    // __return?: WorkflowCalculator;
+    __const?: string | number | boolean;
     /**conditions */
-    $if?: WorkflowCalculator;
-    $then?: WorkflowCalculator;
-    $else?: WorkflowCalculator;
-    $or?: WorkflowCalculator[];
-    $and?: WorkflowCalculator[];
-    $eq?: [WorkflowCalculator, WorkflowCalculator];
-    $gt?: [WorkflowCalculator, WorkflowCalculator];
-    $lt?: [WorkflowCalculator, WorkflowCalculator];
+    __if?: WorkflowCalculator;
+    __then?: WorkflowCalculator;
+    __else?: WorkflowCalculator;
+    __or?: WorkflowCalculator[];
+    __and?: WorkflowCalculator[];
+    __eq?: [WorkflowCalculator, WorkflowCalculator];
+    __gt?: [WorkflowCalculator, WorkflowCalculator];
+    __lt?: [WorkflowCalculator, WorkflowCalculator];
     /**functions */
-    $add?: WorkflowCalculator[];
-    $minus?: WorkflowCalculator[];
-    $mul?: WorkflowCalculator[];
+    __add?: WorkflowCalculator[];
+    __minus?: WorkflowCalculator[];
+    __mul?: WorkflowCalculator[];
 }
 export interface WorkflowStateJob {
     _id?: string;

@@ -15,14 +15,14 @@ for `if (myfield > 5) return 'state3' else 'state4'`
 calculator code:
 ```json
 {
-    "$if": {
-        "$gt": [
-            {"$field": "myfield"}, 
-            {"$const": 5}
+    "__if": {
+        "__gt": [
+            {"__field": "myfield"}, 
+            {"__const": 5}
         ]
     },
-    "$then": {"$const": "state3"},
-    "$else": {"$const": "state4"},
+    "__then": {"__const": "state3"},
+    "__else": {"__const": "state4"},
 }
 ```
 
@@ -33,9 +33,9 @@ for `myfield * 2`
 calculator code:
 ```json
 {
-   "$mul": [
-       {"$field": "myfield"}, 
-       {"$const": 2}
+   "__mul": [
+       {"__field": "myfield"}, 
+       {"__const": 2}
     ]
 }
 ```
@@ -47,21 +47,21 @@ for `if (fieldnum == 5 or fieldnum > 5) return field2 else return 'state1'`
 calculator code:
 ```json
 {
-    "$if": {
-        "$or": [
-            { "$eq": [
-                { "$field": "fieldnum" }, 
-                { "$const": 5 }
+    "__if": {
+        "__or": [
+            { "__eq": [
+                { "__field": "fieldnum" }, 
+                { "__const": 5 }
                 ] 
             },
-            { "$gt": [
-                { "$field": "fieldnum" },
-                 { "$const": 5 }
+            { "__gt": [
+                { "__field": "fieldnum" },
+                 { "__const": 5 }
                 ] 
             },
         ],
     },
-    "$then": { "$field": "field2" },
-    "$else": { "$const": "state1" },
+    "__then": { "__field": "field2" },
+    "__else": { "__const": "state1" },
 }
 ```

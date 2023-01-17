@@ -347,6 +347,7 @@ export namespace WebWorkers {
                 worker.ended_at = new Date().getTime();
                 // =>update  worker
                 await updateWorker(worker);
+                WorkflowEvents.workerFinished$.next(worker);
                 workerRunning--;
             });
         }, 50);

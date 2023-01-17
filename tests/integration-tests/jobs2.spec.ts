@@ -112,7 +112,7 @@ describe('Workflow Jobs (state-based)', () => {
         return new Promise((res) => {
             IntegrationHelpers.timeTraveling({ addMinutes: 20 });
             setTimeout(async () => {
-                let worker = await Const.DB.models.workers.find({
+                let worker = await Const.DB.models.workers?.find({
                     type: 'state_job',
                     meta: { $exists: true },
                     "meta.state": 'end',
@@ -127,9 +127,9 @@ describe('Workflow Jobs (state-based)', () => {
     });
 
     it("check go to 'end' state", async () => {
-        let process = await Const.DB.models.processes.findById(sampleProcessId);
+        let process = await Const.DB.models.processes?.findById(sampleProcessId);
         expect(process).not.toBeUndefined();
-        expect(process.current_state).toEqual('end');
+        expect(process?.current_state).toEqual('end');
     });
 
     it("check removed 'start' state jobs", async () => {

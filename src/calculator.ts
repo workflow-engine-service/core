@@ -1,13 +1,13 @@
 import { WorkflowCalculator } from "./interfaces";
 import { WorkflowProcessModel } from "./models/models";
 
-type WorkflowCalculatorFunctionName = '$add' | '$mul' | '$minus' | '$div';
-type WorkflowCalculatorConditionOperatorName = '$eq' | '$gt' | '$lt';
+type WorkflowCalculatorFunctionName = '__add' | '__mul' | '__minus' | '__div';
+type WorkflowCalculatorConditionOperatorName = '__eq' | '__gt' | '__lt';
 
 export class WorkflowCalculatorClass {
     protected _process: WorkflowProcessModel;
-    private _functionNames: WorkflowCalculatorFunctionName[] = ['$add', '$mul', '$minus', '$div'];
-    private _conditionOperatorNames: WorkflowCalculatorConditionOperatorName[] = ['$eq', '$gt', '$lt'];
+    private _functionNames: WorkflowCalculatorFunctionName[] = ['__add', '__mul', '__minus', '__div'];
+    private _conditionOperatorNames: WorkflowCalculatorConditionOperatorName[] = ['__eq', '__gt', '__lt'];
 
     /********************* */
     constructor(process: WorkflowProcessModel) {
@@ -29,28 +29,28 @@ export class WorkflowCalculatorClass {
             if (this._functionNames.includes(key as any)) {
                 return await this._execFunction(key as any, schema[key]);
             }
-            // =>if '$field'
-            if (key === '$field') {
+            // =>if '__field'
+            if (key === '__field') {
                 return this._process.field_values.find(i => i.name === schema[key])?.value;
             }
-            // =>if '$const'
-            if (key === '$const') {
+            // =>if '__const'
+            if (key === '__const') {
                 return schema[key];
             }
-            // =>if '$if'
-            if (key === '$if') {
-                conditionResult = await this._checkCondition(schema.$if);
+            // =>if '__if'
+            if (key === '__if') {
+                conditionResult = await this._checkCondition(schema.__if);
             }
-            // =>if '$then'
-            if (key === '$then') {
+            // =>if '__then'
+            if (key === '__then') {
                 if (conditionResult === true) {
-                    return this._parseSchema(schema.$then);
+                    return this._parseSchema(schema.__then);
                 }
             }
-            // =>if '$else'
-            if (key === '$else') {
+            // =>if '__else'
+            if (key === '__else') {
                 if (conditionResult === false) {
-                    return this._parseSchema(schema.$else);
+                    return this._parseSchema(schema.__else);
                 }
             }
         }
@@ -59,12 +59,12 @@ export class WorkflowCalculatorClass {
     protected async _checkCondition(condition: WorkflowCalculator) {
         let logicType = 'and';
         let conditions: WorkflowCalculator[] = [condition];
-        if (condition.$or) {
+        if (condition.__or) {
             logicType = 'or';
-            conditions = condition.$or;
+            conditions = condition.__or;
         }
-        if (condition.$and) {
-            conditions = condition.$and;
+        if (condition.__and) {
+            conditions = condition.__and;
         }
         let conditionResults: boolean[] = [];
         // =>iterate conditions
@@ -84,13 +84,13 @@ export class WorkflowCalculatorClass {
             let side2 = await this._parseSchema(cond[operator][1]);
             // =>detect operator
             switch (operator) {
-                case '$eq':
+                case '__eq':
                     conditionResults.push(side1 == side2);
                     break;
-                case '$gt':
+                case '__gt':
                     conditionResults.push(side1 > side2);
                     break;
-                case '$lt':
+                case '__lt':
                     conditionResults.push(side1 < side2);
                     break;
                 default:
@@ -131,11 +131,11 @@ export class WorkflowCalculatorClass {
         }
         // =>detect witch function
         switch (name) {
-            case '$add':
+            case '__add':
                 return this._addFunction(paramValues);
-            case '$minus':
+            case '__minus':
                 return this._minusFunction(paramValues);
-            case '$mul':
+            case '__mul':
                 return this._mulFunction(paramValues);
             default:
                 return 0;

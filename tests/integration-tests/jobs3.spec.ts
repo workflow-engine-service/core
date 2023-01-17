@@ -47,16 +47,16 @@ describe('Workflow Jobs (with calc)', () => {
                     {
                         time: {
                             minute: {
-                                $if: {
-                                    $gt: [
-                                        { $field: 'myfield' },
+                                __if: {
+                                    __gt: [
+                                        { __field: 'myfield' },
                                         {
-                                            $const: 10
+                                            __const: 10
                                         }
                                     ]
                                 },
-                                $then: { $field: 'myfield' },
-                                $else: { $const: 10 }
+                                __then: { __field: 'myfield' },
+                                __else: { __const: 10 }
                             },
                         },
                         state_name: 'end'
@@ -140,13 +140,13 @@ describe('Workflow Jobs (with calc)', () => {
         return new Promise((res) => {
             IntegrationHelpers.timeTraveling({ addMinutes: 20 });
             setTimeout(async () => {
-                let worker = await Const.DB.models.workers.find({
+                let worker = await Const.DB.models.workers?.find({
                     type: 'state_job',
                     meta: { $exists: true },
                     "meta.state": 'end',
                 });
                 // console.log(await Const.DB.models.workers.find())
-                expect(worker.length).toEqual(1);
+                expect(worker?.length).toEqual(1);
                 expect(worker[0].response['next_state']).toEqual('end');
                 expect(worker[0].success).toEqual(true);
                 res(true);
@@ -156,9 +156,9 @@ describe('Workflow Jobs (with calc)', () => {
 
     it("check go to 'end' state", async () => {
 
-        let process = await Const.DB.models.processes.findById(sampleProcessId);
+        let process = await Const.DB.models.processes?.findById(sampleProcessId);
         expect(process).not.toBeUndefined();
-        expect(process.current_state).toEqual('end');
+        expect(process?.current_state).toEqual('end');
     });
 
     it("check removed 'start' state jobs", async () => {

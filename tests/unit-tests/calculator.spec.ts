@@ -27,32 +27,32 @@ describe('Workflow Calculator', () => {
     it('test with simple field value multiply', async () => {
         let calc = new WorkflowCalculatorClass(sampleProcess);
         let res = await calc.calc<number>({
-            $mul: [{ $field: "fieldnum" }, { $const: 2 }]
+            __mul: [{ __field: "fieldnum" }, { __const: 2 }]
         });
         expect(res).toEqual(12 * 2);
     });
     it('test with simple condition (equal)', async () => {
         let calc = new WorkflowCalculatorClass(sampleProcess);
         let res = await calc.calc<string>({
-            $if: {
-                $eq: [{ $field: "fieldnum" }, { $const: 5 }]
+            __if: {
+                __eq: [{ __field: "fieldnum" }, { __const: 5 }]
             },
-            $then: { $field: 'field2' },
-            $else: { $const: 'state1' },
+            __then: { __field: 'field2' },
+            __else: { __const: 'state1' },
         });
         expect(res).toEqual('state1');
     });
     it('test with or conditions', async () => {
         let calc = new WorkflowCalculatorClass(sampleProcess);
         let res = await calc.calc<string>({
-            $if: {
-                $or: [
-                    { $eq: [{ $field: "fieldnum" }, { $const: 5 }] },
-                    { $gt: [{ $field: "fieldnum" }, { $const: 5 }] },
+            __if: {
+                __or: [
+                    { __eq: [{ __field: "fieldnum" }, { __const: 5 }] },
+                    { __gt: [{ __field: "fieldnum" }, { __const: 5 }] },
                 ],
             },
-            $then: { $field: 'field2' },
-            $else: { $const: 'state1' },
+            __then: { __field: 'field2' },
+            __else: { __const: 'state1' },
         });
         expect(res).toEqual('state3');
     });
