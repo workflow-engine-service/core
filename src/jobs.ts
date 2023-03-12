@@ -75,16 +75,16 @@ export namespace WorkflowJob {
                     sendParams._state = sendParams._process.workflow.states.find(i => i.name === sendParams._process.current_state);
                     // =>create new worker
                     let workerId = await WebWorkers.addJobWorker(sendParams);
-                    console.log('dbg3', sendParams.__job_state_name, workerId)
-                    dbLog({
-                        name: 'run_job_worker',
-                        namespace: 'job',
-                        mode: LogMode.INFO,
-                        meta: {
-                            workerId,
-                            job,
-                        },
-                    });
+                    // console.log('dbg3', sendParams.__job_state_name, workerId)
+                    // dbLog({
+                    //     name: 'run_job_worker',
+                    //     namespace: 'job',
+                    //     mode: LogMode.INFO,
+                    //     meta: {
+                    //         workerId,
+                    //         job,
+                    //     },
+                    // });
                     // =>update job started_at
                     job.started_at = new Date().getTime();
                 }
@@ -154,14 +154,14 @@ export namespace WorkflowJob {
             }
             newActiveJobs.push(job);
         }
-        dbLog({
-            name: 'remove_active_jobs',
-            namespace: 'job',
-            mode: LogMode.INFO,
-            meta: {
-                activeJobs,
-            },
-        });
+        // dbLog({
+        //     name: 'remove_active_jobs',
+        //     namespace: 'job',
+        //     mode: LogMode.INFO,
+        //     meta: {
+        //         activeJobs,
+        //     },
+        // });
         activeJobs = clone(newActiveJobs);
         // =>save active jobs on db
         setConfig<WorkflowActiveJob[]>('active_jobs', activeJobs);
