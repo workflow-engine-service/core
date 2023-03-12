@@ -49,7 +49,7 @@ export namespace WorkflowJob {
         WorkflowEvents.ProcessStateOnLeave$.subscribe(async it => {
             try {
                 // =>remove old state active jobs
-                await removeActiveJobsByStateName(it.current_state);
+                await removeActiveJobsByStateName(it.current_state, String(it._id));
             } catch (e) {
                 errorLog('err4e3322', e);
             }
@@ -61,28 +61,30 @@ export namespace WorkflowJob {
             try {
                 runningActiveJobsCycle = true;
                 for (const job of activeJobs) {
+                    // console.log('dbg1', job.state_name, job.process_id)
                     // =>check for repeat limit
                     if (job.repeat > 0 && job.current_repeat >= job.repeat) continue;
                     let date = new Date()
                     // =>match job time
-                    if (!await matchJobTime(job, job.started_at)) continue;
+                    if (!(await matchJobTime(job, job.started_at))) continue;
                     job.current_repeat++;
-
+                    // console.log('dbg2', JSON.stringify(job, null, 2))
                     // =>normalize send params
                     let sendParams: WorkflowActiveJobSendParameters = job as any;
                     sendParams._process = await ProcessHelper.findProcessById(job.process_id);
                     sendParams._state = sendParams._process.workflow.states.find(i => i.name === sendParams._process.current_state);
                     // =>create new worker
                     let workerId = await WebWorkers.addJobWorker(sendParams);
-                    // dbLog({
-                    //     name: 'run_job_worker',
-                    //     namespace: 'job',
-                    //     mode: LogMode.INFO,
-                    //     meta: {
-                    //         workerId,
-                    //         job,
-                    //     },
-                    // });
+                    console.log('dbg3', sendParams.__job_state_name, workerId)
+                    dbLog({
+                        name: 'run_job_worker',
+                        namespace: 'job',
+                        mode: LogMode.INFO,
+                        meta: {
+                            workerId,
+                            job,
+                        },
+                    });
                     // =>update job started_at
                     job.started_at = new Date().getTime();
                 }
@@ -144,8 +146,29 @@ export namespace WorkflowJob {
         setConfig<WorkflowActiveJob[]>('active_jobs', activeJobs);
     }
     /****************************** */
-    export async function removeActiveJobsByStateName(stateName: string) {
-        let newActiveJobs = activeJobs.filter(i => i.__job_state_name !== stateName);
+    export async function removeActiveJobsByStateName(stateName: string, processId: string) {
+        let newActiveJobs: WorkflowActiveJob[] = [];
+        for (const job of activeJobs) {
+            if (processId === job.process_id && stateName === job.__job_state_name) {
+                continue;
+            }
+            newActiveJobs.push(job);
+        }
+        dbLog({
+            name: 'remove_active_jobs',
+            namespace: 'job',
+            mode: LogMode.INFO,
+            meta: {
+                activeJobs,
+            },
+        });
+        activeJobs = clone(newActiveJobs);
+        // =>save active jobs on db
+        setConfig<WorkflowActiveJob[]>('active_jobs', activeJobs);
+    }
+    /****************************** */
+    export async function removeActiveJobById(id: string) {
+        let newActiveJobs = activeJobs.filter(i => i._id !== id);
         activeJobs = clone(newActiveJobs);
         // =>save active jobs on db
         setConfig<WorkflowActiveJob[]>('active_jobs', activeJobs);

@@ -14,10 +14,10 @@ export default class IntegrationHelpers {
         await loadConfigs();
 
         // =>reset logs
-        fs.rmSync(Const.CONFIGS.server.logs_path, { recursive: true, force: true });
+        fs.rmSync(Const.CONFIGS.server.logs_path as any, { recursive: true, force: true });
 
-        fs.mkdirSync(Const.CONFIGS.server.logs_path, { recursive: true });
-        fs.mkdirSync(Const.CONFIGS.server.tmp_path, { recursive: true });
+        fs.mkdirSync(Const.CONFIGS.server.logs_path as any, { recursive: true });
+        fs.mkdirSync(Const.CONFIGS.server.tmp_path as any, { recursive: true });
         // =>init mongo db
         await InitDB();
         // =>init webserver
@@ -33,7 +33,7 @@ export default class IntegrationHelpers {
         console.log('clear the database');
     }
 
-    public static timeTraveling(options: { addHours?: number; addMinutes?: number; addSeconds?: number;}) {
+    public static timeTraveling(options: { addHours?: number; addMinutes?: number; addSeconds?: number; }) {
         const DATE_TO_USE = new Date();
         if (options.addHours) {
             DATE_TO_USE.setHours(DATE_TO_USE.getHours() + options.addHours);

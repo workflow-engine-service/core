@@ -22,6 +22,7 @@ export interface ServerConfigs {
         logs_path?: string;
         uploads_path?: string;
         debug_mode?: boolean;
+        debug_level?: number;
         tmp_path?: string;
         ssl?: {
             privateKeyPath: string;
