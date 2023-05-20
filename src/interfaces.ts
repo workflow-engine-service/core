@@ -338,6 +338,10 @@ export interface WorkflowStateJob {
      * next state to will go after time seen
      */
     state_name?: string;
+    /**
+     * set last calculated job run timestamp (in matchJobTime)
+     */
+    _last_job_dateTime?: number;
 }
 
 export interface WorkflowStateJobResponse {

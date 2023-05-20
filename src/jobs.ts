@@ -178,8 +178,12 @@ export namespace WorkflowJob {
         // =>normalize job time
         let jobTimeDate = calculateJobTime(job, startedAt);
         let nowDate = new Date();
-
+        // =>check if same as last date time
+        if (job._last_job_dateTime && Math.abs(job._last_job_dateTime - jobTimeDate.getTime()) <= 500) {
+            return false;
+        }
         if (nowDate.getTime() >= jobTimeDate.getTime()) {
+            job._last_job_dateTime = jobTimeDate.getTime();
             return true;
         }
 

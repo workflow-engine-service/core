@@ -125,7 +125,7 @@ export namespace ProcessHelper {
                     dbLog({
                         namespace: 'action', name: 'error_on_hook_response', 'meta': {
                             msg: error.message,
-                            res_data: String(error.response.data),
+                            res_data: String(error.response?.data),
                             code: error.code,
                         }
                     });
