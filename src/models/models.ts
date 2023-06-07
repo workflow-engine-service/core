@@ -107,6 +107,7 @@ export interface WorkerModel<R = {}> {
 export interface ConfigModel {
     _id?: string;
     name: ConfigName;
+    second_name?: string;
     value?: string | number | object;
     type?: 'string' | 'number' | 'json';
     updated_at?: number;

@@ -73,4 +73,4 @@ export type HookMethodType = 'post' | 'put' | 'get' | 'delete';
 
 export type HttpResponse = [string, HttpStatusCode, string];
 
-export type ConfigName = 'active_jobs';
+export type ConfigName = /*'active_jobs' |*/ 'active_process_jobs';

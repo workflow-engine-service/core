@@ -4,7 +4,7 @@ import { clone, dbLog, errorLog, infoLog } from "./common";
 import { Const } from "./const";
 import { WorkflowEvents } from "./events";
 import { WorkflowActiveJob, WorkflowActiveJobSendParameters, WorkflowStateJob } from "./interfaces";
-import { getConfig, setConfig } from "./models/configs";
+import { getConfig, getConfigs, setConfig } from "./models/configs";
 import { LogMode } from "./types";
 import { WebWorkers } from "./workers";
 
@@ -14,16 +14,21 @@ export namespace WorkflowJob {
     export async function start() {
         // =>if active job empty, restore it
         if (activeJobs.length === 0) {
-            activeJobs = await getConfig<WorkflowActiveJob[]>('active_jobs', []);
-            infoLog('job', `restored '${activeJobs.length}' active jobs`);
-            dbLog({
-                name: 'restore_active_jobs',
-                namespace: 'job',
-                mode: LogMode.INFO,
-                meta: {
-                    jobs_length: activeJobs.length,
-                },
-            });
+            try {
+                // activeJobs = await getConfigs<WorkflowActiveJob>('active_process_job');
+                activeJobs = await loadActiveJobsFromDB();
+                infoLog('job', `restored '${activeJobs.length}' active jobs`);
+                dbLog({
+                    name: 'restore_active_jobs',
+                    namespace: 'job',
+                    mode: LogMode.INFO,
+                    meta: {
+                        jobs_length: activeJobs.length,
+                    },
+                });
+            } catch (e) {
+                errorLog('err4e5323443221', e);
+            }
         }
         // =>listen on every process state onInit
         WorkflowEvents.ProcessStateOnInit$.subscribe(async it => {
@@ -97,6 +102,7 @@ export namespace WorkflowJob {
     }
     /****************************** */
     export async function addActiveJobs(jobs: WorkflowActiveJob[]) {
+        let addedJobsProcessIds: string[] = [];
         for (const job of jobs) {
             if (!job._id) {
                 errorLog('err43322', `job no have any _id: ${JSON.stringify(job)}`);
@@ -140,10 +146,16 @@ export namespace WorkflowJob {
             }
             // =>Add job to active
             activeJobs.push(job);
+            if (!addedJobsProcessIds.indexOf(job.process_id)) {
+                addedJobsProcessIds.push(job.process_id);
+            }
             // console.log('add job:', job)
         }
         // =>save active jobs on db
-        setConfig<WorkflowActiveJob[]>('active_jobs', activeJobs);
+        for (const pid of addedJobsProcessIds) {
+            updateActiveJobsInDB(pid, 'add');
+        }
+        // setConfig<WorkflowActiveJob[]>('active_jobs', activeJobs);
     }
     /****************************** */
     export async function removeActiveJobsByStateName(stateName: string, processId: string) {
@@ -164,14 +176,18 @@ export namespace WorkflowJob {
         // });
         activeJobs = clone(newActiveJobs);
         // =>save active jobs on db
-        setConfig<WorkflowActiveJob[]>('active_jobs', activeJobs);
+        updateActiveJobsInDB(processId, 'remove');
+        // setConfig<WorkflowActiveJob[]>('active_jobs', activeJobs);
     }
     /****************************** */
     export async function removeActiveJobById(id: string) {
+        const removeJob = activeJobs.find(i => i._id === id);
+        if (!removeJob) return;
         let newActiveJobs = activeJobs.filter(i => i._id !== id);
         activeJobs = clone(newActiveJobs);
         // =>save active jobs on db
-        setConfig<WorkflowActiveJob[]>('active_jobs', activeJobs);
+        updateActiveJobsInDB(removeJob.process_id, 'remove');
+        // setConfig<WorkflowActiveJob[]>('active_jobs', activeJobs);
     }
     /****************************** */
     async function matchJobTime(job: WorkflowStateJob, startedAt: number): Promise<boolean> {
@@ -189,6 +205,31 @@ export namespace WorkflowJob {
 
 
         return false;
+    }
+
+    /****************************** */
+    export function getActiveJobs() {
+        return activeJobs;
+    }
+    /****************************** */
+    /****************************** */
+    /****************************** */
+    async function loadActiveJobsFromDB() {
+        let activeJobs: WorkflowActiveJob[] = [];
+        const allProcessesJobs = await Const.DB?.models?.configs.find({ name: 'active_process_jobs' });
+        for (const pjobs of allProcessesJobs) {
+            if (typeof pjobs.value === 'string') {
+                pjobs.value = JSON.parse(pjobs.value);
+            }
+            activeJobs.push(...pjobs.value as any);
+        }
+        return activeJobs;
+    }
+    /****************************** */
+    async function updateActiveJobsInDB(processId: string, mode: 'add' | 'remove' = 'add') {
+        // =>filter process active jobs
+        const processActiveJobs = activeJobs.filter(i => i.process_id == processId);
+        return await setConfig('active_process_jobs', processActiveJobs, processId);
     }
     /****************************** */
     function calculateJobTime(job: WorkflowStateJob, startedAt: number): Date {
@@ -216,9 +257,5 @@ export namespace WorkflowJob {
         }
 
         return jobTimeDate;
-    }
-    /****************************** */
-    export function getActiveJobs() {
-        return activeJobs;
     }
 }
