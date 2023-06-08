@@ -4,7 +4,7 @@ import { clone, dbLog, errorLog, infoLog } from "./common";
 import { Const } from "./const";
 import { WorkflowEvents } from "./events";
 import { WorkflowActiveJob, WorkflowActiveJobSendParameters, WorkflowStateJob } from "./interfaces";
-import { getConfig, getConfigs, setConfig } from "./models/configs";
+import { getConfig, getConfigs, removeConfig, setConfig } from "./models/configs";
 import { LogMode } from "./types";
 import { WebWorkers } from "./workers";
 
@@ -146,7 +146,7 @@ export namespace WorkflowJob {
             }
             // =>Add job to active
             activeJobs.push(job);
-            if (!addedJobsProcessIds.indexOf(job.process_id)) {
+            if (!addedJobsProcessIds.includes(job.process_id)) {
                 addedJobsProcessIds.push(job.process_id);
             }
             // console.log('add job:', job)
@@ -229,7 +229,13 @@ export namespace WorkflowJob {
     async function updateActiveJobsInDB(processId: string, mode: 'add' | 'remove' = 'add') {
         // =>filter process active jobs
         const processActiveJobs = activeJobs.filter(i => i.process_id == processId);
-        return await setConfig('active_process_jobs', processActiveJobs, processId);
+        if (processActiveJobs.length === 0) {
+            await removeConfig('active_process_jobs', processId);
+        } else {
+            await setConfig('active_process_jobs', processActiveJobs, processId);
+        }
+
+        return processActiveJobs;
     }
     /****************************** */
     function calculateJobTime(job: WorkflowStateJob, startedAt: number): Date {

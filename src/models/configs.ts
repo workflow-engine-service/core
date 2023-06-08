@@ -56,6 +56,13 @@ export async function setConfig<T = string>(name: ConfigName, value: T, second_n
     return configDB;
 }
 
+export async function removeConfig(name: ConfigName, second_name?: string) {
+    if (second_name) {
+        return await Const.DB?.models?.configs.deleteMany({ name, second_name });
+    }
+    return await Const.DB?.models?.configs.deleteMany({ name });
+}
+
 export async function getConfig<T = string>(name: ConfigName, def?: T): Promise<T> {
     // =>find by name
     const conf = await Const.DB?.models?.configs.findOne({ name });
