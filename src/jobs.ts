@@ -60,7 +60,7 @@ export namespace WorkflowJob {
             }
         });
 
-        // =>iterate active jobs, on every 500 ms
+        // =>iterate active jobs, on every 2s
         setInterval(async () => {
             if (runningActiveJobsCycle) return;
             try {
@@ -69,7 +69,6 @@ export namespace WorkflowJob {
                     // console.log('dbg1', job.state_name, job.process_id)
                     // =>check for repeat limit
                     if (job.repeat > 0 && job.current_repeat >= job.repeat) continue;
-                    let date = new Date()
                     // =>match job time
                     if (!(await matchJobTime(job, job.started_at))) continue;
                     job.current_repeat++;
@@ -98,7 +97,7 @@ export namespace WorkflowJob {
             }
             runningActiveJobsCycle = false;
 
-        }, 500);
+        }, 2 * 1000);
     }
     /****************************** */
     export async function addActiveJobs(jobs: WorkflowActiveJob[]) {

@@ -140,7 +140,7 @@ export namespace Auth {
                 let res: AxiosResponse;
                 try {
                     res = await axios({
-                        httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+                        httpsAgent: Const.CONFIGS.auth_user.url.startsWith('https') ? new https.Agent({ rejectUnauthorized: false }) : undefined,
                         method: Const.CONFIGS.auth_user.method,
                         url: Const.CONFIGS.auth_user.url,
                         headers,
