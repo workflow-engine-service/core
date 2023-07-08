@@ -1,4 +1,4 @@
-import { clone, dbLog, debugLog, errorLog, generateString, setTimingProfile } from "./common";
+import { clone, dbLog, debugLog, errorLog, generateString, infoLog, setTimingProfile } from "./common";
 import { WorkerStruct, WorkflowActiveJob, WorkflowActiveJobSendParameters, WorkflowCreateProcessSendParameters, WorkflowProcessJob, WorkflowProcessResponse, WorkflowStateActionResponse, WorkflowStateActionSendParameters, WorkflowStateJobResponse } from "./interfaces";
 import { Subject } from "rxjs";
 import { ProcessHelper } from "./apis/processHelper";
@@ -93,7 +93,7 @@ export namespace WebWorkers {
                 state: params.state_name,
                 action: params.state_action_name,
             },
-            priority: 2,
+            priority: 3,
             started_by: params.user_id,
         });
 
@@ -167,18 +167,21 @@ export namespace WebWorkers {
                 state: params.state_name,
                 // action: params.state_action_name,
             },
-            priority: 3,
+            priority: 1,
             started_by: 0,
         });
         return workerId;
     }
     /******************************** */
     export async function addProcessWorker(params: WorkflowCreateProcessSendParameters, request: CoreRequest): Promise<string> {
+        let startTimeWorker = new Date().getTime();
+
         // =>generate worker id
         let workerId = await addWorker<WorkflowProcessResponse>({
             type: 'process',
             doAction: async () => {
                 try {
+                    request?.setTiming('process_start_worker', startTimeWorker);
                     let startTime = new Date().getTime();
                     let responseFromProcess: WorkflowProcessResponse = {};
                     // =>normalize jobs
@@ -269,6 +272,11 @@ export namespace WebWorkers {
         }
         // dbLog({ namespace: 'worker', name: 'add_worker', meta: { struct }, user_id: struct.started_by });
         workers.push(struct);
+
+        // =>sort workers by them priority
+        workers = workers.sort((a, b) => Number(a.priority) >= Number(b.priority) ? -1 : 1);
+
+
         return struct._id;
     }
     /******************************** */
@@ -301,11 +309,13 @@ export namespace WebWorkers {
             if (workerRunning >= maxWorkerRunning) {
                 return;
             }
+            // =>get top priority worker
             let worker = workers.shift();
             workerRunning++;
             worker.started_at = new Date().getTime();
             // =>update  worker
             await updateWorker(worker);
+            // infoLog('dddd', `${worker.type}, ${worker.started_at}, ${workerRunning}/${workers.length}`)
             debugLog('worker', `start '${worker._id}' worker ...`);
             //TODO:multithreading
             // if (isMainThread) {
