@@ -80,7 +80,7 @@ export class PublicPostApi extends BaseApi {
                 created_by: createdByUserId,
                 process_id: undefined,
                 user_id: this.request.user().id,
-            });
+            }, this.request);
             this.request.setTiming('create_process_worker', startTime);
             startTime = new Date().getTime();
 

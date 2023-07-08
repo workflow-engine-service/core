@@ -328,9 +328,16 @@ export async function importFile(filePath: string) {
     return await import(filePath);
 }
 /***************************************** */
-export function setTimingProfile(req: Request, key: string, startTime: number) {
+export function setTimingProfile(req: Request, key: string, startTime: number, increaseTime = false) {
     if (!Const.CONFIGS.server?.timing_profile_enabled) return 0;
-    const diff = new Date().getTime() - startTime;
-    this.req[Const.RequestTimingProfileKey][key] = diff;
+    let diff = new Date().getTime() - startTime;
+    if (!req[Const.RequestTimingProfileKey]) {
+        req[Const.RequestTimingProfileKey] = {};
+    }
+    // =>increase time
+    if (increaseTime && typeof req[Const.RequestTimingProfileKey][key] === 'number' && req[Const.RequestTimingProfileKey][key] > 0) {
+        diff += req[Const.RequestTimingProfileKey][key];
+    }
+    req[Const.RequestTimingProfileKey][key] = diff;
     return diff;
 }

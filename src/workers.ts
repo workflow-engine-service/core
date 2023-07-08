@@ -1,4 +1,4 @@
-import { clone, dbLog, debugLog, errorLog, generateString } from "./common";
+import { clone, dbLog, debugLog, errorLog, generateString, setTimingProfile } from "./common";
 import { WorkerStruct, WorkflowActiveJob, WorkflowActiveJobSendParameters, WorkflowCreateProcessSendParameters, WorkflowProcessJob, WorkflowProcessResponse, WorkflowStateActionResponse, WorkflowStateActionSendParameters, WorkflowStateJobResponse } from "./interfaces";
 import { Subject } from "rxjs";
 import { ProcessHelper } from "./apis/processHelper";
@@ -7,6 +7,7 @@ import { WorkerModel, WorkflowProcessModel } from "./models/models";
 import { isMainThread, Worker } from 'worker_threads';
 import { WorkflowEvents } from "./events";
 import { LogMode } from "./types";
+import { CoreRequest } from "./apis/request";
 
 export namespace WebWorkers {
     let workers: WorkerStruct[] = [];
@@ -172,12 +173,13 @@ export namespace WebWorkers {
         return workerId;
     }
     /******************************** */
-    export async function addProcessWorker(params: WorkflowCreateProcessSendParameters): Promise<string> {
+    export async function addProcessWorker(params: WorkflowCreateProcessSendParameters, request: CoreRequest): Promise<string> {
         // =>generate worker id
         let workerId = await addWorker<WorkflowProcessResponse>({
             type: 'process',
             doAction: async () => {
                 try {
+                    let startTime = new Date().getTime();
                     let responseFromProcess: WorkflowProcessResponse = {};
                     // =>normalize jobs
                     let processJobs: WorkflowProcessJob[] = [];
@@ -202,7 +204,7 @@ export namespace WebWorkers {
                         process: res,
                     };
                     params.process_id = res._id;
-
+                    request?.setTiming('create_process_db', startTime);
                     // =>emit event
                     WorkflowEvents.ProcessCreate$.next({
                         process: res,
@@ -248,6 +250,7 @@ export namespace WebWorkers {
             },
             priority: 5,
             started_by: params.created_by,
+            request: request?.req,
         });
         return workerId;
     }
@@ -261,6 +264,9 @@ export namespace WebWorkers {
         let worker = await Const.DB.models.workers.create(struct);
         struct._id = worker._id;
         debugLog('worker', `added a new worker by id '${struct._id}' by type '${struct.type}'`);
+        if (struct.request) {
+            setTimingProfile(struct.request, 'add_worker_db', struct.init_at, true);
+        }
         // dbLog({ namespace: 'worker', name: 'add_worker', meta: { struct }, user_id: struct.started_by });
         workers.push(struct);
         return struct._id;

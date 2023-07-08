@@ -1,3 +1,4 @@
+import { Request } from "express";
 import { SwaggerApiParameter, SwaggerApiResponse } from "./document/interfaces";
 import { WorkerModel, WorkflowProcessModel } from "./models/models";
 import { HookMethodType, HttpStatusCode, MiddlewareName, RequestMethodType, SwaggerTagName, WorkflowFieldDataType, WorkflowStateActionType, WorkflowStateEventName } from "./types";
@@ -547,6 +548,7 @@ export interface WorkerStruct<R = {}> extends WorkerModel<R> {
     doAction: () => Promise<[boolean, R]>;
     successResult: (response: R) => Promise<object>;
     failedResult: (response: R) => Promise<object>;
+    request?: Request;
 }
 
 export interface WorkflowProcessOnInit {
