@@ -9,7 +9,7 @@ export class CoreRequest {
    method: RequestMethodType = 'GET';
    params: object;
    startResponseTime: number;
-
+   protected timingProfile = {};
    /************************************* */
    constructor(req: Request, res: Response) {
       this.req = req;
@@ -86,5 +86,26 @@ export class CoreRequest {
    clientIp(): string {
       return this.req.ip || JSON.stringify(this.req.ips);
    }
+   /************************************* */
+   /**
+    * 
+    * @param key 
+    * @param startTime as ms
+    */
+   setTiming(key: string, startTime: number) {
+      if (!Const.CONFIGS.server?.timing_profile_enabled) return 0;
+      const diff = new Date().getTime() - startTime;
 
+      this.timingProfile[key] = diff;
+      return diff;
+   }
+   /************************************* */
+   collectTimings() {
+      if (this.req[Const.RequestTimingProfileKey] && typeof this.req[Const.RequestTimingProfileKey] === 'object') {
+         for (const key of Object.keys(this.req[Const.RequestTimingProfileKey])) {
+            this.timingProfile[key] = this.req[Const.RequestTimingProfileKey][key];
+         }
+      }
+      return this.timingProfile;
+   }
 }

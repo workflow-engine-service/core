@@ -38,7 +38,8 @@ export namespace Swagger {
     /********************** */
     async function generate() {
         let swaggerSchemes = ['http'];
-        if (Const.CONFIGS.server?.swagger_hostname?.startsWith('https://')) {
+        let swaggerUrl = new URL(Const.CONFIGS.server?.swagger_hostname);
+        if (swaggerUrl.protocol.startsWith('https')) {
             swaggerSchemes.unshift('https');
         }
         let swagger = {
@@ -61,7 +62,7 @@ export namespace Swagger {
             //         },
             //     },
             // ],
-            host: Const.CONFIGS.server.swagger_hostname,
+            host: swaggerUrl.host,
             basePath: '/api/v1/',
             tags: [],
             paths: {},

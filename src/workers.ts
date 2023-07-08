@@ -202,6 +202,7 @@ export namespace WebWorkers {
                         process: res,
                     };
                     params.process_id = res._id;
+
                     // =>emit event
                     WorkflowEvents.ProcessCreate$.next({
                         process: res,

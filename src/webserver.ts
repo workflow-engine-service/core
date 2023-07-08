@@ -26,6 +26,7 @@ export namespace WebServer {
             }
             var cors = require('cors');
             app.use(cors(corsOptions));
+            app.disable('x-powered-by');
             await loadMiddlewares();
             WebRoutes.routes(app);
             // =>start workers service

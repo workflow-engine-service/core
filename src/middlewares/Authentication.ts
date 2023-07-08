@@ -2,7 +2,7 @@ import { HttpStatusCode } from './../types';
 import { Request, Response } from "express";
 import { Middleware } from './middleware';
 import { Const } from '../const';
-import { errorLog } from '../common';
+import { errorLog, setTimingProfile } from '../common';
 import { UserModel } from '../models/models';
 import { Auth } from '../auth';
 import { WebRoutes } from '../routes';
@@ -13,8 +13,10 @@ export function middleware() {
 }
 
 export class Authentication extends Middleware {
+   req: Request;
 
    async handle(req: Request, res: Response) {
+      this.req = req;
       // =>check if root url
       if (req.path == '/') return true;
       // =>check for exclude urls
@@ -64,11 +66,13 @@ export class Authentication extends Middleware {
    }
    /***************************************** */
    async getUserBySessionToken(authToken: string): Promise<UserModel | 'expired' | 'invalid'> {
+      let startTime = new Date().getTime();
       // =>check if directly method
       if (Const.CONFIGS.auth_user.type === 'directly' || Const.CONFIGS.auth_user.type === 'dual') {
          let res = await Auth.getUserByDirectlyToken(authToken);
          // console.log(res)
          if (res !== 'invalid') {
+            setTimingProfile(this.req, 'direct_auth_user', startTime);
             return res;
          }
       }
@@ -76,6 +80,7 @@ export class Authentication extends Middleware {
       if (Const.CONFIGS.auth_user.type === 'api_based' || Const.CONFIGS.auth_user.type === 'dual') {
          let res = await Auth.getUserByApiToken(authToken);
          if (res !== 'invalid') {
+            setTimingProfile(this.req, 'api_auth_user', startTime);
             return res;
          }
       }

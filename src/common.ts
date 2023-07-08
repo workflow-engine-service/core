@@ -4,6 +4,7 @@ import * as os from "os";
 import { Const } from "./const";
 import { MongoDB } from "./mongo";
 import { LogMode, WorkflowNamespace } from "./types";
+import { Request } from "express";
 /***************************************** */
 export async function InitDB() {
     infoLog('db', 'init mongodb ...');
@@ -325,4 +326,11 @@ export async function importFile(filePath: string) {
         return undefined;
     }
     return await import(filePath);
-} 
+}
+/***************************************** */
+export function setTimingProfile(req: Request, key: string, startTime: number) {
+    if (!Const.CONFIGS.server?.timing_profile_enabled) return 0;
+    const diff = new Date().getTime() - startTime;
+    this.req[Const.RequestTimingProfileKey][key] = diff;
+    return diff;
+}

@@ -1,6 +1,6 @@
 import { DeployedWorkflowModel, WorkflowProcessModel } from "../../models/models";
 import { Auth } from "../../auth";
-import { dbLog, debugLog, errorLog, generateString, infoLog } from "../../common";
+import { dbLog, debugLog, errorLog, generateString, infoLog, setTimingProfile } from "../../common";
 import { Const } from "../../const";
 import { HttpStatusCode } from "../../types";
 import { BaseApi } from "../base";
@@ -45,12 +45,14 @@ export class PublicPostApi extends BaseApi {
     /********************************** */
     async createProcess() {
         try {
+            let startTime = new Date().getTime();
             // =>get params
             let name = this.param('name');
             let version = this.paramNumber('version');
             let workflow = await this.getDeployedWorkflow(name, version);
             let ownerId = this.paramNumber('owner_id');
-
+            this.request.setTiming('fetch_deployed_workflow', startTime);
+            startTime = new Date().getTime();
             let createdByUserId = this.request.user().id;
             if (ownerId && this.isAdmin()) {
                 // =>check exist such user
@@ -79,12 +81,16 @@ export class PublicPostApi extends BaseApi {
                 process_id: undefined,
                 user_id: this.request.user().id,
             });
+            this.request.setTiming('create_process_worker', startTime);
+            startTime = new Date().getTime();
 
             return new Promise((resolve) => {
                 // =>listen on process create event
                 let processCreateEvent = WorkflowEvents.ProcessCreate$.subscribe(it => {
                     // =>if this  worker
                     if (it.worker_id !== workerId) return;
+                    this.request.setTiming('complete_process_worker', startTime);
+
                     let newProcess = this.truncateProcessInfo(it.process);
                     resolve(this.response(newProcess));
                     processCreateEvent.unsubscribe();

@@ -97,6 +97,10 @@ export class BaseApi {
         if (applyObjects) {
             resp = { ...resp, ...applyObjects };
         }
+        // =>if timing profile
+        if (Const.CONFIGS.server?.timing_profile_enabled) {
+            resp['timing_profile'] = this.request.collectTimings();
+        }
         // =>check for success response
         if (code >= 200 && code < 300) {
             resp.success = true;

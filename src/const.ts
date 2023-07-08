@@ -5,7 +5,7 @@ import { MiddlewareName } from "./types";
 
 export namespace Const {
 
-    export const VERSION = '0.120';
+    export const VERSION = '0.121';
 
     export let SERVER_MODE: 'dev' | 'prod' | 'test' = 'dev';
 
@@ -14,6 +14,8 @@ export namespace Const {
     export let DB: MongoDB;
 
     export let AuthenticateUserKey = '_.wf._auth_user_';
+
+    export let RequestTimingProfileKey = '_wf_timing_';
 
     export let CoreRequestKey = '_.wf.core_request';
 

@@ -63,6 +63,8 @@ export interface ServerConfigs {
          * @default 10
          */
         max_worker_running?: number;
+
+        timing_profile_enabled?: boolean;
         /**
          * auto fill by system
          */
